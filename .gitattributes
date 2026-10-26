@@ -5,3 +5,4 @@
 *.pdf binary
 *.pptx binary
 *.docx binary
+web/vendor/** -diff linguist-vendored
