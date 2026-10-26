@@ -283,6 +283,8 @@ body[data-view="study"] #view-study { max-width: 1500px; }
 
 .card-meta { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.1rem; font-size: .82rem; }
 .deck-tag { color: var(--muted); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Like on the exam, the question gives no hint which lecture it is from. */
+.card:not(.flipped) .deck-tag { visibility: hidden; }
 .level-badge { padding: .15em .7em; border-radius: 99px; font-weight: 600; white-space: nowrap; }
 .level-badge.new { background: var(--new-weak); color: var(--muted); }
 .level-badge.not { background: var(--not-weak); color: var(--not); }
