@@ -1,0 +1,582 @@
+{
+  "id": "lecture-07",
+  "name": "L7 · Neural Networks & Deep Learning",
+  "description": "Neurons, activation functions, perceptron, gradient descent, backprop, CNN/RNN/GAN, history",
+  "group": "Lectures",
+  "order": 7,
+  "cards": [
+    {
+      "id": "l7-001",
+      "front": "What is an artificial neural network (ANN)?",
+      "back": "An ANN is a **pool of simple processing units (neurons)** that communicate by sending signals to each other over a large number of **weighted connections**.\n\n- A **mathematical model** that tries to simulate the structure and function of **biological neural networks** in the brain.\n- Its basic building block is the **artificial neuron** – a simple mathematical function.\n- Learning = adjusting the weights so the network maps inputs to the right outputs.\n\n*Example:* every pixel of an image is an input feature; the network learns to output \"this is the nose of a cat\".",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 9
+        },
+        {
+          "doc": "L7",
+          "page": 4
+        }
+      ]
+    },
+    {
+      "id": "l7-002",
+      "front": "Compare a biological neuron with an artificial neuron.",
+      "back": "**Biological neuron**\n- The brain has ~**100 billion neurons** and ~1000 trillion synaptic connections.\n- Receives signals through dendrites; if sufficiently **excited**, it fires electrical pulses (**spikes**) along its axon to connected neurons. The frequency and phase of spikes encode the information.\n\n**Artificial neuron**\n- **Inputs** x₁…xₙ (≈ dendrites) with **weights** w₁…wₙ (≈ synapse strengths)\n- **Summation** Σ wᵢxᵢ (≈ the cell body)\n- **Activation function** f decides the output (≈ firing or not)\n- **Exactly one output** (≈ the axon), which can go to many other neurons",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 10
+        },
+        {
+          "doc": "L7",
+          "page": 11
+        },
+        {
+          "doc": "L7",
+          "page": 12
+        }
+      ]
+    },
+    {
+      "id": "l7-003",
+      "front": "How does an artificial neuron compute its output?",
+      "back": "1. **Inputs are weighted** – not all inputs are equally important: each xᵢ is multiplied by its weight wᵢ.\n2. **Sum** them (plus a bias b): **v = Σ xᵢwᵢ + b**\n3. **Activation (transfer) function**: the sum isn't passed on as it is – **y = f(v)**\n\nSo the output depends on the **inputs, the weights and the activation function**.\n\n*Example:* x = (2, 1), w = (0.5, −1), b = 0.2 → v = 1 − 1 + 0.2 = 0.2 → with a step function, y = 1.",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 13
+        },
+        {
+          "doc": "L7",
+          "page": 14
+        },
+        {
+          "doc": "L7",
+          "page": 15
+        },
+        {
+          "doc": "L7",
+          "page": 16
+        }
+      ]
+    },
+    {
+      "id": "l7-004",
+      "front": "Why are activation functions used? What are hard-limit and soft-limit activation functions?",
+      "back": "An activation function **converts a neuron's input signal into its output signal**.\n\n- It keeps values **bounded** – the weighted sum alone is unbounded and could grow huge through the layers.\n- It helps the network keep useful information and reduce the effect of noise.\n- It adds **non-linearity** – without it, a stack of layers is still just one linear function.\n\n**Hard-limit** functions jump between two values: **step** (0 or 1) and **sign** (−1 or +1).\n**Soft-limit** functions change gradually: **linear** and **sigmoid**.",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 17
+        }
+      ]
+    },
+    {
+      "id": "l7-005",
+      "front": "Give the step, sign, sigmoid and linear activation functions, and compute each for x = 5.",
+      "back": "| Function | Formula | y for x = 5 |\n|---|---|---|\n| **Step** | 1 if x ≥ 0, else 0 | **1** |\n| **Sign** | +1 if x ≥ 0, else −1 | **+1** |\n| **Sigmoid** | 1 / (1 + e⁻ˣ) | 1 / (1 + e⁻⁵) = **0.9933** |\n| **Linear** | x | **5** |\n\nFor x = −2: step → 0, sign → −1, sigmoid → 1/(1 + e²) ≈ 0.119, linear → −2.",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 18
+        }
+      ]
+    },
+    {
+      "id": "l7-006",
+      "front": "How do you choose activation functions for hidden and output layers?",
+      "back": "**Hidden layers**\n- Rule of thumb: start with **ReLU** – f(x) = max(0, x); try others if it doesn't work well.\n- Avoid **sigmoid / tanh** in (deep) hidden layers – they cause **vanishing gradients**.\n- **Swish** for very deep networks (> 40 layers).\n- CNNs: ReLU. RNNs: tanh and/or sigmoid.\n\n**Output layer (depends on the task)**\n- **Regression** → linear\n- **Binary classification** → sigmoid (one probability)\n- **Multi-class classification** → **softmax** (probabilities that sum to 1)\n- **Multi-label classification** → sigmoid per label\n\n**Why derivatives matter:** training uses the **slope** of the activation function to know in which direction and how much to update the weights, so it must be differentiable (almost everywhere).",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 19
+        },
+        {
+          "doc": "L7",
+          "page": 20
+        }
+      ]
+    },
+    {
+      "id": "l7-007",
+      "front": "What is a perceptron, and what can and can't it learn?",
+      "back": "A **perceptron** is a **single artificial neuron** with a threshold (step) activation:\ny = 1 if w₁x₁ + w₂x₂ + … + θ ≥ 0, else 0\n\n- Its decision boundary **w₁x₁ + w₂x₂ + θ = 0 is a straight line** (a hyperplane in higher dimensions).\n- With 0 hidden layers you get a **linear model** (a perceptron ≈ logistic regression).\n- It can only classify **linearly separable** problems (AND, OR).\n- It **fails on XOR**, which needs two lines – i.e. more than one perceptron / a hidden layer.\n\nWith **at least one hidden layer** the network can learn **non-linear** decision boundaries.",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 21
+        },
+        {
+          "doc": "L7",
+          "page": 22
+        }
+      ]
+    },
+    {
+      "id": "l7-008",
+      "front": "Draw an artificial neural network with a single perceptron, 4 inputs and 1 output.",
+      "back": "```\n x1 ──w1──╮\n x2 ──w2──┤\n          ├──▶ ( Σ  wᵢxᵢ + b ) ──▶ [ f ] ──▶ y\n x3 ──w3──┤        ▲\n x4 ──w4──╯        │\n              bias b (x0 = +1, weight w0)\n```\n\nLabel the parts:\n- **Inputs** x₁, x₂, x₃, x₄\n- **Weights** w₁…w₄ on the connections (plus the bias b)\n- **Summation unit**: v = w₁x₁ + w₂x₂ + w₃x₃ + w₄x₄ + b\n- **Activation function** f (e.g. step or sigmoid)\n- **One output** y = f(v)\n\nThere is no hidden layer: the inputs connect directly to the single output neuron.",
+      "sources": [
+        {
+          "doc": "EXQ",
+          "page": 3,
+          "note": "Question 6b"
+        },
+        {
+          "doc": "L7",
+          "page": 21
+        },
+        {
+          "doc": "L7",
+          "page": 65
+        }
+      ]
+    },
+    {
+      "id": "l7-009",
+      "front": "A perceptron has inputs x = (1, 0, 1, 1), weights w = (0.5, −0.3, 0.8, 0.2), bias −0.6 and a step activation. What does it output?",
+      "back": "v = 0.5·1 + (−0.3)·0 + 0.8·1 + 0.2·1 + (−0.6)\n= 0.5 + 0 + 0.8 + 0.2 − 0.6 = **0.9**\n\nStep function: v ≥ 0 → **y = 1**\n\nWith a sigmoid instead: y = 1 / (1 + e⁻⁰·⁹) ≈ **0.711**.",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 15
+        },
+        {
+          "doc": "L7",
+          "page": 18
+        }
+      ]
+    },
+    {
+      "id": "l7-010",
+      "front": "How does a perceptron learn? Give the learning rule and one update step.",
+      "back": "Rosenblatt's perceptron learns by **adjusting the weight of each input** whenever it makes a mistake:\n\n**wᵢ ← wᵢ + η · (t − y) · xᵢ**    (and b ← b + η · (t − y))\n\nη = learning rate, t = target output, y = actual output. If y = t, nothing changes.\n\n*Example:* w = (0.2, −0.1), b = 0, η = 0.1, input x = (1, 0), target t = 0.\n- v = 0.2 → step → y = 1 (wrong, error t − y = −1)\n- w₁ ← 0.2 + 0.1·(−1)·1 = **0.1**, w₂ unchanged (x₂ = 0), b ← 0 + 0.1·(−1) = **−0.1**\n- Now v = 0.1 − 0.1 = 0 – closer to the right answer; repeat over all examples until no errors.\n\nIt only converges if the data is **linearly separable**.",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 65
+        }
+      ]
+    },
+    {
+      "id": "l7-011",
+      "front": "What is gradient descent? Give the update rule.",
+      "back": "**Gradient descent** is an iterative algorithm that **minimizes a function** (e.g. the cost/error E(θ) of a model).\n\nRepeat until convergence:\n**θ ← θ − α · ∇E(θ)**\n\n- **∇E(θ)** – the gradient: the vector of partial derivatives ∂E/∂θⱼ for each parameter. It points uphill.\n- **α (learning rate)** > 0 – the step size.\n- Moving in the **negative** gradient direction goes downhill, towards a minimum.\n\nFor one variable: x ← x − lr · f'(x).",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 23
+        },
+        {
+          "doc": "L7",
+          "page": 28
+        }
+      ]
+    },
+    {
+      "id": "l7-012",
+      "front": "Minimize f(x) = x² with gradient descent, learning rate 0.1, starting at x = 11. Do the first iterations.",
+      "back": "f'(x) = 2x, so the update is **x ← x − 0.1 · 2x = 0.8x**\n\n| Iteration | x | f(x) = x² |\n|---|---|---|\n| 0 | 11 | 121 |\n| 1 | 11 − 0.1·22 = **8.8** | 77.44 |\n| 2 | 8.8 − 0.1·17.6 = **7.04** | 49.56 |\n| 3 | 7.04 − 0.1·14.08 = **5.632** | 31.72 |\n| 4 | 5.632 − 0.1·11.264 = **4.506** | 20.30 |\n| … | … | … |\n| 50 | ≈ 0.000196 | ≈ 0.00000004 |\n\nx approaches the minimum at **x = 0**; the steps get smaller because the gradient shrinks near the minimum.",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 24
+        }
+      ]
+    },
+    {
+      "id": "l7-013",
+      "front": "What can go wrong in gradient descent (local minima, learning rate)?",
+      "back": "- **Local minima:** for a non-convex function, where you end up depends on the **starting values** of θ. At a local minimum the derivative is **0**, so the update stops – it **converges there and gets stuck**.\n- **Learning rate α too small** → very slow convergence, many iterations.\n- **Learning rate α too large** → overshoots the minimum, may oscillate or even diverge.\n\nA convex cost function (like linear regression's MSE) has only one (global) minimum, so this problem doesn't occur there.",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 25
+        },
+        {
+          "doc": "L7",
+          "page": 26
+        },
+        {
+          "doc": "L7",
+          "page": 29
+        }
+      ]
+    },
+    {
+      "id": "l7-014",
+      "front": "What is the difference between batch, stochastic and mini-batch gradient descent?",
+      "back": "- **Batch GD** – compute the error on the **whole dataset**, then update the weights once. Accurate, but **slow** per update.\n- **Stochastic GD (online)** – update after **each single data point**. Much faster updates, but noisy. Useful when data arrives as a **stream**, or the dataset is too big for memory.\n- **Mini-batch GD** – update after a **small batch** (e.g. 32 examples). A good balance: fast and efficient, the standard in deep learning.",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 30
+        }
+      ]
+    },
+    {
+      "id": "l7-015",
+      "front": "What is a multi-layer neural network, and why use multiple layers?",
+      "back": "A network with an **input layer, one or more hidden layers and an output layer**, made of many perceptrons. It is trained with **feed-forward** passes and **back-propagation**.\n\n**Why multiple layers?**\n- Hidden units become **self-organised feature detectors**.\n- **Early layers learn low-level, generic features** (e.g. edges and strokes in handwritten digits).\n- **Deeper layers learn higher-level, specialised features** (loops, digit parts, whole digits).\n- These intermediate features make difficult, **non-linear** problems (like XOR) solvable.",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 32
+        },
+        {
+          "doc": "L7",
+          "page": 33
+        },
+        {
+          "doc": "L7",
+          "page": 36
+        },
+        {
+          "doc": "L7",
+          "page": 38
+        }
+      ]
+    },
+    {
+      "id": "l7-016",
+      "front": "Why is a middle layer called a \"hidden\" layer?",
+      "back": "A hidden layer **hides its desired output**:\n\n- Its neurons **can't be observed** through the network's input/output behaviour.\n- There is **no obvious way to know what its desired output should be** – the training data only gives targets for the output layer.\n\nThis is why the simple perceptron learning rule doesn't work for hidden layers, and **back-propagation** is needed to assign them error.",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 39
+        },
+        {
+          "doc": "L7",
+          "page": 67
+        }
+      ]
+    },
+    {
+      "id": "l7-017",
+      "front": "What is a feed-forward neural network?",
+      "back": "A network whose **connections don't form any cycles**:\n\n- Data enters at the inputs and flows **layer by layer** to the outputs.\n- In normal operation (e.g. as a classifier) there is **no feedback** between layers.\n\nContrast: **recurrent** networks have feedback connections that carry state from one time step to the next.",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 40
+        }
+      ]
+    },
+    {
+      "id": "l7-018",
+      "front": "How does back-propagation work?",
+      "back": "**Forward pass:** input signals x₁…xₙ propagate left to right through the network to produce the output.\n\n**Backward pass:** error signals propagate **from right to left**:\n1. At the output layer, compute the **error = desired output − actual output**.\n2. Propagate the error **backwards** to the hidden layers (each hidden neuron gets blame in proportion to its weights to the output) using the chain rule.\n3. **Update all weights with gradient descent** to reduce the error.\n\nRepeat over many examples/epochs. This lets multi-layer networks learn, solving XOR and much harder problems (Rumelhart, Hinton & Williams, 1986).",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 41
+        },
+        {
+          "doc": "L7",
+          "page": 42
+        },
+        {
+          "doc": "L7",
+          "page": 49
+        }
+      ]
+    },
+    {
+      "id": "l7-019",
+      "front": "What is representation learning, and how does it differ from classical machine learning?",
+      "back": "**Classical ML:** input → **hand-designed feature extractor** → trainable classifier → output. Performance depends heavily on the hand-made representation, and simple methods struggle with complex recognition.\n\n**Representation (feature) learning:** input → **trainable feature extractor** → trainable classifier → output. The machine is fed **raw data** and **discovers the features itself** – replacing manual feature engineering.\n\n**Classic example:** an **autoencoder** – an encoder compresses the input into a latent representation, and a decoder reconstructs the input from it.\n\n**Deep learning** goes further: several layers of trainable features, from simple to more and more abstract.",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 44
+        },
+        {
+          "doc": "L7",
+          "page": 45
+        },
+        {
+          "doc": "L7",
+          "page": 46
+        }
+      ]
+    },
+    {
+      "id": "l7-020",
+      "front": "What is deep learning, and what is hierarchical feature representation?",
+      "back": "**Deep learning** is representation learning where the learned features are **hierarchical (compositional)**, using ANNs with **many layers** as non-linear function approximators. \"Deep\" refers to the **scale (depth) of the network**.\n\n- Features are learned **directly from raw data** – no more feature engineering.\n- Trained with **back-propagation + gradient descent**.\n\n**Hierarchy of features (image example):**\n1. First layer: **low-level** features – edges at particular orientations and locations.\n2. Next layer: **mid-level** features – motifs, arrangements of edges.\n3. Higher layers: **high-level, class-specific** features – object parts (eyes, ears) → the whole object (\"cat\").\n\nHigher layers see **bigger regions** of the input (larger receptive fields).",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 47
+        },
+        {
+          "doc": "L7",
+          "page": 48
+        },
+        {
+          "doc": "L7",
+          "page": 49
+        },
+        {
+          "doc": "L7",
+          "page": 52
+        }
+      ]
+    },
+    {
+      "id": "l7-021",
+      "front": "How is deep learning inspired by the brain's visual cortex?",
+      "back": "The mammalian visual cortex is **hierarchical**, like a deep network:\n\n- **Retina / sub-cortical processing** – contrast, small receptive fields, changes in brightness.\n- **Early vision (occipital, ~66 % of the visual cortex)** – generic features: edges, bars, colours, contours.\n- **Ventral pathway** – object recognition and categorization; much larger receptive fields and more complex features.\n- **Dorsal pathway** – motion, action planning; bridges vision and motor systems.\n\nMoving up the hierarchy, **receptive fields grow and features get more complex** – exactly how CNN layers build up from edges to objects.",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 50
+        },
+        {
+          "doc": "L7",
+          "page": 51
+        }
+      ]
+    },
+    {
+      "id": "l7-022",
+      "front": "Which families of deep architectures exist?",
+      "back": "- **Feed-forward** – multi-layer neural nets, **Convolutional Neural Networks (CNNs)**\n- **Feed-back** – **Deconvolutional networks**\n- **Bi-directional** – Deep Boltzmann Machines, **stacked autoencoders**\n- **Sequence-based** – **Recurrent Neural Networks (RNNs)**, **LSTMs**",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 53
+        }
+      ]
+    },
+    {
+      "id": "l7-023",
+      "front": "How does a Convolutional Neural Network (CNN) work?",
+      "back": "A **feed-forward** architecture inspired by the visual cortex, learning a **hierarchy of visual features**. Designed for grid-like, multi-channel data such as RGB images.\n\n- **Convolution layer** – a feature detector: a small **kernel (filter)** slides over the image and responds to a pattern (e.g. an edge). It automatically learns to filter out irrelevant information.\n- **Weight sharing** – the same small set of weights is reused at every position. *LeNet:* 5×5 = 25 weights instead of 40×60 = 2400 per neuron.\n- **Pooling layer** – e.g. **max pooling** takes the max value over a region; reduces the size and memory and gives some translation invariance.\n- **Fully connected layers** at the end do the **classification**.\n\nLocal features are (fairly) **scale- and translation-invariant**, so CNNs generalize well.",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 55
+        },
+        {
+          "doc": "L7",
+          "page": 72
+        }
+      ]
+    },
+    {
+      "id": "l7-024",
+      "front": "What is a deconvolutional network?",
+      "back": "A **feed-back** architecture that does the **opposite of a CNN**: it maps learned features back to, e.g., **pixels**.\n\n- **Unpooling** approximates the inverse of max pooling: the positions of the maxima are saved in the forward pass and used to place values back.\n- **Deconvolution** uses the **transposed (flipped) filters** of the forward convolution.\n\nUsed for image reconstruction, segmentation and visualizing what a CNN has learned.",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 56
+        }
+      ]
+    },
+    {
+      "id": "l7-025",
+      "front": "What is an autoencoder, and what is it used for?",
+      "back": "A **bi-directional** network with an **encoder–decoder** structure that is trained to **reproduce its own input** at the output:\n\ninput → **encoder** → small hidden layer (latent code) → **decoder** → reconstructed input\n\n- Trained on typically **unlabelled** data (the input is its own target).\n- The narrow hidden layer is forced to keep the essential information, so it acts as a **feature extractor** / **dimensionality reduction**.\n- After training you can drop the decoder and use the hidden layer as input features for a classifier.\n\n*Other uses:* denoising images, anomaly detection (anomalies reconstruct badly).",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 57
+        },
+        {
+          "doc": "L7",
+          "page": 45
+        }
+      ]
+    },
+    {
+      "id": "l7-026",
+      "front": "What is a Recurrent Neural Network (RNN), and what is an LSTM?",
+      "back": "**RNNs** model **sequences / time series** (text, speech, sensor data):\n- Like a feed-forward network, but the **hidden state at each time step depends on the previous time step** – a recurrent connection back to itself. Unfolded in time it looks like the same network repeated side by side.\n- They learn frequent patterns and **predict what comes next**; they map input sequences to output sequences of flexible length. *E.g. read three characters and predict the next three.*\n\n**LSTM (Long Short-Term Memory)** – Hochreiter & Schmidhuber, **1997**: an improved RNN with gates that can **remember information for much longer**, avoiding the vanishing-gradient problem of plain RNNs.",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 58
+        },
+        {
+          "doc": "L7",
+          "page": 71
+        },
+        {
+          "doc": "L7",
+          "page": 73
+        }
+      ]
+    },
+    {
+      "id": "l7-027",
+      "front": "What is the difference between generative and discriminative models? How does a GAN work?",
+      "back": "| **Discriminative** | **Generative** |\n|---|---|\n| Focuses on the **decision boundary** | Models how the data was **generated** – estimates the data distribution |\n| Can classify but **not generate** data | Can generate new data; natural use of unlabelled data |\n| Supervised only; strong with lots of data | Harder: needs lots of data |\n| *E.g. CNN classifiers* | *E.g. GANs* |\n\n**GAN (Generative Adversarial Network)** – Ian Goodfellow, 2014. Two networks play against each other:\n- The **generator** turns random noise into fake data (e.g. faces) to **fool** the discriminator.\n- The **discriminator** tries to tell **real from fake** data.\n- Both improve until the fakes look real. Yann LeCun called it *\"the most interesting idea in the last ten years in machine learning\"*.",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 59
+        },
+        {
+          "doc": "L7",
+          "page": 76
+        }
+      ]
+    },
+    {
+      "id": "l7-028",
+      "front": "When should you use deep neural networks, and when classical ML?",
+      "back": "**No free lunch theorem:** no single technique is always best – it depends on the problem.\n\n**DNNs** give state-of-the-art results because they are:\n- **Robust** – features are learned automatically and optimally for the task, including robustness to natural variations.\n- **Generalizable** – the same approach works across applications and data types.\n- **Scalable** – performance improves with more data; massively parallelizable.\n\n**Classical ML** is still better when:\n- **Data is small** – deep nets need huge datasets (e.g. 1.2 million images); with little data, classical methods often win.\n- **Cost matters** – deep nets need high-end GPUs; classical ML runs on a normal CPU.\n- **Interpretability matters** – with hand-made features, classical models are easier to understand.",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 60
+        }
+      ]
+    },
+    {
+      "id": "l7-029",
+      "front": "What did McCulloch & Pitts (1943) and Donald Hebb (1949) contribute?",
+      "back": "**McCulloch & Pitts, 1943 – \"electronic brain\"**\n- The first computational neuron model, based on **threshold logic**: sum binary inputs; output 1 if the sum exceeds a threshold, else 0.\n- Limitations: only binary inputs/outputs, only a step function, **no weights**, and **no learning**.\n\n**Donald Hebb, 1949 – *The Organization of Behavior***\n- **Hebbian rule:** *\"Cells that fire together wire together\"* – when two neurons fire together, the connection between them **strengthens** (the idea of weights and learning).",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 61
+        },
+        {
+          "doc": "L7",
+          "page": 62
+        }
+      ]
+    },
+    {
+      "id": "l7-030",
+      "front": "What did Rosenblatt's perceptron (1958) and Widrow & Hoff's ADALINE (1960) introduce?",
+      "back": "**Perceptron – Frank Rosenblatt, 1958**\n- Built on McCulloch–Pitts + Hebb: a single neuron with **one weight per input**, plus a bias; output 1 if the weighted sum exceeds the threshold, otherwise 0.\n- It could **learn** its weights, and solved **binary classification** (convergence theorem 1962).\n- The **structural building block of deep learning**.\n\n**ADALINE – Widrow & Hoff, 1960**\n- Same architecture, but a **linear** transfer function, so the output can be any value.\n- Learns with the **least mean squares** rule – in fact the **stochastic gradient descent** update, still the dominant training method in deep learning.",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 65
+        },
+        {
+          "doc": "L7",
+          "page": 66
+        }
+      ]
+    },
+    {
+      "id": "l7-031",
+      "front": "What did Minsky & Papert show in 1969, and what was the first AI winter?",
+      "back": "**\"Perceptrons\" (Minsky & Papert, 1969)** stressed the limits of single-layer networks: perceptrons and ADALINE can only solve **linearly separable** problems and **cannot learn XOR**.\n\n- They never said neural networks can't solve XOR – **multi-layer perceptrons can**.\n- The real problem: most interesting problems are non-linear, and the perceptron learning rule **doesn't work for multiple layers** (the desired outputs of hidden units are unknown).\n\n**First AI winter (~1974):** the book is widely blamed for a period of **reduced funding and interest** in AI. Still, a few people continued: **Paul Werbos** proposed **back-propagation** for neural nets in the 1970s, but only published its application in 1982.",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 67
+        },
+        {
+          "doc": "L7",
+          "page": 68
+        }
+      ]
+    },
+    {
+      "id": "l7-032",
+      "front": "What happened in neural networks in the 1980s?",
+      "back": "- **1980 – Neocognitron (Kunihiko Fukushima):** a hierarchical multi-layer network for robust visual pattern recognition, inspired by the visual nervous system. It led to the first **convolutional neural networks**.\n- **1986 – Back-propagation (Rumelhart, Hinton & Williams)**, *\"Learning representations by back-propagating errors\"*: showed that networks can **learn useful internal representations**. Training **multi-layer perceptrons** became possible, so XOR and more complex functions could be solved.\n- **Jordan networks:** recurrent feedback connections to \"remember\" state, for sequences.\n- **LeNet (Yann LeCun, ~1989–98):** CNN + back-propagation for **handwritten digit recognition**; it read zip codes and processed 10–20 % of US cheques.",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 69
+        },
+        {
+          "doc": "L7",
+          "page": 70
+        },
+        {
+          "doc": "L7",
+          "page": 71
+        },
+        {
+          "doc": "L7",
+          "page": 72
+        }
+      ]
+    },
+    {
+      "id": "l7-033",
+      "front": "Why was there a second AI winter for neural networks?",
+      "back": "Until the early 2000s good algorithms existed (back-propagation, LSTMs, LeNet), but neural networks **didn't scale to larger problems**:\n\n- **Too many parameters** to learn from few labelled examples.\n- **Slow and inefficient** with multiple hidden layers.\n- **Vanishing gradient:** back-propagation multiplies many small numbers; e.g. ten weights of 0.1 give 0.1¹⁰ = 0.0000000001 – too small to learn anything in the early layers.\n\nMeanwhile **kernel machines / SVMs (Vapnik & Cortes)** became popular: similar accuracy, fewer heuristics, and nice generalization proofs. So the community turned away from neural networks again.",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 73
+        }
+      ]
+    },
+    {
+      "id": "l7-034",
+      "front": "How did deep learning arrive (2006 and 2012)?",
+      "back": "**2006 – Hinton's greedy layer-wise pre-training (Deep Belief Networks):**\n- Train **one layer at a time**, from the input upward (unsupervised); freeze it, then train the next layer.\n- Each layer learns a higher-level representation of the one below. Finally add an output layer and fine-tune everything with back-propagation.\n- This trained networks deeper than before, and \"neural networks\" were **rebranded as \"deep learning\"**.\n\n**2012 – AlexNet wins ImageNet** by a large margin (error ~16 % vs ~26 %):\n- A deep CNN with 8 layers and **60 M parameters**, based on LeNet-5.\n- Tricks: **ReLU** activation, **data augmentation**, **dropout**, GPU training.",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 74
+        },
+        {
+          "doc": "L7",
+          "page": 75
+        }
+      ]
+    },
+    {
+      "id": "l7-035",
+      "front": "Name deep-learning milestones after 2012.",
+      "back": "- **2014 – GANs** (Ian Goodfellow): generator vs. discriminator.\n- **2015 – ResNet** (152 layers, Microsoft Research): ImageNet error **4.94 %**, better than humans – **superhuman image classification**.\n- **2016 – AlphaGo** (DeepMind): learned Go from human games, then mastered it by **playing against itself** (deep reinforcement learning).\n- **2017 – Transformers**, *\"Attention Is All You Need\"* (Google) – the basis of today's LLMs.\n- **2019 – Quantum supremacy claim** (Google's 53-qubit Sycamore).\n- **2021 – Vision Transformer (ViT)** (Google): transformers for images.",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 76
+        },
+        {
+          "doc": "L7",
+          "page": 77
+        },
+        {
+          "doc": "L7",
+          "page": 78
+        },
+        {
+          "doc": "L7",
+          "page": 79
+        },
+        {
+          "doc": "L7",
+          "page": 80
+        }
+      ]
+    },
+    {
+      "id": "l7-036",
+      "front": "Neural networks have existed for decades – why are they taking off now? And what are the three historical waves?",
+      "back": "**Four driving factors:**\n1. **Big data availability** – larger datasets, easier collection and annotation (ImageNet: 15 M labelled images; Facebook: 350 M images uploaded per day; YouTube: 100 hours of video per minute).\n2. **Computational power** – **GPUs**, massively parallel hardware, falling prices; compute grows exponentially.\n3. **Algorithms / software** – better regularization (**dropout**), optimization techniques, new methods, toolboxes (TensorFlow, PyTorch).\n4. **Marketing** – fancy naming (\"deep learning\") and breakthroughs in robotics and AI.\n\n**Three historical waves (rebrandings):** **cybernetics** (1940s–60s) → **connectionism / neural networks** (1980s–90s) → **deep learning** (2006–).",
+      "sources": [
+        {
+          "doc": "L7",
+          "page": 81
+        },
+        {
+          "doc": "L7",
+          "page": 82
+        },
+        {
+          "doc": "L7",
+          "page": 83
+        }
+      ]
+    }
+  ]
+}

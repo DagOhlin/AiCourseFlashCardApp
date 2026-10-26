@@ -1,0 +1,392 @@
+{
+  "id": "lecture-08",
+  "name": "L8 · Computer Vision & NLP",
+  "description": "Images, CV problems, pattern recognition, CNNs, NLP tasks and why language is hard",
+  "group": "Lectures",
+  "order": 8,
+  "cards": [
+    {
+      "id": "l8-001",
+      "front": "What is computer vision, and what is its goal?",
+      "back": "**Computer vision** is the science and technology of machines that **see and extract meaning from images** (and video, which is a sequence of images).\n\n**Goal:** to extract **\"meaning\" from pixels** – go from a grid of numbers to \"there is a dog on the left, running\".\n\n**Application areas:** image understanding, security, machine vision, robot vision, image analysis, video understanding.\n\nWhy it matters: *\"an image is worth 1000 words\"*, and images and movies are everywhere.",
+      "sources": [
+        {
+          "doc": "L8",
+          "page": 2
+        },
+        {
+          "doc": "L8",
+          "page": 3
+        },
+        {
+          "doc": "L8",
+          "page": 8
+        }
+      ]
+    },
+    {
+      "id": "l8-002",
+      "front": "What is a digital image, mathematically?",
+      "back": "An image is a **2-dimensional function I(x, y)**:\n\n- **x, y** – the image coordinates, which are **integers** (pixel positions)\n- **I(x, y)** – the **intensity** (gray level) at that point\n\nSo a digital image is a **matrix of numbers**: rows × columns of pixel values.\n\n*Example:* a 255 × 252 grayscale image; I(112, 56) = 10 means the pixel at x = 112, y = 56 has intensity 10 (very dark). A small region might look like\n```\n196 145 139 119  64\n145 139 135  84  52\n 80  36 238  21  48\n```\nAn edge shows up as a sudden change in these values.",
+      "sources": [
+        {
+          "doc": "L8",
+          "page": 9
+        },
+        {
+          "doc": "L8",
+          "page": 11
+        }
+      ]
+    },
+    {
+      "id": "l8-003",
+      "front": "What are the types of digital images?",
+      "back": "- **Binary image** – each pixel is 0 or 1 (black or white).\n- **Grayscale image** – each pixel is an intensity, typically 0 (black) to 255 (white).\n- **RGB (colour) image** – three channels, **Red, Green and Blue**; each pixel has three intensity values. It can be seen as three grayscale images stacked together.",
+      "sources": [
+        {
+          "doc": "L8",
+          "page": 10
+        }
+      ]
+    },
+    {
+      "id": "l8-004",
+      "front": "What is the spectrum of supervision in computer vision?",
+      "back": "From **less** to **more** supervision:\n\n- **Unsupervised** – just a collection of images, no labels.\n- **\"Weakly\" supervised** – coarse labels, e.g. \"this image contains a car\" without saying where.\n- **Fully supervised** – detailed labels, e.g. bounding boxes or the exact outline of every object.\n\nWhat counts as each level **depends on the task**.",
+      "sources": [
+        {
+          "doc": "L8",
+          "page": 4
+        }
+      ]
+    },
+    {
+      "id": "l8-005",
+      "front": "Give applications of computer vision.",
+      "back": "- **Biometric recognition** – face, ear, iris, hand, fingerprint\n- **Handwriting recognition** – difficult with degradation, bleed-through, faint ink, uneven backgrounds\n- **Emotion detection** from faces\n- **Mobile visual search** – photograph something to search for it\n- **Automotive safety** (BMW, GM, Volvo) – object, sign and pedestrian detection, lane-distance and headway warnings\n- **Self-driving cars** – Google/Waymo, Tesla\n- **Vision-based interaction** – Xbox Kinect\n- **3D reconstruction**, **object recognition**, **robotics** (RoboCup, snake robots)",
+      "sources": [
+        {
+          "doc": "L8",
+          "page": 12
+        },
+        {
+          "doc": "L8",
+          "page": 13
+        },
+        {
+          "doc": "L8",
+          "page": 15
+        },
+        {
+          "doc": "L8",
+          "page": 17
+        },
+        {
+          "doc": "L8",
+          "page": 18
+        },
+        {
+          "doc": "L8",
+          "page": 19
+        },
+        {
+          "doc": "L8",
+          "page": 20
+        }
+      ]
+    },
+    {
+      "id": "l8-006",
+      "front": "Describe the block diagram of a fingerprint recognition system.",
+      "back": "Two phases sharing a **database**:\n\n**Enrollment**\n1. **Fingerprint sensor** captures the fingerprint.\n2. **Feature extraction** (e.g. minutiae: ridge endings and bifurcations).\n3. The template is stored in the **database** with the person's ID.\n\n**Authentication**\n1. Sensor captures the fingerprint, and the user claims an ID (e.g. 123).\n2. **Feature extraction**.\n3. **Matching** against the stored template for that ID.\n4. **Result:** accept or reject.",
+      "sources": [
+        {
+          "doc": "L8",
+          "page": 14
+        }
+      ]
+    },
+    {
+      "id": "l8-007",
+      "front": "Why is computer vision difficult?",
+      "back": "The same object can produce very different pixel values because of:\n\n- **Contrast** – lighting and shadows\n- **Noise** – sensor noise, grainy low-light images\n- **Resolution** – too few pixels to see details\n- **Blur** – out of focus, or **motion blur** from a moving camera/object\n- **Scale** – objects appear at very different sizes\n- **Compression** artefacts (e.g. JPEG blocks)\n- Also: viewpoint, occlusion, background clutter, variation within a class\n\nA bad-quality image is hard for humans too, but the computer only ever sees numbers.",
+      "sources": [
+        {
+          "doc": "L8",
+          "page": 6
+        },
+        {
+          "doc": "L8",
+          "page": 23
+        },
+        {
+          "doc": "L8",
+          "page": 24
+        },
+        {
+          "doc": "L8",
+          "page": 25
+        },
+        {
+          "doc": "L8",
+          "page": 27
+        },
+        {
+          "doc": "L8",
+          "page": 28
+        }
+      ]
+    },
+    {
+      "id": "l8-008",
+      "front": "What are the most popular types of computer-vision problems?",
+      "back": "- **Image classification** – what is in the image? (\"Is this a dog?\") → one label for the whole image, e.g. P(sheep) = 0.6, P(dog) = 0.3.\n- **Classification with localization** – the label plus a bounding box around the single object.\n- **Object detection** – **several objects**: a rectangle (bounding box) and a label around each one.\n- **Image segmentation** – a label for **every pixel**:\n  - **Semantic segmentation** – all pixels of the same class get the same label (all sheep = one colour).\n  - **Instance segmentation** – each individual object gets its own label (sheep 1, sheep 2, sheep 3).",
+      "sources": [
+        {
+          "doc": "L8",
+          "page": 29
+        },
+        {
+          "doc": "L8",
+          "page": 30
+        },
+        {
+          "doc": "L8",
+          "page": 31
+        },
+        {
+          "doc": "L8",
+          "page": 32
+        },
+        {
+          "doc": "L8",
+          "page": 35
+        },
+        {
+          "doc": "L8",
+          "page": 36
+        }
+      ]
+    },
+    {
+      "id": "l8-009",
+      "front": "What is image segmentation, and what is it used for?",
+      "back": "**Image segmentation** divides an image into **regions based on pixel characteristics** to identify objects or boundaries – it simplifies the image so it can be analysed more efficiently.\n\n- It can be viewed as **clustering**: pixels with similar colour, intensity or texture are grouped together.\n- **Semantic** (one label per class) vs. **instance** segmentation (one label per object).\n\n**Uses:** film making; tracking objects across video frames; classifying terrain (e.g. petroleum reserves) in satellite images; medicine – identifying injured muscle, measuring bone and tissue, detecting suspicious structures to help radiologists.",
+      "sources": [
+        {
+          "doc": "L8",
+          "page": 33
+        },
+        {
+          "doc": "L8",
+          "page": 34
+        },
+        {
+          "doc": "L8",
+          "page": 35
+        }
+      ]
+    },
+    {
+      "id": "l8-010",
+      "front": "What is a pattern? Describe the pattern-recognition pipeline with the salmon vs. sea bass example.",
+      "back": "A **pattern** is an object, process or event that can be given a name (object: a face; event: a car accident).\n\n**Fish example:** a camera watches fish on a conveyor belt and must classify each as **salmon or sea bass**:\n\n1. **Pre-processing** – noise reduction, deblurring, isolating the fish from the background.\n2. **Feature extraction** – measure features such as **length, lightness, width, weight**.\n3. **Classification** – decide salmon or sea bass from the features.\n\nThe training set should be a **representative** sample of fish whose class is known.",
+      "sources": [
+        {
+          "doc": "L8",
+          "page": 37
+        },
+        {
+          "doc": "L8",
+          "page": 38
+        },
+        {
+          "doc": "L8",
+          "page": 39
+        },
+        {
+          "doc": "L8",
+          "page": 40
+        }
+      ]
+    },
+    {
+      "id": "l8-011",
+      "front": "In the fish example, why do we compare features with histograms, and why combine several features?",
+      "back": "- **Length:** a histogram of length per class shows a lot of **overlap** – many salmon and sea bass have similar lengths, so length alone gives many errors.\n- **Lightness:** shows a **much better separation** between the classes.\n- **Combining features:** lightness (x₁) and width (x₂) together form a **2-D feature space**, where the classes separate **much better than with either feature alone** – a decision boundary (line/curve) splits them.\n\nThis suggests adding a third, fourth… feature. But each feature must add real information: too many features make the model complex and prone to overfitting (the curse of dimensionality).",
+      "sources": [
+        {
+          "doc": "L8",
+          "page": 40
+        },
+        {
+          "doc": "L8",
+          "page": 41
+        },
+        {
+          "doc": "L8",
+          "page": 42
+        },
+        {
+          "doc": "L8",
+          "page": 43
+        }
+      ]
+    },
+    {
+      "id": "l8-012",
+      "front": "Describe the architecture of a whole CNN for image classification.",
+      "back": "```\nimage → [Convolution → Max pooling] → [Convolution → Max pooling] → … → Flatten\n      → Fully connected network → Softmax → cat / dog / …\n```\n- **Convolution layers** learn filters that detect features (edges → textures → parts).\n- **Max pooling** downsamples, keeping the strongest responses.\n- The conv + pool block **can repeat many times**.\n- **Flatten** turns the feature maps into a vector.\n- A **fully connected network** combines the features; **softmax** outputs class probabilities.\n\n*Example (digit \"7\", 28×28):* layer 1 has 16 filters (5×5) → 14×14 maps; layer 2 has 36 filters → 7×7 maps; then 128 features → 10 outputs, the highest for class 7.",
+      "sources": [
+        {
+          "doc": "L8",
+          "page": 45
+        },
+        {
+          "doc": "L8",
+          "page": 46
+        }
+      ]
+    },
+    {
+      "id": "l8-013",
+      "front": "What is NLP? Name its applications and core technologies.",
+      "back": "**Natural Language Processing** lies at the **intersection of computational linguistics and machine learning** – getting computers to understand and generate human language.\n\n**Applications:** machine translation, information retrieval, question answering, dialogue systems, information extraction, summarization, sentiment analysis.\n\n**Core technologies:** language modelling, **part-of-speech tagging**, **syntactic parsing**, **named-entity recognition**, **word-sense disambiguation**, semantic role labelling.",
+      "sources": [
+        {
+          "doc": "L8",
+          "page": 48
+        }
+      ]
+    },
+    {
+      "id": "l8-014",
+      "front": "How can NLP correct spelling? Compare dictionary-based and context-aware approaches.",
+      "back": "- **Dictionary-based:** for the input *\"speling\"*, find the **closest dictionary word** using **edit distance** (the minimum number of insertions, deletions and substitutions) → *\"spelling\"*. It only looks at the single word.\n- **Context-aware (statistical / neural language model):** for *\"I went to the store to **by** milk\"*, \"by\" is a real word, so a dictionary won't flag it. A language model uses the context to predict that **\"buy\"** is much more likely.",
+      "sources": [
+        {
+          "doc": "L8",
+          "page": 49
+        }
+      ]
+    },
+    {
+      "id": "l8-015",
+      "front": "What do speech systems do? Give examples.",
+      "back": "- **Speech recognition (speech-to-text)** – understand spoken commands. *E.g. virtual assistants: Siri, Alexa, Google Assistant.*\n- **Speech synthesis (text-to-speech)** – read text aloud. *E.g. screen readers for the visually impaired, GPS navigation voices.*\n\nA virtual assistant combines both with NLP in between: speech → text → understand the intent → act / answer → speech.",
+      "sources": [
+        {
+          "doc": "L8",
+          "page": 50
+        },
+        {
+          "doc": "L8",
+          "page": 51
+        }
+      ]
+    },
+    {
+      "id": "l8-016",
+      "front": "What is machine translation, and what makes it hard?",
+      "back": "**Machine translation** – a system converts text or speech from a **source language** (e.g. English) to a **target language** (e.g. French) while **preserving meaning, grammar and style**. Goal: accurate, fluent, context-appropriate translation without human help (e.g. Google Translate).\n\n**Challenges:**\n- **Ambiguity** – \"bank\": financial institution or river bank?\n- **Idiomatic expressions** – \"it's raining cats and dogs\" shouldn't be translated word for word.\n- **Context understanding** – \"He saw her duck\": the bird, or her ducking down?\n- **Morphological complexity** – languages with many word forms (Finnish, Turkish…).",
+      "sources": [
+        {
+          "doc": "L8",
+          "page": 52
+        },
+        {
+          "doc": "L8",
+          "page": 53
+        }
+      ]
+    },
+    {
+      "id": "l8-017",
+      "front": "What does \"deeper understanding: reference\" mean in NLP?",
+      "back": "To answer *\"Who signed the Serve America Act?\"* from the text\n\n> President Barack Obama received the Serve America Act after congress' vote. **He** signed **the bill** last Thursday. **The president** said it would greatly increase service opportunities…\n\nthe system must resolve that **\"He\" and \"the president\" refer to Barack Obama**, and **\"the bill\" refers to the Serve America Act** (**coreference resolution**). Only then can it answer **Barack Obama**, even though no single sentence says \"Obama signed the Serve America Act\".",
+      "sources": [
+        {
+          "doc": "L8",
+          "page": 54
+        },
+        {
+          "doc": "L8",
+          "page": 55
+        }
+      ]
+    },
+    {
+      "id": "l8-018",
+      "front": "Why is NLP hard? List the main reasons.",
+      "back": "1. **Ambiguity** – one form, many meanings\n2. **Scale** – huge vocabularies and amounts of text\n3. **Sparsity** – most words are rare (Zipf's law)\n4. **Variation** – dialects, styles, spelling, domains\n5. **Expressivity** – one meaning, many forms\n6. **Unmodelled variables** – world knowledge, the speaker's intent\n7. **Unknown representations** – how should meaning be represented at all?",
+      "sources": [
+        {
+          "doc": "L8",
+          "page": 57
+        }
+      ]
+    },
+    {
+      "id": "l8-019",
+      "front": "Explain ambiguity in NLP with examples.",
+      "back": "Language is **ambiguous at multiple levels**:\n\n- **Word sense:** \"**bank**\" – a financial institution or a river bank?\n- **Part of speech:** \"**chair**\" – a noun (a chair) or a verb (to chair a meeting)?\n- **Syntactic / structural:** \"I saw the man with the telescope\" – who has the telescope?\n- **Reference:** \"He saw her duck\".\n\nHumans resolve these effortlessly from context; machines need models of context and world knowledge.",
+      "sources": [
+        {
+          "doc": "L8",
+          "page": 58
+        },
+        {
+          "doc": "L8",
+          "page": 52
+        }
+      ]
+    },
+    {
+      "id": "l8-020",
+      "front": "Explain sparsity and expressivity in NLP.",
+      "back": "**Sparsity (Zipf's law):** a few words are extremely frequent (\"the\", \"of\", \"to\", \"and\"), while **most words are rare**. Even in a huge corpus, many words and word combinations appear only a few times or never, so there is little data to learn them from.\n\n**Expressivity:** not only can one form have several meanings (ambiguity), but the **same meaning can be expressed in different forms**:\n- \"She gave the book to Tom\" vs. \"She gave Tom the book\"\n- \"Some kids popped by\" vs. \"A few children visited\"\n- \"Is that window still open?\" vs. \"Please close the window\" (same intent!)",
+      "sources": [
+        {
+          "doc": "L8",
+          "page": 59
+        },
+        {
+          "doc": "L8",
+          "page": 60
+        }
+      ]
+    },
+    {
+      "id": "l8-021",
+      "front": "Which fields connect to NLP, and what are today's NLP applications?",
+      "back": "**Connected fields:** machine learning, linguistics (psycho-, socio-, descriptive, theoretical), cognitive science, information theory, logic, data science, political science, psychology, economics, education.\n\n**Today's applications:**\n- Conversational agents (chatbots, assistants)\n- Information extraction and question answering\n- Machine translation\n- Opinion and sentiment analysis\n- Social-media analysis\n- Visual understanding (image captioning)\n- Essay evaluation\n- Mining legal, medical or scholarly literature",
+      "sources": [
+        {
+          "doc": "L8",
+          "page": 61
+        },
+        {
+          "doc": "L8",
+          "page": 62
+        }
+      ]
+    },
+    {
+      "id": "l8-022",
+      "front": "Give one disadvantage each of top-down and bottom-up parsing in NLP.",
+      "back": "**Parsing** finds the grammatical (syntactic) structure of a sentence using grammar rules.\n\n- **Top-down parsing** starts from the sentence symbol S and expands rules down to the words. Disadvantage: it can get **stuck in infinite loops** (left-recursive rules like NP → NP PP) and wastes **time and space** exploring trees that can never match the actual words.\n- **Bottom-up parsing** starts from the words and combines them into larger constituents. Disadvantage: it builds constituents that can never fit into a full sentence, and it is **hard to backtrack and re-parse** once a wrong combination has been made.",
+      "sources": [
+        {
+          "doc": "EX2020S",
+          "page": 3,
+          "note": "Question 8"
+        },
+        {
+          "doc": "L8",
+          "page": 48
+        }
+      ]
+    }
+  ]
+}
