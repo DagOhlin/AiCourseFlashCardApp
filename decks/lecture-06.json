@@ -1,0 +1,572 @@
+{
+  "id": "lecture-06",
+  "name": "L6 · Introduction to Machine Learning",
+  "description": "ML types, data preparation, classification and regression, metrics, overfitting",
+  "group": "Lectures",
+  "order": 6,
+  "cards": [
+    {
+      "id": "l6-001",
+      "front": "Why do we need machine learning today?",
+      "back": "- **Various data types** – structured (relational databases), semi-structured (XML, JSON) and unstructured (video, images, text).\n- **Massive data** – big data generated every day from many sources (IoT).\n- **Tasks too complex to program by hand**\n  - human/animal tasks: speech recognition, image understanding, driving\n  - tasks beyond humans: very large, complex data (astronomy, weather prediction)\n- **Adaptivity** – tasks that change over time: spam detection, product recommendation. A learned model can be retrained; hand-written rules go stale.",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 3
+        }
+      ]
+    },
+    {
+      "id": "l6-002",
+      "front": "What is learning (according to Simon, Michalski and Minsky)?",
+      "back": "- **Herbert Simon:** \"Learning denotes changes in a system that enable it to do the same task **more efficiently the next time**\" / \"any process by which a system **improves performance from experience**.\"\n- **Ryszard Michalski:** \"Learning is **constructing or modifying representations** of what is being experienced.\"\n- **Marvin Minsky:** \"Learning is making **useful changes in our minds**.\"\n\nIn short, learning is **turning experience into expertise**:\n- *Experience* = training data, measurements, observations\n- *Expertise* = the ability to perform some task\n\nPure memorization fails because there is too much diversity; we need generalization and prior knowledge.",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 4
+        },
+        {
+          "doc": "L6",
+          "page": 5
+        }
+      ]
+    },
+    {
+      "id": "l6-003",
+      "front": "What is machine learning, and how does it relate to AI, computer science, mathematics and statistics?",
+      "back": "**Machine learning** is a field of study that gives machines **the ability to learn from examples without being explicitly programmed** – embedding knowledge into machines without hard-coding it. It **optimizes a performance criterion using example data or past experience**.\n\n- ML is a **subfield of AI**.\n- **Computer science:** efficient algorithms to solve the optimization problem, and to represent and evaluate the model for inference.\n- **Mathematics:** linear algebra and calculus for regression and optimization.\n- **Statistics:** modelling uncertainty, inference from samples.\n\n*Examples:* email spam detection, face recognition, weather forecasting, activity recognition.",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 6
+        }
+      ]
+    },
+    {
+      "id": "l6-004",
+      "front": "Give Tom Mitchell's definition of learning (E, T, P). Apply it to Twitter learning which tweets you mark as \"uninteresting\".",
+      "back": "**A program learns from experience E with respect to task T and performance measure P if its performance on T, as measured by P, improves with experience E.**\n\nTwitter example:\n- **T (task):** classifying tweets as interesting or uninteresting\n- **E (experience):** watching you label tweets as interesting or uninteresting\n- **P (performance):** the fraction of tweets correctly classified\n\n*Another example:* a spam filter – T = classify emails, E = emails you marked as spam, P = % correctly filtered.",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 7
+        }
+      ]
+    },
+    {
+      "id": "l6-005",
+      "front": "How does machine learning differ from traditional programming?",
+      "back": "- **Traditional programming:** Data + **Program** (rules written by a human) → Output\n- **Machine learning (supervised):** Data + **Output (labels)** → *training* → **Model**; then Model + new data → predicted output\n\nML builds the model (the \"program\") **from the training data**, and then uses it to make predictions or decisions.\n\n*Example:* train on animal images labelled cat / dog / lion. For a new image the model outputs probabilities, e.g. cat 5 %, dog 65 %, lion 30 % → predicted label **dog**.",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 8
+        },
+        {
+          "doc": "L6",
+          "page": 9
+        }
+      ]
+    },
+    {
+      "id": "l6-006",
+      "front": "Why is machine learning needed for a self-driving car's camera, and when should ML be used in general?",
+      "back": "**Self-driving car:** the app must recognise what each camera image contains (pedestrians, bikes, cars…). We **cannot manually write general rules** for what a pedestrian looks like in every light, pose and angle, so it is extremely hard without ML – the model learns it from labelled examples.\n\n**Use ML when:**\n- **Human expertise doesn't exist** – navigating on Mars\n- **Humans can't explain their expertise** – speech recognition\n- **Models must be customized** – personalized medicine\n- **Models are based on huge amounts of data** – genomics",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 11
+        },
+        {
+          "doc": "L6",
+          "page": 12
+        }
+      ]
+    },
+    {
+      "id": "l6-007",
+      "front": "What are the main types of machine learning?",
+      "back": "- **Supervised learning** – training data **includes the desired outputs (labels)**. → *Classification* (discrete output) and *regression* (continuous output). *E.g. image classification, fraud detection, weather forecasting, price prediction.*\n- **Unsupervised learning** – training data has **no outputs**. → *Clustering*, *anomaly detection*, *dimensionality reduction*. *E.g. customer segmentation, recommender systems, big-data visualization.*\n- **Semi-supervised learning** – a few labelled examples + many unlabelled ones.\n- **Reinforcement learning** – learn from rewards/mistakes by interacting with an environment. *E.g. game AI, robot navigation, skill acquisition.*\n- **Interactive / active learning** – the algorithm asks an expert to label the most useful examples.",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 13
+        },
+        {
+          "doc": "L6",
+          "page": 14
+        }
+      ]
+    },
+    {
+      "id": "l6-008",
+      "front": "What are the differences between supervised and unsupervised learning? (give at least three)",
+      "back": "| | **Supervised** | **Unsupervised** |\n|---|---|---|\n| **Data** | **Labelled** – each input has a known output | **Unlabelled** – only inputs |\n| **Goal** | Learn a mapping input → output to **predict** labels/values for new data | **Discover hidden structure** – groups, patterns, anomalies |\n| **Tasks** | Classification, regression | Clustering, dimensionality reduction, anomaly detection |\n| **Feedback** | Error = difference between the right and predicted output guides training | No \"right answer\" to compare with |\n| **Evaluation** | Easy: accuracy, MSE on a test set | Harder: e.g. cluster cohesion/separation |\n| **Algorithms** | Linear/logistic regression, SVM, random forest, neural networks | k-means, DBSCAN, hierarchical clustering, PCA, autoencoders |\n| **Example** | Predict whether a tumour is malignant from labelled patient data | Group news articles by topic without knowing the topics |",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 13
+        },
+        {
+          "doc": "L6",
+          "page": 18
+        },
+        {
+          "doc": "L6",
+          "page": 63
+        },
+        {
+          "doc": "L6",
+          "page": 64
+        },
+        {
+          "doc": "EX250114",
+          "page": 8,
+          "note": "Question 8"
+        }
+      ]
+    },
+    {
+      "id": "l6-009",
+      "front": "\"AI system = Code + Data\": what does this mean for ML projects?",
+      "back": "An AI system consists of the **model/algorithm (code)** and the **data**.\n\n- **Data is the food for AI**: in practice ~80 % of the work is sourcing and preparing high-quality data, and ~20 % is training the model (like cooking: prep the ingredients, then cook).\n- Yet most research has focused on the model. The **data-centric** view says that improving data quality often helps more than changing the model.",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 16
+        },
+        {
+          "doc": "L6",
+          "page": 10
+        }
+      ]
+    },
+    {
+      "id": "l6-010",
+      "front": "How does supervised learning work?",
+      "back": "- An **expert (teacher)** provides **labelled data**: inputs together with the correct outputs.\n- During **training**, the algorithm (learner) produces an output for each input and **compares it with the right output**.\n- The error (the difference) **guides the learning process** to modify the model and reduce the error.\n- Goal: **good generalization** – correct predictions on new, unseen data.\n\nUsed for **classification** and **regression**. Classification problems can be **linearly separable or not**.\n\n*Algorithms:* logistic regression, SVMs, random forest, neural networks (CNN, RNN, LSTM…).",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 17
+        },
+        {
+          "doc": "L6",
+          "page": 18
+        }
+      ]
+    },
+    {
+      "id": "l6-011",
+      "front": "What should you do before applying supervised learning?",
+      "back": "1. **Identify the problem type**\n   - **Classification** (discrete class label) – linearly or non-linearly separable?\n   - **Regression** (continuous output)\n   - Rule of thumb: try **simple methods first** (decision trees, linear SVM). If the results are poor, try non-linear ones (SVM with Gaussian kernel, random forest, MLP).\n2. **Prepare the data**\n   - **Select** data – the relevant features and patterns\n   - **Preprocess** – formatting, cleaning, sampling\n   - **Transform** – scaling, decomposition, aggregation",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 19
+        },
+        {
+          "doc": "L6",
+          "page": 20
+        }
+      ]
+    },
+    {
+      "id": "l6-012",
+      "front": "What does selecting and preprocessing data involve in supervised learning?",
+      "back": "**Select data**\n- Understand the problem; identify the right features (all or a subset) – feature extraction, correlation analysis. \"More is better\".\n- With a small dataset, **derive or simulate data**: generate synthetic patterns based on the data's behaviour. Exclude irrelevant data.\n\n**Preprocess data**\n- **Formatting** – convert to a usable format (relational database → flat file, proprietary format → text).\n- **Cleaning** – remove outliers, repeated patterns and noise; fix missing data.\n- **Sampling** – take a small **representative** sample to reduce running time and resources, and to prototype faster.\n\n*Example:* the UCI Zoo dataset went from 101 patterns, 17 features, 6 classes to 55 patterns, 16 features, 6 classes after preprocessing.",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 21
+        },
+        {
+          "doc": "L6",
+          "page": 22
+        },
+        {
+          "doc": "L6",
+          "page": 23
+        },
+        {
+          "doc": "L6",
+          "page": 24
+        }
+      ]
+    },
+    {
+      "id": "l6-013",
+      "front": "Why is feature normalization important? Give the two common methods.",
+      "back": "Normalization brings features to a **similar range**; it matters when features have very different scales (feature 1 ∈ [0, 1], feature 2 ∈ [120, 190]).\n\n**Motivation:** an algorithm that uses **Euclidean distance** (k-NN, k-means, SVM) would be dominated by the feature with the broadest range. After normalization each feature contributes roughly proportionately.\n\n- **Min-max scaling:** v' = (v − min) / (max − min) → values in [0, 1]\n- **Standardization (z-score):** v' = (v − mean) / std → mean 0, standard deviation 1\n\n**Don't rescale or standardize the output (target variable).**",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 25
+        },
+        {
+          "doc": "L6",
+          "page": 26
+        },
+        {
+          "doc": "L6",
+          "page": 28
+        },
+        {
+          "doc": "L6",
+          "page": 30
+        }
+      ]
+    },
+    {
+      "id": "l6-014",
+      "front": "What are the data-transformation steps scaling, decomposition and aggregation?",
+      "back": "- **Scaling** – normalization / standardization of feature ranges.\n- **Decomposition** – split a complex feature into its constituent parts. *E.g. a timestamp → day and time of day (\"weekday\" and \"hour\" are often more predictive).*\n- **Aggregation** – merge two or more features into one. *E.g. air-conditioning status (on/off) and its temperature → a single feature.*",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 30
+        }
+      ]
+    },
+    {
+      "id": "l6-015",
+      "front": "Why split the data into training, validation and test sets?",
+      "back": "- **Training set** – the algorithm **learns** the model parameters from it.\n- **Validation set** – used for **hyperparameter tuning** and model selection (or use cross-validation on the training set instead).\n- **Test set** – held back until the end to **evaluate quality** on unseen data, i.e. estimate real-world performance.\n\nIf you tune on the test set, the test score becomes optimistic and no longer measures generalization.\n\nAfter that: tune, train, and **export the trained model for deployment**.",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 32
+        },
+        {
+          "doc": "L6",
+          "page": 85
+        }
+      ]
+    },
+    {
+      "id": "l6-016",
+      "front": "How is a regression model evaluated? Give the formulas for MSE and Pearson's r.",
+      "back": "**Mean Squared Error:**\n**MSE = (1/N) Σ (ŷᵢ − yᵢ)²** – the average squared difference between prediction and truth (the slide divides by N − 1). Lower is better; squaring punishes large errors.\n\n**Pearson correlation coefficient (R):**\n**r = (1/(N−1)) Σ ((ŷᵢ − μ_ŷ)/σ_ŷ) · ((yᵢ − μ_y)/σ_y)**\nMeasures how linearly related predictions and true values are: **+1** = perfect positive, **0** = no linear relation, **−1** = perfect negative.\n\nMany regression algorithms exist: linear regression, lasso, ridge, support vector regression, regression trees, random forests, gradient boosting, Gaussian processes, neural networks…",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 41
+        },
+        {
+          "doc": "L6",
+          "page": 44
+        }
+      ]
+    },
+    {
+      "id": "l6-017",
+      "front": "What is classification? Explain with the breast-cancer example.",
+      "back": "**Classification** predicts a **discrete class label** for an input. Training data with inputs and their correct classes is needed.\n\n*Breast cancer:* predict **malignant (1) or benign (0)**.\n- One feature (tumour size): classes along one axis.\n- Two features (tumour size *s* and age *a*): each patient is a point in 2-D.\n- For a new patient (s, a), **fit a linear model** (a line separating the classes) – or a **non-linear** boundary – to the training data and see which side the patient falls on, e.g. \"benign\".\n\nClassification is about **learning decision boundaries**: a line in 2-D, a **plane** in 3-D, a **hyperplane** in more dimensions.",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 46
+        },
+        {
+          "doc": "L6",
+          "page": 48
+        },
+        {
+          "doc": "L6",
+          "page": 50
+        },
+        {
+          "doc": "L6",
+          "page": 51
+        },
+        {
+          "doc": "L6",
+          "page": 53
+        }
+      ]
+    },
+    {
+      "id": "l6-018",
+      "front": "Name popular classification algorithms.",
+      "back": "- **Logistic regression**\n- **k-Nearest Neighbours (k-NN)** – class of the majority of the k closest training points\n- **Support Vector Machine (SVM)** – the maximum-margin separating hyperplane (with kernels for non-linear data)\n- **Naive Bayes** – Bayes' rule assuming independent features\n- **Decision tree** – a tree of if-then tests on features\n- **Random forest** – an ensemble of many decision trees (reduces overfitting)\n- **Neural networks (ANN)**",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 55
+        }
+      ]
+    },
+    {
+      "id": "l6-019",
+      "front": "Draw the confusion matrix and give the formulas for accuracy, misclassification, precision, recall (sensitivity), specificity and F1.",
+      "back": "|  | **Actual positive** | **Actual negative** |\n|---|---|---|\n| **Predicted positive** | TP | FP |\n| **Predicted negative** | FN | TN |\n\n- **Accuracy** = (TP + TN) / (TP + TN + FP + FN) – all correct / all\n- **Misclassification** = (FP + FN) / all – all incorrect / all\n- **Precision** = TP / (TP + FP) – of those *predicted* positive, how many really are\n- **Recall / sensitivity** = TP / (TP + FN) – of the *actual* positives, how many we found\n- **Specificity** = TN / (TN + FP) – of the actual negatives, how many we correctly rejected\n- **F1** = 2 · (Precision · Recall) / (Precision + Recall) – balances the two\n\n**ROC curve:** true-positive rate vs. false-positive rate at different thresholds; **AUC** = the area under it (1 = perfect, 0.5 = random).",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 56
+        }
+      ]
+    },
+    {
+      "id": "l6-020",
+      "front": "A cancer classifier gives TP = 40, FP = 10, FN = 5, TN = 45. Compute accuracy, precision, recall, specificity and F1.",
+      "back": "Total = 100\n\n- **Accuracy** = (40 + 45) / 100 = **0.85**\n- **Precision** = 40 / (40 + 10) = **0.80**\n- **Recall** = 40 / (40 + 5) = **0.889**\n- **Specificity** = 45 / (45 + 10) = **0.818**\n- **F1** = 2 · 0.80 · 0.889 / (0.80 + 0.889) = **0.842**\n\nFor cancer screening, **recall** matters most: each of the 5 false negatives is a missed cancer. In spam filtering, **precision** matters more (a false positive hides a real email).",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 56
+        }
+      ]
+    },
+    {
+      "id": "l6-021",
+      "front": "What is Cohen's kappa, and why use it?",
+      "back": "A **single performance measure** for classification that **discards patterns classified correctly by chance**:\n\n**κ = 100 · (pₐ − pₑ) / (s − pₑ)**\n- pₐ = observed agreement (correctly classified, the diagonal of the confusion matrix)\n- pₑ = agreement expected by chance (from the row and column totals)\n\nUseful with **unbalanced classes**: with 95 % negatives, always predicting \"negative\" gives 95 % accuracy but κ ≈ 0.\n\nDuring training, **k-fold cross-validation** is used to evaluate the model.",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 57
+        }
+      ]
+    },
+    {
+      "id": "l6-022",
+      "front": "Regression or classification? (1) Amazon predicts articles sold in 2 months. (2) Volvo detects faulty/healthy air pressure systems. (3) Predict Bitcoin's price tomorrow. (4) Group research articles by topic.",
+      "back": "1. **Regression** – the number of articles sold is a continuous quantity.\n2. **Classification** – faulty vs. healthy (labelled examples from similar vehicles).\n3. **Regression** – price is a continuous value.\n4. **Clustering** (unsupervised) – the topics aren't known in advance, so there are no labels.\n\nRule: **continuous output → regression** (house price in SEK, power use in kW, health score ∈ [0, 1]); **discrete classes → classification** (cat/dog, healthy/sick, A/B/C/D); **no labels → clustering**.",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 58
+        },
+        {
+          "doc": "L6",
+          "page": 59
+        },
+        {
+          "doc": "L6",
+          "page": 60
+        }
+      ]
+    },
+    {
+      "id": "l6-023",
+      "front": "What is unsupervised learning, and which method families does it include?",
+      "back": "In unsupervised learning the training data is **unlabelled** – only the data points xᵢ, no y. The goal is to **explore the data and find intrinsic structure** that isn't known beforehand.\n\n- **Clustering** – k-means, Gaussian mixture models (GMM), DBSCAN, hierarchical clustering\n- **Anomaly detection** – e.g. density estimation\n- **Dimensionality reduction** – PCA, LDA, MDS, PKDA\n- **Representation learning** – autoencoders",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 62
+        },
+        {
+          "doc": "L6",
+          "page": 63
+        },
+        {
+          "doc": "L6",
+          "page": 64
+        }
+      ]
+    },
+    {
+      "id": "l6-024",
+      "front": "Give applications of clustering.",
+      "back": "- **News aggregation** – automatically group web news stories about the same topic (Google News).\n- **Genetics** – group individuals by their genes from DNA microarray data.\n- **Social network analysis** – find communities.\n- **Customer segmentation / targeted marketing**, recommender systems.\n- **Image segmentation** and compression.",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 65
+        },
+        {
+          "doc": "L6",
+          "page": 66
+        },
+        {
+          "doc": "L6",
+          "page": 14
+        }
+      ]
+    },
+    {
+      "id": "l6-025",
+      "front": "How is dimensionality reduction used for data visualization?",
+      "back": "Patterns in **n dimensions** (xᵢ ∈ ℝⁿ) can't be plotted directly. Dimensionality reduction **maps them to 2-D (or 3-D)** while preserving the structure that matters, so classification or regression problems can be **visualized**.\n\nThe goal is a mapping that **preserves performance**: a classifier/regressor trained on the 2-D data should still do about as well as on the original data. Methods include PCA, LDA, MDS and PKDA (Polynomial Kernel Discriminant Analysis).",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 67
+        },
+        {
+          "doc": "L6",
+          "page": 68
+        },
+        {
+          "doc": "L6",
+          "page": 69
+        }
+      ]
+    },
+    {
+      "id": "l6-026",
+      "front": "What is reinforcement learning?",
+      "back": "An **agent learns to perform a task by interacting with an environment**:\n\n- The agent observes a **state**, takes an **action**, and receives a **reward** and the next state.\n- It learns a **policy**: **action = POLICY(state)** that maximizes the total reward over time.\n- Learning happens by trial and error – learning from mistakes – with no labelled examples.\n\n**Methods:** Q-learning, Deep Q-Networks (DQN).\n\n*Examples:* game AI (AlphaGo), robot navigation, learning to walk.",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 71
+        },
+        {
+          "doc": "L6",
+          "page": 14
+        }
+      ]
+    },
+    {
+      "id": "l6-027",
+      "front": "What are semi-supervised learning and active (interactive) learning?",
+      "back": "**Semi-supervised learning**\n- Labelling is **costly and time-consuming** (lots of expert effort), but unlabelled data is cheap.\n- So learn from **a few labelled + many unlabelled** examples. *E.g. a few hundred labelled medical images + thousands of unlabelled ones.*\n\n**Active / interactive learning**\n- The algorithm and the expert **interact during learning**.\n- In active learning for classification, the algorithm **selects the most informative examples** and asks the expert to label just those.\n- Interactive anomaly detection: learn to detect the anomalies that are most relevant to the expert, from their feedback.",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 72
+        },
+        {
+          "doc": "L6",
+          "page": 73
+        }
+      ]
+    },
+    {
+      "id": "l6-028",
+      "front": "Explain underfitting and overfitting (bias vs. variance) with the housing-price example.",
+      "back": "- **Underfitting – high bias:** the model is **too simple**. A straight line assumes prices grow linearly with size and doesn't even fit the training data well.\n- **Just right:** e.g. a quadratic curve fits the data pretty well and generalizes.\n- **Overfitting – high variance:** the model is **too complex** (e.g. a high-order polynomial). It passes through every training point (≈ 0 training error) but wiggles wildly and **performs poorly on new data** – it memorized noise.\n\nClassification works the same way: a straight boundary may underfit, and a very twisted boundary around every point overfits.",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 75
+        },
+        {
+          "doc": "L6",
+          "page": 76
+        },
+        {
+          "doc": "L6",
+          "page": 77
+        },
+        {
+          "doc": "L6",
+          "page": 79
+        }
+      ]
+    },
+    {
+      "id": "l6-029",
+      "front": "What makes overfitting more likely?",
+      "back": "- **Not enough training examples** (a small training dataset)\n- **Too many features** (relative to the number of examples)\n- **A model that is too complex** for the problem/data (wrong type of hypothesis function)\n\nThe aim is a **good model complexity** between underfitting and overfitting.",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 80
+        },
+        {
+          "doc": "L6",
+          "page": 86
+        }
+      ]
+    },
+    {
+      "id": "l6-030",
+      "front": "What is the difference between training error and generalization error? How do you estimate the generalization error?",
+      "back": "- **Training error** – the error on the training examples. **Not** an estimate of performance on new data (it is usually too optimistic).\n- **Generalization error** – the error on **new, unseen data**; typically higher than the training error.\n\n**k-fold cross-validation** (e.g. k = 5):\n1. Split the training data into 5 folds.\n2. Train on 4 folds, test on the remaining one; repeat so each fold is the test fold once.\n3. The generalization error = the **average of the 5 errors** (accuracy % = 100 − error %).\n\n**Leave-one-out CV:** k = n – leave out one sample at a time; used for **small datasets**.",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 81
+        },
+        {
+          "doc": "L6",
+          "page": 82
+        }
+      ]
+    },
+    {
+      "id": "l6-031",
+      "front": "How can you address overfitting?",
+      "back": "- **Hyperparameter tuning** – try models of different complexity, estimate each one's generalization error (cross-validation), keep the best.\n- **Reduce the number of features** (feature selection) – overfitting is more likely with many features relative to the data size. Or collect more data.\n- **Ensemble methods** – e.g. random forest, which fixes the overfitting of a single decision tree.\n- **Regularization** – keep all features but **shrink the parameter values θⱼ**. Works well when many features each contribute a little.",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 83
+        },
+        {
+          "doc": "L6",
+          "page": 84
+        }
+      ]
+    },
+    {
+      "id": "l6-032",
+      "front": "How do you tune hyperparameters?",
+      "back": "**Hyperparameters** control model complexity and are set *before* training, e.g. **k in k-NN**, tree depth, λ in regularization.\n\n1. Pick values for the hyperparameters.\n2. Compute the **generalization error with 10-fold cross-validation**.\n3. Repeat 1–2 for many values (grid search).\n4. Keep the values with the **smallest generalization error**, and train a model on the **whole training set** with them.\n5. Finally, evaluate it on the **test set** to see how it will perform in the real world.\n\nIn scikit-learn: `GridSearchCV`.",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 85
+        }
+      ]
+    },
+    {
+      "id": "l6-033",
+      "front": "Why and how is feature selection done?",
+      "back": "Datasets with thousands or millions of features are common. A very large number of features **d** relative to the number of examples **n** leads to **overfitting**.\n\n- Increase **n** (collect more data) if possible, or\n- Decrease **d** – select the most important features → simpler and faster models.\n\n**Tree-based feature importance:** decision trees and random forests can compute how much each feature **decreases the weighted impurity** across the tree(s); keep the most important features.",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 86
+        },
+        {
+          "doc": "L6",
+          "page": 87
+        }
+      ]
+    },
+    {
+      "id": "l6-034",
+      "front": "What is regularization? What does λ do, and what happens if it is 0 or very large?",
+      "back": "Regularization adds a **penalty on large parameter values** to the cost function, because small parameters give a **simpler model that is less prone to overfitting**:\n\n**E(θ) = (1/2n) [ Σᵢ (h_θ(x⁽ⁱ⁾) − y⁽ⁱ⁾)² + λ Σⱼ θⱼ² ]**\n\n**λ (the regularization parameter, a hyperparameter)** controls the trade-off between:\n- Objective 1: **fit the training data well** (first term)\n- Objective 2: **keep the parameters small** (second term)\n\n- **λ = 0** → the original cost function; **overfitting** can happen.\n- **λ extremely large** → all θⱼ are pushed to ≈ 0 → the model is almost a flat line → **underfitting**.\n\nSo try several λ values and pick the one with the best cross-validated generalization error.\n\n*Example:* adding 1000·θ₃² + 1000·θ₄² to the cost forces θ₃, θ₄ ≈ 0, turning an overfitting 4th-order polynomial back into a quadratic.",
+      "sources": [
+        {
+          "doc": "L6",
+          "page": 88
+        },
+        {
+          "doc": "L6",
+          "page": 89
+        },
+        {
+          "doc": "L6",
+          "page": 90
+        }
+      ]
+    },
+    {
+      "id": "l6-035",
+      "front": "Build a decision tree for GoForDrive from: (Low, Sunny) NO; (Medium, Sunny) NO; (High, Sunny) YES; (Medium, Rainy) NO; (High, Rainy) NO; (High, Overcast) YES; (Low, Overcast) NO; (Medium, Overcast) NO.",
+      "back": "Split first on **Temperature** – two of its branches are already pure:\n\n```\nTemperature\n├── Low    → NO\n├── Medium → NO\n└── High   → Outlook\n             ├── Sunny    → YES\n             ├── Overcast → YES\n             └── Rainy    → NO\n```\n\n**Why Temperature first:** Low (2 rows) and Medium (3 rows) are all NO, so only High (3 rows) needs a further split, and Outlook separates those perfectly. Choosing the attribute that gives the purest subsets is what **information gain / entropy** formalizes.\n\n(Other correct trees exist, e.g. splitting on Outlook first, but they are larger.)",
+      "sources": [
+        {
+          "doc": "EX2020S",
+          "page": 2,
+          "note": "Question 5"
+        },
+        {
+          "doc": "L6",
+          "page": 55
+        },
+        {
+          "doc": "L6",
+          "page": 87
+        }
+      ]
+    }
+  ]
+}

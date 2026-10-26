@@ -1,0 +1,556 @@
+{
+  "id": "lecture-05",
+  "name": "L5 · Data Mining & Knowledge Discovery",
+  "description": "KDD/CRISP-DM, data types and quality, preprocessing, normalization, regression",
+  "group": "Lectures",
+  "order": 5,
+  "cards": [
+    {
+      "id": "l5-001",
+      "front": "What is data mining?",
+      "back": "**Data mining** (knowledge discovery from data) is the **extraction of interesting patterns or knowledge from huge amounts of data** – patterns that are *non-trivial, implicit, previously unknown and potentially useful*.\n\nMain steps: **acquire and clean** the data → **extract insights** with machine learning → **present / visualize** them.\n\nAlternative names: knowledge discovery in databases (**KDD**), knowledge extraction, data/pattern analysis, data archaeology, information harvesting, business intelligence.\n\n*Example (direct marketing):* a phone company mines past purchase data to find the customers most likely to buy a new phone, and targets only them to increase profit.",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 3
+        },
+        {
+          "doc": "L5",
+          "page": 5
+        },
+        {
+          "doc": "L5",
+          "page": 8
+        }
+      ]
+    },
+    {
+      "id": "l5-002",
+      "front": "Why has data mining become important?",
+      "back": "- **Huge amounts of data are collected and warehoused**: web data and e-commerce, purchases at department/grocery stores, bank and credit-card transactions, sensors…\n- **Computers have become cheaper and more powerful**, so analysing that data is feasible.\n- The data is far too large for humans to analyse manually, but contains valuable knowledge (customer behaviour, fraud, trends).",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 4
+        }
+      ]
+    },
+    {
+      "id": "l5-003",
+      "front": "What is data mining and what is *not*? Give examples.",
+      "back": "**Not data mining** (simple search / query processing, deductive expert systems):\n- Looking up a phone number in a phone directory\n- Querying a web search engine for information about \"Amazon\"\n\n**Data mining** (discovering new, non-obvious patterns):\n- Discovering that certain surnames are more common in certain US areas (O'Brien, O'Rourke, O'Reilly… in the Boston area)\n- Grouping similar documents returned by a search engine by context (Amazon rainforest vs. Amazon.com)",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 6
+        },
+        {
+          "doc": "L5",
+          "page": 8
+        }
+      ]
+    },
+    {
+      "id": "l5-004",
+      "front": "Which disciplines does data mining draw on?",
+      "back": "Data mining sits at the **confluence of several disciplines**:\n\n- **Machine learning** – learning algorithms\n- **Statistics** – modelling, hypothesis testing\n- **Database technology** – storing and querying large data\n- **Visualization** – presenting patterns\n- **Information science**\n- Other disciplines (domain knowledge, high-performance computing…)",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 7
+        }
+      ]
+    },
+    {
+      "id": "l5-005",
+      "front": "Describe the KDD (Knowledge Discovery in Databases) process.",
+      "back": "KDD process (**Fayyad, 1996**):\n\n**Data → Selection → Target data → Preprocessing → Preprocessed data → Transformation → Transformed data → Data mining → Patterns → Interpretation / Evaluation → Knowledge**\n\n1. **Selection** – pick the relevant data\n2. **Preprocessing** – clean it (noise, missing values)\n3. **Transformation** – reduce and transform it into a suitable form (normalization, feature selection)\n4. **Data mining** – apply algorithms to find patterns\n5. **Interpretation / evaluation** – judge which patterns are useful knowledge\n\nThe process is **iterative** – you often go back to earlier steps.",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 9
+        },
+        {
+          "doc": "L5",
+          "page": 10
+        }
+      ]
+    },
+    {
+      "id": "l5-006",
+      "front": "In the machine-learning/statistics view of KDD, what happens in pre-processing, data mining and post-processing?",
+      "back": "**Input data →**\n\n- **Pre-processing:** data integration, normalization, feature selection, dimension reduction\n- **Data mining:** pattern discovery, association & correlation, classification, clustering, outlier analysis\n- **Post-processing:** pattern evaluation, pattern selection, pattern interpretation, pattern visualization\n\n**→ Pattern → Information → Knowledge**",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 11
+        }
+      ]
+    },
+    {
+      "id": "l5-007",
+      "front": "What is CRISP-DM?",
+      "back": "**CRoss-Industry Standard Process for Data Mining** (Shearer, 2000) – a cyclic process with six phases around the data:\n\n1. **Business understanding** – what is the business goal?\n2. **Data understanding** – collect and explore the data\n3. **Data preparation** – clean, select and transform\n4. **Modelling** – apply data-mining techniques\n5. **Evaluation** – does the model meet the business goal?\n6. **Deployment** – put it into use\n\nArrows go back and forth (e.g. modelling → data preparation), and the whole cycle repeats.",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 9
+        },
+        {
+          "doc": "L5",
+          "page": 12
+        }
+      ]
+    },
+    {
+      "id": "l5-008",
+      "front": "What does OSEMN stand for?",
+      "back": "A data-science process in five steps:\n\n- **O**btain data\n- **S**crub (clean) data\n- **E**xplore data\n- **M**odel the data\n- i**N**terpret the results\n\nThe three standard processes from the lecture: **KDD** (Fayyad, 1996), **CRISP-DM** (Shearer, 2000) and **OSEMN**.",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 9
+        },
+        {
+          "doc": "L5",
+          "page": 13
+        }
+      ]
+    },
+    {
+      "id": "l5-009",
+      "front": "What are data objects and attributes? Give synonyms.",
+      "back": "Data = a **collection of data objects and their attributes**.\n\n- **Attribute** – a property or characteristic of an object (eye colour, temperature, taxable income). Also called **variable, field, characteristic or feature**.\n- **Object** – described by a collection of attributes. Also called **record, point, case, sample, entity or instance**.\n\n*Example:* in a table of tax records, each **row** (Tid 1, 2, …) is an object and each **column** (Refund, Marital status, Taxable income) is an attribute.\n\n**Attribute values** are the numbers/symbols assigned to an attribute. The same attribute can have different values (height in feet or metres); different attributes can share a value set (ID and age are both integers, but age has a min and max).",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 14
+        },
+        {
+          "doc": "L5",
+          "page": 15
+        }
+      ]
+    },
+    {
+      "id": "l5-010",
+      "front": "What are the four types of attributes? Give examples.",
+      "back": "| Type | Meaning | Examples |\n|---|---|---|\n| **Nominal** | Just names/labels, no order (=, ≠) | ID numbers, eye colour, zip codes |\n| **Ordinal** | Ordered categories, but differences aren't meaningful (<, >) | Rankings (taste 1–10), grades, height in {short, medium, tall} |\n| **Interval** | Differences are meaningful, but no true zero (+, −) | Calendar dates, temperature in °C or °F |\n| **Ratio** | Has a true zero, so ratios are meaningful (×, ÷) | Temperature in Kelvin, length, time, counts |\n\n*Check:* 20 °C is not \"twice as warm\" as 10 °C (interval), but 20 K is twice 10 K (ratio).",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 16
+        }
+      ]
+    },
+    {
+      "id": "l5-011",
+      "front": "What kinds of data-quality problems exist? Give examples of dirty data.",
+      "back": "Real-world data is **dirty** (faulty instruments, human/computer errors, transmission errors):\n\n- **Incomplete** – missing attribute values or attributes, e.g. Occupation = \"\" (missing)\n- **Noisy** – errors and outliers, e.g. Salary = \"−10\"\n- **Inconsistent** – discrepancies in codes or names, e.g. Age = \"42\" vs \"Fortytwo\"; Birthday = \"03/07/2010\" vs \"3rd July 2010\"; a rating that used to be 1, 2, 3 is now A, B, C\n- **Duplicate data** – the same record more than once\n\nKey questions: how can we **detect** the problems, and what can we **do** about them?",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 17
+        },
+        {
+          "doc": "L5",
+          "page": 29
+        }
+      ]
+    },
+    {
+      "id": "l5-012",
+      "front": "What is data integration, and what problems does it involve?",
+      "back": "**Data integration** combines data from **multiple sources into one coherent store**.\n\n- **Schema integration** – merge the metadata of the different sources.\n- **Entity identification problem** – recognise that records refer to the same real-world entity, e.g. `A.cust-id` ≡ `B.cust-#`.\n- **Data value conflicts** – the same entity has different values in different sources, because of different representations or scales (metric vs. British units, EUR vs. SEK).",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 18
+        }
+      ]
+    },
+    {
+      "id": "l5-013",
+      "front": "What are the steps for performing successful data mining?",
+      "back": "1. **Understand** the data\n2. **Normalize** the data\n3. **Extract** features\n4. **Select** a model\n5. **Train** the model\n6. **Evaluate** the model\n\nEverything starts with **understanding the data**: ask whether the problem is solvable from this data at all. If not, no machine-learning algorithm will solve it.",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 19
+        },
+        {
+          "doc": "L5",
+          "page": 20
+        }
+      ]
+    },
+    {
+      "id": "l5-014",
+      "front": "Why must you understand the relationship in the data? Which of these predictions make sense: next hour's temperature from today's; cars sold from ice-creams sold; tomorrow's weather from BTH admissions?",
+      "back": "A model can only learn a relationship that **actually exists** in the data.\n\n- Temperature over the last day → temperature next hour: **yes**, the two are connected.\n- Ice-creams sold → cars sold that day: **no**, there is no (causal) connection.\n- Students admitted to BTH → tomorrow's weather: **no** connection.\n\nIf there is no relationship between inputs and output, the problem is probably **unsolvable with machine learning**, however good the algorithm.",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 20
+        },
+        {
+          "doc": "L5",
+          "page": 21
+        },
+        {
+          "doc": "L5",
+          "page": 22
+        }
+      ]
+    },
+    {
+      "id": "l5-015",
+      "front": "How does the scale (aggregation level) of the data affect a prediction? Example: predict tomorrow's mean temperature from last year's data stored per minute/day/week/month/year.",
+      "back": "Data can be stored at different scales and **aggregated** to larger units (e.g. daily means averaged into weekly means), but aggregation throws away detail.\n\nPredicting tomorrow's mean temperature from last year's data stored as the mean per:\n- **Minute** – okay\n- **Day** – okay\n- **Week** – okay\n- **Month** – starting to get hard\n- **Year** – really hard (one number per year says nothing about tomorrow)\n\nRule: the data's scale must be **fine enough for the scale of the prediction**.",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 23
+        },
+        {
+          "doc": "L5",
+          "page": 24
+        },
+        {
+          "doc": "L5",
+          "page": 25
+        }
+      ]
+    },
+    {
+      "id": "l5-016",
+      "front": "What is the curse of dimensionality, and how does dimensionality reduction help?",
+      "back": "**Curse of dimensionality** – with many features (dimensions):\n- the computational cost often grows (quadratically) with input size;\n- the data becomes increasingly **sparse** in the space, so patterns are hard to find and models overfit.\n\n**Dimensionality reduction** lowers the number of dimensions while keeping as much variation/information as possible:\n- **PCA** (Principal Component Analysis) – new axes in the directions of largest variance\n- **SVD** (Singular Value Decomposition)\n\n*Example:* 1000 pixel values of an image compressed to 50 principal components that still describe most of the variation.",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 26
+        }
+      ]
+    },
+    {
+      "id": "l5-017",
+      "front": "What are the major tasks in data pre-processing?",
+      "back": "1. **Data cleaning** – remove incorrect, incomplete and inaccurate data; fix noise and inconsistencies.\n2. **Handling missing values** – delete, impute or predict them.\n3. **Binning** – group continuous values into discrete classes.\n4. **Data reduction** – fewer records or features (sampling, PCA, feature selection).\n5. **Data transformation** – normalization, log/root transforms, aggregation.\n\nPlus **data integration** when combining sources and **data editing** to standardise values.",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 27
+        },
+        {
+          "doc": "L5",
+          "page": 28
+        }
+      ]
+    },
+    {
+      "id": "l5-018",
+      "front": "What are data cleaning and data editing? Give an example.",
+      "back": "**Data cleaning** removes incorrect, incomplete and inaccurate data, and replaces missing values.\n\n**Data editing** changes values so the later analysis is clearer and consistent.\n\n*Example:* a column \"Mobile phones\" contains Apple, Samsung, **BMW**, Apple, **Ford**. BMW and Ford aren't phone brands, so they are errors:\n- **Cleaning:** delete those rows.\n- **Editing:** replace them with valid values (e.g. Samsung, Apple), keeping the rows.",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 28
+        },
+        {
+          "doc": "L5",
+          "page": 30
+        }
+      ]
+    },
+    {
+      "id": "l5-019",
+      "front": "How can missing values be handled?",
+      "back": "Missing values are very common (data-collection problems, validation rules…) and must be handled:\n\n- **Delete the rows** with missing values (simple, but loses data)\n- **Impute** them – e.g. the most frequent value for a categorical variable, or the mean/median for a numeric one\n- **Predict** them with a model from the other attributes\n- **Weighting and averaging** of similar records\n- **Fill with the nearest data** (e.g. the previous value in a time series, or the nearest neighbour)",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 31
+        }
+      ]
+    },
+    {
+      "id": "l5-020",
+      "front": "What is binning?",
+      "back": "**Binning** converts a continuous variable into a small number of **discrete classes (bins)**.\n\n*Example:* length → {small, medium, large}; age → {0–17, 18–64, 65+}.\n\nIt can reduce the effect of noise and small measurement errors, and makes some models and analyses simpler.",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 32
+        }
+      ]
+    },
+    {
+      "id": "l5-021",
+      "front": "What is normalization, why is it needed, and which methods exist?",
+      "back": "**Normalization** transforms feature values to a **common scale**. Many ML algorithms (distance-based ones like k-NN and k-means, neural networks, gradient descent) are **sensitive to scale**: a salary in the 100 000s would dominate an age in the 10s.\n\n**Methods:**\n1. **Min-max** – scale to [0, 1] (or another range): (v − min) / (max − min)\n2. **Z-score** – mean 0, standard deviation 1: (v − mean) / sd\n3. **Decimal scaling** – divide by a power of 10\n4. **Logarithmic transform** – log(v), for data with a wide range; reduces the effect of outliers\n5. **Root transform** – √v, similar purpose\n\nNormalize only the **input features**, not the target variable.",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 33
+        },
+        {
+          "doc": "L5",
+          "page": 34
+        }
+      ]
+    },
+    {
+      "id": "l5-022",
+      "front": "Give the min-max normalization formula and normalize salaries 100000, 52000, 28000, 12000, 4000 to [0, 1].",
+      "back": "**v' = (v − min) / (max − min) · (new_max − new_min) + new_min**\n\nHere min = 4000, max = 100000, range = 96000, new range [0, 1]:\n\n| Salary | Calculation | Normalized |\n|---|---|---|\n| 100000 | 96000 / 96000 | **1** |\n| 52000 | 48000 / 96000 | **0.5** |\n| 28000 | 24000 / 96000 | **0.25** |\n| 12000 | 8000 / 96000 | **0.0833** |\n| 4000 | 0 / 96000 | **0** |",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 34
+        },
+        {
+          "doc": "L5",
+          "page": 35
+        }
+      ]
+    },
+    {
+      "id": "l5-023",
+      "front": "Give the z-score normalization formula and normalize salaries 100000, 52000, 28000, 12000, 4000 (mean 39200, sd 38616.06).",
+      "back": "**z = (x − mean) / sd**, where sd = √( Σ(xᵢ − x̄)² / (n − 1) )\n\n| Salary | Calculation | z |\n|---|---|---|\n| 100000 | 60800 / 38616 | **1.5745** |\n| 52000 | 12800 / 38616 | **0.3315** |\n| 28000 | −11200 / 38616 | **−0.2900** |\n| 12000 | −27200 / 38616 | **−0.7044** |\n| 4000 | −35200 / 38616 | **−0.9115** |\n\nz tells how many standard deviations a value is above (+) or below (−) the mean.",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 34
+        },
+        {
+          "doc": "L5",
+          "page": 35
+        }
+      ]
+    },
+    {
+      "id": "l5-024",
+      "front": "House prices range from $150,000 to $1,500,000. Min-max normalize $800,000 to the range [1, 5].",
+      "back": "**v' = new_min + (v − min) / (max − min) · (new_max − new_min)**\n\nv' = 1 + (800000 − 150000) / (1500000 − 150000) · (5 − 1)\n= 1 + 650000 / 1350000 · 4\n= 1 + 0.4815 · 4\n= **2.9259**",
+      "sources": [
+        {
+          "doc": "EX2024S",
+          "page": 12,
+          "note": "Question 8a"
+        },
+        {
+          "doc": "EX2024S",
+          "page": 13
+        },
+        {
+          "doc": "L5",
+          "page": 35
+        }
+      ]
+    },
+    {
+      "id": "l5-025",
+      "front": "What is a limitation of min-max normalization? What happens if a new house price of $1,600,000 is added (range was $150k–$1.5M, scaled to [1, 5])?",
+      "back": "**Limitation:** min-max normalization is **sensitive to outliers and to the range**. Values outside the original [min, max] fall outside the target range, and when the min or max changes, **all previously normalized values must be recalculated**. One extreme outlier also squeezes all other values into a small part of the range.\n\nWith $1,600,000 the max changes:\n\nv'(800000) = 1 + (800000 − 150000) / (1600000 − 150000) · 4 = 1 + 650000 / 1450000 · 4 = **2.7931**\n\n(It was 2.9259 before, so every normalized value changes.) Z-score normalization is less affected by a single new extreme value.",
+      "sources": [
+        {
+          "doc": "EX2024S",
+          "page": 12,
+          "note": "Question 8b"
+        },
+        {
+          "doc": "EX2024S",
+          "page": 13
+        },
+        {
+          "doc": "L5",
+          "page": 36
+        }
+      ]
+    },
+    {
+      "id": "l5-026",
+      "front": "Exam scores have mean 75 and standard deviation 10. What is the z-score of a score of 85?",
+      "back": "z = (x − mean) / sd = (85 − 75) / 10 = **1.0**\n\nThe score is **one standard deviation above the mean**.",
+      "sources": [
+        {
+          "doc": "EX2024S",
+          "page": 12,
+          "note": "Question 8c"
+        },
+        {
+          "doc": "L5",
+          "page": 35
+        }
+      ]
+    },
+    {
+      "id": "l5-027",
+      "front": "What are the advantages and disadvantages of normalization?",
+      "back": "**Advantages**\n1. **Better ML performance** – features on a common scale; no feature dominates just because of its units.\n2. **Handles outliers better** – scaled outliers are less influential (especially with log/z-score).\n3. **Easier interpretation** of results and model weights.\n4. **Better generalization** – the model is less sensitive to the scale of the inputs.\n\n**Disadvantages**\n1. **Loss of information** if the original scale is important.\n2. **Outliers become harder to detect**, since they are scaled along with the rest.\n3. **Extra computational cost**.",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 36
+        }
+      ]
+    },
+    {
+      "id": "l5-028",
+      "front": "What are classification and prediction in data mining? Name typical methods and applications.",
+      "back": "Both **build models from training examples**.\n\n- **Classification** – describe and distinguish **classes**, and assign a class label to new instances (e.g. classify countries by climate, cars by size).\n- **Prediction** – predict unknown or missing **numerical** values.\n\n**Typical methods:** decision trees, naïve Bayes, support vector machines, neural networks, rule-based and pattern-based classification, logistic regression.\n\n**Applications:** credit-card fraud detection, direct marketing, classifying stars, diseases, web pages.\n\n**Binary classification** has two classes (spam / not spam); **multi-class** has more than two (handwritten digits 0–9).",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 37
+        },
+        {
+          "doc": "L5",
+          "page": 38
+        }
+      ]
+    },
+    {
+      "id": "l5-029",
+      "front": "What is cluster analysis?",
+      "back": "**Cluster analysis** groups data into **new categories (clusters)** – it is **unsupervised**, the class labels are unknown.\n\n**Principle:** maximize **intra-class similarity** (objects in the same cluster are alike) and minimize **inter-class similarity** (different clusters are different).\n\n*Example:* cluster houses to find distribution patterns; group customers into segments for marketing.",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 39
+        }
+      ]
+    },
+    {
+      "id": "l5-030",
+      "front": "What is an outlier, what causes outliers, and where is outlier detection used?",
+      "back": "An **outlier** is a data object that **does not comply with the general behaviour** of the data. *Noise or exception? One person's garbage can be another person's treasure.*\n\n**Causes:**\n- **Inherent variability** – natural variation (a genuinely rare event)\n- **Measurement error** – inaccuracy and mistakes\n\n**Types:** outliers w.r.t. a **distribution** (far in the tails), w.r.t. a **pattern** (off a trend line), and **time-series** outliers (sudden spikes).\n\n**Applications:** credit-card fraud detection, criminal activity in e-commerce, network intrusion detection, video surveillance. Outliers are often found as a by-product of clustering or regression.",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 39
+        },
+        {
+          "doc": "L5",
+          "page": 40
+        },
+        {
+          "doc": "L5",
+          "page": 41
+        }
+      ]
+    },
+    {
+      "id": "l5-031",
+      "front": "What is regression? Give an example.",
+      "back": "**Regression** is a predictive modelling technique that investigates the relationship between a **dependent variable (output)** and one or more **independent variables (inputs)**, and predicts a **continuous** value.\n\n*Example (housing prices):* given the sizes and prices of sold houses, predict the price of a 750 ft² house. Fit a **straight line** (or perhaps a **quadratic** curve) to the data and read off the price at 750.\n\nIt is **supervised learning**: the right answers (prices) are given in the training data.",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 43
+        },
+        {
+          "doc": "L5",
+          "page": 44
+        },
+        {
+          "doc": "L5",
+          "page": 45
+        },
+        {
+          "doc": "L5",
+          "page": 46
+        },
+        {
+          "doc": "L5",
+          "page": 47
+        }
+      ]
+    },
+    {
+      "id": "l5-032",
+      "front": "What is the difference between classification and regression? Give examples of each.",
+      "back": "Both are **supervised learning**; the difference is the type of label y:\n\n- **Classification** – y takes a **finite set of values** (classes).\n  *Examples:* handwritten-digit recognition (y ∈ 0–9), spam filtering (y ∈ {spam, not spam}).\n- **Regression** – y can take any **real (continuous) value**.\n  *Examples:* predicting the stock market, predicting sales, estimating a person's age from a photo, house prices.\n\n**Linear models** can do both; they are geometric models (a line in 2-D, a plane in 3-D, a hyperplane in d-D).",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 49
+        },
+        {
+          "doc": "L5",
+          "page": 50
+        }
+      ]
+    },
+    {
+      "id": "l5-033",
+      "front": "Give the formulas for univariate linear regression y = a + b·x.",
+      "back": "**Slope:**\n**b = cov(x, y) / var(x) = Σ(xᵢ − x̄)(yᵢ − ȳ) / Σ(xᵢ − x̄)²**\n\n**Intercept:**\n**a = ȳ − b·x̄**\n\n(x̄, ȳ = the averages of x and y.) The regression line always passes through the point (x̄, ȳ). These are the **least-squares** estimates – they minimize the sum of squared errors.",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 51
+        }
+      ]
+    },
+    {
+      "id": "l5-034",
+      "front": "Fit y = a + b·x to x = 1…8, y = 3, 5, 7, 6, 9, 11, 12, 14. Predict x = 9 and 10 and compute the MSE against the true values 15 and 17.",
+      "back": "**Means:** x̄ = 4.5, ȳ = 8.375\n**Σ(x − x̄)(y − ȳ)** = 63.5, **Σ(x − x̄)²** = 42\n\n- **b** = 63.5 / 42 = **1.5119**\n- **a** = 8.375 − 1.5119 · 4.5 = **1.5714**\n- Model: **y = 1.5714 + 1.5119·x**\n\n**Predictions:**\n- x = 9: 1.5714 + 1.5119 · 9 = **15.1786**\n- x = 10: 1.5714 + 1.5119 · 10 = **16.6905**\n\n**MSE** = (1/n) Σ (y_true − y_pred)²\n= [(15 − 15.1786)² + (17 − 16.6905)²] / 2 = (0.0319 + 0.0958) / 2 = **0.0638**",
+      "sources": [
+        {
+          "doc": "EX2024S",
+          "page": 12,
+          "note": "Question 7"
+        },
+        {
+          "doc": "L5",
+          "page": 51
+        }
+      ]
+    },
+    {
+      "id": "l5-035",
+      "front": "What is the XOR problem, and why does it matter?",
+      "back": "In XOR the classes are placed diagonally: points near (0,0) and (1,1) belong to one class, points near (0,1) and (1,0) to the other.\n\n**No single straight line can separate the two classes** – the data is **not linearly separable**.\n\nSo a linear model (or a single perceptron) cannot solve it. You need a **non-linear model** (e.g. a multi-layer neural network) or a **transformation of the inputs** that makes the data separable.",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 52
+        },
+        {
+          "doc": "L5",
+          "page": 53
+        }
+      ]
+    },
+    {
+      "id": "l5-036",
+      "front": "What types of non-linear regression exist?",
+      "back": "1. **Transformable non-linear models** – one predictor, where transforming Y, X or both gives a linear relationship. *E.g. y = a·eᵇˣ becomes linear after taking log y.*\n2. **Polynomial models** – include higher-order terms: **Y = β₀ + β₁X + β₂X² + β₃X³**. Still linear in the parameters β, so least squares still works.\n3. **Models that are non-linear in the parameters** – need iterative fitting methods.",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 54
+        }
+      ]
+    },
+    {
+      "id": "l5-037",
+      "front": "Why can transforming the data make a problem easier? Give an example.",
+      "back": "A transformation can turn a hard (non-linear) problem into an easy (linear) one, or an extra transformed variable can add useful information.\n\n*Example:* red points lie inside a circle and blue points outside it. In the original (x₁, x₂) space no straight line separates them. After transforming every point to **(x₁², x₂²)**, the circle x₁² + x₂² = r² becomes the **straight line** z₁ + z₂ = r², so a linear classifier works.\n\nThe same idea is behind polynomial features and the kernel trick in SVMs.",
+      "sources": [
+        {
+          "doc": "L5",
+          "page": 55
+        },
+        {
+          "doc": "L5",
+          "page": 56
+        }
+      ]
+    }
+  ]
+}
