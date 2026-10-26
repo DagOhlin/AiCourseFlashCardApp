@@ -1,57 +1,408 @@
 {
   "id": "lecture-01",
   "name": "L1 · Introduction to Applied AI",
-  "description": "Starter set: the four views of AI and the Turing Test",
+  "description": "Views of AI, the Turing Test, AI history and applications",
   "group": "Lectures",
   "order": 1,
   "cards": [
     {
       "id": "l1-001",
       "front": "What are the four categories (views) of AI systems?",
-      "back": "|  | **Humanly** | **Rationally** |\n|---|---|---|\n| **Thinking** | Thinking humanly – cognitive modelling | Thinking rationally – \"laws of thought\" / logic |\n| **Acting** | Acting humanly – the Turing Test approach | Acting rationally – rational agents |\n\n- Systems that **think like humans**\n- Systems that **act like humans**\n- Systems that **think rationally**\n- Systems that **act rationally**",
-      "sources": [{ "doc": "L1", "page": 23 }, { "doc": "L1", "page": 24 }]
+      "back": "AI systems can be classified by two questions: do we care about **thinking** or **acting**, and do we measure success against **humans** or against **rationality** (the ideal, \"right\" answer)?\n\n|  | **Humanly** | **Rationally** |\n|---|---|---|\n| **Thinking** | Thinking humanly – cognitive modelling | Thinking rationally – \"laws of thought\" / logic |\n| **Acting** | Acting humanly – the Turing Test approach | Acting rationally – rational agents |\n\n- **Thinking humanly**: model how people actually think (e.g. a system that solves puzzles with the same steps a human uses).\n- **Acting humanly**: behave so that you can't be told apart from a human (e.g. a chatbot passing the Turing Test).\n- **Thinking rationally**: draw correct conclusions with formal logic (e.g. a medical rule-based expert system).\n- **Acting rationally**: do whatever best achieves the goal (e.g. a self-driving car braking for a pedestrian).",
+      "sources": [
+        {
+          "doc": "L1",
+          "page": 23
+        },
+        {
+          "doc": "L1",
+          "page": 24
+        }
+      ]
     },
     {
       "id": "l1-002",
-      "front": "What is the Turing Test, and who proposed it when?",
-      "back": "Proposed by **Alan Turing in 1950** as a test of *acting humanly*.\n\n- A human **interrogator** asks questions via a text terminal.\n- At the other end is either a human or a computer – no physical interaction.\n- The computer **passes** if the interrogator cannot reliably tell whether the answers come from a person or a machine.",
-      "sources": [{ "doc": "L1", "page": 25 }, { "doc": "L1", "page": 27 }]
+      "front": "Describe the Turing Test and explain its significance for evaluating AI.",
+      "back": "**The test** (Alan Turing, **1950**) is the *acting humanly* approach:\n\n- A human **interrogator** chats over a text terminal (no physical interaction) for a fixed time.\n- At the other end is either a human or a computer.\n- If the interrogator **cannot reliably tell** whether the answers come from a person or a machine, the machine is considered intelligent.\n\n**Significance**\n- It gives an **operational, testable definition** of intelligence: judge the *behaviour*, instead of arguing about what \"thinking\" means.\n- It sets a broad goal: to pass, a machine needs language, knowledge, reasoning and learning – so it drove research in many AI areas.\n- Limitation: it tests **imitation of humans**, not necessarily understanding, and a machine can be intelligent without being human-like.\n\n*Example:* if you chat with a system like ChatGPT and can't tell whether it is a person or a machine, it passes for that conversation.",
+      "sources": [
+        {
+          "doc": "L1",
+          "page": 25
+        },
+        {
+          "doc": "L1",
+          "page": 27
+        },
+        {
+          "doc": "L1",
+          "page": 28
+        },
+        {
+          "doc": "EX251030",
+          "page": 1,
+          "note": "Question 1a"
+        },
+        {
+          "doc": "EX2024S",
+          "page": 1,
+          "note": "Question 1a"
+        }
+      ]
     },
     {
       "id": "l1-003",
-      "front": "Which four capabilities would a computer need to pass the Turing Test?",
-      "back": "1. **Natural language processing** – to communicate successfully\n2. **Knowledge representation** – to store what it knows or hears\n3. **Automated reasoning** – to use stored knowledge to answer questions and draw new conclusions\n4. **Machine learning** – to adapt to new circumstances and detect patterns",
-      "sources": [{ "doc": "L1", "page": 31 }]
+      "front": "List and briefly explain the four capabilities a computer needs to pass the Turing Test.",
+      "back": "1. **Natural language processing** – to understand the questions and communicate in a human language.\n   *E.g. parsing \"What did you eat for breakfast?\" and answering fluently.*\n2. **Knowledge representation** – to store what it knows or hears.\n   *E.g. remembering that the interrogator mentioned a dog earlier in the chat.*\n3. **Automated reasoning** – to use the stored knowledge to answer questions and draw new conclusions.\n   *E.g. \"you said you live in Karlskrona, so you live in Sweden\".*\n4. **Machine learning** – to adapt to new circumstances and detect/extrapolate patterns.\n   *E.g. picking up the interrogator's style or a new topic during the conversation.*",
+      "sources": [
+        {
+          "doc": "L1",
+          "page": 31
+        },
+        {
+          "doc": "EX251030",
+          "page": 1,
+          "note": "Question 1b"
+        }
+      ]
     },
     {
       "id": "l1-004",
       "front": "What does the *total* Turing Test add on top of the normal Turing Test?",
-      "back": "Two more capabilities:\n\n- **Computer vision** – to perceive objects (seeing)\n- **Robotics** – to manipulate / move objects (acting)",
-      "sources": [{ "doc": "L1", "page": 32 }]
+      "back": "The total Turing Test also allows **physical interaction**, so the computer additionally needs:\n\n- **Computer vision** – to perceive objects (seeing). *E.g. recognising an object the interrogator holds up.*\n- **Robotics** – to manipulate and move objects (acting). *E.g. picking the object up and handing it back.*\n\nTogether with NLP, knowledge representation, reasoning and learning, these six disciplines make up most of AI.",
+      "sources": [
+        {
+          "doc": "L1",
+          "page": 32
+        }
+      ]
     },
     {
       "id": "l1-005",
       "front": "What is *thinking humanly* in AI?",
-      "back": "Designing systems that **emulate human cognitive processes** – trying to think the way humans think (cognitive modelling).\n\n- Closely tied to cognitive science, psychology and neuroscience.\n- Interested not only in the right answer but in **how the reasoning process** reaches it (e.g. 2, 4, 6, 8, ? → \"it increases by 2, so 10\").",
-      "sources": [{ "doc": "L1", "page": 33 }, { "doc": "L1", "page": 35 }]
+      "back": "Designing systems that **emulate human cognitive processes** – the AI should think *the way humans think* (cognitive modelling).\n\n- Main question: *how do humans think, learn, remember and solve problems – and can a computer do something similar?*\n- Closely tied to **cognitive science, psychology and neuroscience**.\n- It cares not only about the right answer but about **how the reasoning process** reaches it.\n\n*Example:* for the sequence 2, 4, 6, 8, ? a human reasons \"it increases by 2 each time, so 10\". A thinking-humanly system should reach 10 through that same kind of reasoning, not just output 10.",
+      "sources": [
+        {
+          "doc": "L1",
+          "page": 33
+        },
+        {
+          "doc": "L1",
+          "page": 34
+        },
+        {
+          "doc": "L1",
+          "page": 35
+        }
+      ]
     },
     {
       "id": "l1-006",
       "front": "What is *thinking rationally* (\"laws of thought\")? Give an example.",
-      "back": "Designing systems that **reason logically**, reaching conclusions by following **formal rules of logic** – conclusions consistent with the facts and rules they know.\n\nExample (syllogism):\n- All humans are mortal. Socrates is a human.\n- Human(Socrates) → Mortal(Socrates) ⇒ **Socrates is mortal.**\n\nOther example: a medical expert system with rules like *IF fever AND sore throat THEN consider throat infection*.",
-      "sources": [{ "doc": "L1", "page": 36 }, { "doc": "L1", "page": 37 }, { "doc": "EX250114", "page": 1, "note": "Question 1b" }]
+      "back": "Designing systems that **reason logically**: they reach conclusions by following **formal rules of logic**, so the conclusions are consistent with the facts and rules they know.\n\n*Example (syllogism):*\n- All humans are mortal. Socrates is a human.\n- Human(Socrates) → Mortal(Socrates) ⇒ **Socrates is mortal.**\n\n*Example (expert system):* rule *IF fever AND sore throat THEN consider throat infection*; observing Fever = True and Sore throat = True, the system concludes \"consider a throat infection\".\n\nThe conclusion comes from **applying a rule**, not from learning it from examples. Weak points: real-world knowledge is uncertain and hard to write as clean logic, and logical reasoning can be computationally expensive.",
+      "sources": [
+        {
+          "doc": "L1",
+          "page": 36
+        },
+        {
+          "doc": "L1",
+          "page": 37
+        },
+        {
+          "doc": "L1",
+          "page": 24
+        },
+        {
+          "doc": "EX250114",
+          "page": 1,
+          "note": "Question 1b"
+        }
+      ]
     },
     {
       "id": "l1-007",
       "front": "What is *acting rationally* (the rational agent approach)?",
-      "back": "Designing a system that **chooses the best possible action** to achieve its goals, based on what it knows and observes – \"do the right thing\": the action expected to **maximize goal achievement** given the available information.\n\nExample: a self-driving car perceives a pedestrian stepping onto the road → braking is the rational action because it best serves the goal of driving safely.",
-      "sources": [{ "doc": "L1", "page": 38 }, { "doc": "L1", "page": 39 }, { "doc": "EX250114", "page": 1, "note": "Question 1a" }]
+      "back": "Designing a system that **chooses the best possible action** to achieve its goals, based on what it knows and observes – \"do the right thing\": the action expected to **maximize goal achievement** given the available information.\n\nA *rational agent* maximizes the expected value of its **performance measure** given what it currently knows.\n\n*Example (self-driving car):*\n- Perception: cameras and sensors detect pedestrians, cars, lights.\n- Goal: reach the destination safely and efficiently.\n- Actions: accelerate, brake, turn, change lanes.\n- If a pedestrian suddenly steps onto the road, the rational action is to **brake**, because that best serves the goal of safe driving.",
+      "sources": [
+        {
+          "doc": "L1",
+          "page": 38
+        },
+        {
+          "doc": "L1",
+          "page": 39
+        },
+        {
+          "doc": "EX250114",
+          "page": 1,
+          "note": "Question 1a"
+        }
+      ]
     },
     {
       "id": "l1-008",
       "front": "How can an agent act rationally *without* thinking rationally?",
-      "back": "Rational action does **not necessarily require thinking** (logical deliberation). The right action can come from:\n\n- **Reflexes** – e.g. the blinking reflex, or pulling your hand away from a hot stove: fast and correct, with no reasoning.\n- Simple condition–action rules or learned behaviour that pick the best action directly.\n\nThinking should be *in the service of* rational action, but it is not the only way to get there.",
-      "sources": [{ "doc": "L1", "page": 38 }, { "doc": "EX250114", "page": 1, "note": "Question 1c" }]
+      "back": "Acting rationally means producing the **best action**; it does **not necessarily require thinking** (logical deliberation). The right action can come from:\n\n- **Reflexes** – e.g. the blinking reflex, or pulling your hand away from a hot stove: fast and correct, with no reasoning at all. Deliberating would actually be *worse* here because it is too slow.\n- **Simple condition–action rules** or **learned behaviour** – e.g. a thermostat or a trained neural network that maps the situation directly to a good action.\n\nSo rationality is judged by the **outcome of the action**, not by the process. Thinking should be *in the service of* rational action, but it is only one way to get there.",
+      "sources": [
+        {
+          "doc": "L1",
+          "page": 38
+        },
+        {
+          "doc": "EX250114",
+          "page": 1,
+          "note": "Question 1c"
+        }
+      ]
+    },
+    {
+      "id": "l1-009",
+      "front": "Give a definition of Artificial Intelligence.",
+      "back": "Several equivalent definitions from the lecture:\n\n- The **simulation of human intelligence processes by machines**, especially computer systems.\n- The field of computer science dedicated to creating systems that can **perform tasks that typically require human intelligence**.\n- The ability of a computer or computer-controlled robot to perform tasks commonly associated with intelligent beings.\n\n*Examples of such tasks:* understanding language, recognising faces, planning a route, playing chess, diagnosing a disease.",
+      "sources": [
+        {
+          "doc": "L1",
+          "page": 18
+        }
+      ]
+    },
+    {
+      "id": "l1-010",
+      "front": "Which main sub-fields and branches does the AI domain consist of?",
+      "back": "- **Machine learning** – supervised, unsupervised, reinforcement and deep learning\n- **Knowledge-based systems** – expert systems, intelligent agents, case-based reasoning\n- **Computer vision** – recognition, scene reconstruction, motion analysis, image restoration\n- **Robotics** – sensing, actuation, locomotion\n- **Natural language processing** – text and speech\n- **Automated planning and scheduling**\n- **Optimization** – evolutionary algorithms, genetic algorithms, differential evolution, particle swarm optimization\n\n**Types of AI:** Artificial *Narrow* Intelligence (one task, e.g. a chess engine – all AI today), Artificial *General* Intelligence (human-level across tasks), Artificial *Super* Intelligence (beyond humans).\n\n**Components of AI:** knowledge representation & reasoning, perception, learning, planning, action, communication.",
+      "sources": [
+        {
+          "doc": "L1",
+          "page": 21
+        }
+      ]
+    },
+    {
+      "id": "l1-011",
+      "front": "Can an AI system both *think humanly* and *behave rationally*? Give an example.",
+      "back": "**Yes.** It can mimic human cognitive processes while still choosing the logically best, goal-oriented action.\n\n- **Healthcare:** *thinks humanly* by analysing symptoms, history and test results the way a doctor would (knowledge base + human-like reasoning); *behaves rationally* by choosing the treatment that gives the best expected patient outcome.\n- **Strategy game:** *thinks humanly* by learning from past matches and adapting to the opponent like a human player; *behaves rationally* by evaluating strategies and picking the one with the highest chance of winning (e.g. attack vs. fortify based on relative strength) – without human mistakes such as distraction.",
+      "sources": [
+        {
+          "doc": "L1",
+          "page": 41
+        },
+        {
+          "doc": "L1",
+          "page": 42
+        }
+      ]
+    },
+    {
+      "id": "l1-012",
+      "front": "What do acting humanly, thinking humanly, acting rationally and thinking rationally have in common?",
+      "back": "All four approaches share:\n\n- **Decision-making and problem-solving** – they choose between alternatives to solve a task.\n- **Goal-oriented behaviour** – they work towards objectives.\n- **Use of knowledge and information** – they need to represent and use knowledge.\n- **Adaptation and learning** – they improve with experience.\n- **Evaluation of outcomes** – they judge how good a result is.\n- **Ethics and fairness considerations** – all of them must behave responsibly.",
+      "sources": [
+        {
+          "doc": "L1",
+          "page": 43
+        },
+        {
+          "doc": "EX2024S",
+          "page": 1,
+          "note": "Question 1b"
+        }
+      ]
+    },
+    {
+      "id": "l1-013",
+      "front": "A robot helps you cook a meal. How would it work under each of the four AI paradigms?",
+      "back": "- **Acting humanly:** imitates a human chef – chops, stirs and tastes the food with a spoon, maybe makes small talk, even hesitates to check the recipe.\n- **Thinking humanly:** decides like a human would – recalls recipes it \"remembers\", uses smell to judge whether something burns, multitasks like people do (boil water while chopping).\n- **Acting rationally:** goes for the best result as efficiently as possible, *not* human-like – e.g. uses timers and a sous-vide machine for perfect precision, skips unnecessary steps like tasting.\n- **Thinking rationally:** treats cooking as a logical problem – breaks it into steps (select → prepare → cook), uses rules/algorithms to compute timings and order (e.g. onions before garlic because they take longer).",
+      "sources": [
+        {
+          "doc": "EX2024S",
+          "page": 2,
+          "note": "Question 3"
+        },
+        {
+          "doc": "EX2024S",
+          "page": 3
+        }
+      ]
+    },
+    {
+      "id": "l1-014",
+      "front": "Early AI history (1800–1900s): who were the key people and what did they contribute?",
+      "back": "**George Boole, Alfred North Whitehead, Bertrand Russell**\n\n- **Boolean algebra** (Boole) – logic expressed as algebra with true/false values; the basis of digital circuits and logical reasoning.\n- **Principia Mathematica** (Whitehead & Russell) – an attempt to derive all of mathematics from formal logic.\n\nTogether they laid the **theoretical foundations**: reasoning can be formalised and computed.",
+      "sources": [
+        {
+          "doc": "L1",
+          "page": 45
+        }
+      ]
+    },
+    {
+      "id": "l1-015",
+      "front": "AI history from the 1930s: who were Turing, Shannon and von Neumann and what did they contribute?",
+      "back": "- **Alan Turing** – theory of computation and the **Turing machine**; the **Turing Test** (to distinguish machine from human).\n- **Claude Shannon** – **information theory** and applying Boolean algebra to circuits.\n- **John von Neumann** – the **von Neumann architecture** of computing machines (program and data stored in the same memory), used by practically every computer since.",
+      "sources": [
+        {
+          "doc": "L1",
+          "page": 46
+        }
+      ]
+    },
+    {
+      "id": "l1-016",
+      "front": "What happened in AI around the 1980s (\"soft computing\")?",
+      "back": "Methods inspired by human-like and natural computing:\n\n| Person | Contribution |\n|---|---|\n| David Rumelhart | Learning of multi-layer perceptrons (back-propagation) |\n| Lotfi Zadeh | Fuzzy logic |\n| John Holland | Genetic algorithms |\n| Lawrence Fogel | Evolutionary programming |\n| Ingo Rechenberg | Evolution strategies |\n| John Koza | Genetic programming |",
+      "sources": [
+        {
+          "doc": "L1",
+          "page": 47
+        }
+      ]
+    },
+    {
+      "id": "l1-017",
+      "front": "Name some key milestones on the AI timeline.",
+      "back": "- **1950** – Turing Test proposed\n- **1956** – the term \"Artificial Intelligence\" is used for the first time (Dartmouth workshop)\n- **1965** – ELIZA, an early natural-language chatbot\n- **1979** – Neocognitron (early convolutional-style neural network)\n- **1986** – neural networks trained widely with **back-propagation**\n- **1997** – IBM **Deep Blue** beats chess world champion Garry Kasparov\n- **2011** – IBM **Watson** wins Jeopardy!; 2011–2014 virtual assistants (Siri, Google Now, Cortana, Alexa)\n- **2015** – deep-learning frameworks TensorFlow and Keras released\n- **2016** – **AlphaGo** beats Go champion Lee Sedol\n- **2020** – OpenAI's **GPT-3** produces text that is almost indistinguishable from human writing",
+      "sources": [
+        {
+          "doc": "L1",
+          "page": 50
+        }
+      ]
+    },
+    {
+      "id": "l1-018",
+      "front": "What technologies characterise AI from the 2000s onwards, and how can AI history be summarised in three periods?",
+      "back": "**Representative technologies (2000~):**\n- Internet / WWW (Tim Berners-Lee, 1989), Internet of Things (Kevin Ashton, 1999)\n- Cloud computing (mainframes → virtual machines → cloud)\n- Big data (John Mashey, 1998)\n- **Deep learning** (Geoffrey Hinton, 2006)\n\n**Three periods:**\n1. **Early work** – theoretical foundations (logic, computation).\n2. **Second period** – acquiring knowledge from data and experience (learning).\n3. **Third period** – advanced-level intelligence methods (deep learning, big data, generative AI).",
+      "sources": [
+        {
+          "doc": "L1",
+          "page": 48
+        },
+        {
+          "doc": "L1",
+          "page": 49
+        }
+      ]
+    },
+    {
+      "id": "l1-019",
+      "front": "What are the main application areas of AI? Give an example for each.",
+      "back": "- **Computer vision** – face/biometric recognition (face, iris, fingerprint, gait); pedestrian, sign and lane detection in cars (Tesla, Volvo, BMW).\n- **Natural language processing** – text classification, sentiment analysis, translation, chatbots.\n- **Voice recognition** – virtual assistants such as Siri or Alexa.\n- **Robotics** – industrial robots, nanobots that target cancer cells.\n- **Planning and optimization** – train scheduling (profit, timeliness, robustness), logistics.\n- **Knowledge capture** – expert systems.\n- **Medicine** – deep-learning breast-cancer diagnosis from medical images.\n- **Remote sensing** – detecting changes on Earth (ice melt, deforestation) from satellite images.\n- **Games** – Deep Blue, AlphaGo.",
+      "sources": [
+        {
+          "doc": "L1",
+          "page": 52
+        },
+        {
+          "doc": "L1",
+          "page": 57
+        },
+        {
+          "doc": "L1",
+          "page": 59
+        },
+        {
+          "doc": "L1",
+          "page": 68
+        },
+        {
+          "doc": "L1",
+          "page": 69
+        }
+      ]
+    },
+    {
+      "id": "l1-020",
+      "front": "Why do we need AI to handle big data, and what challenges does big data bring?",
+      "back": "**Why AI:** the data is too large and complex for humans – analysing it manually is **impractical, time-consuming and hard**. Data is everywhere: surveillance video, recorded financial transactions, terabytes of satellite images, digitised libraries, social media (Facebook alone generated ~4 PB per day). AI algorithms explore the data to find patterns and make predictions. The overall purpose is to make life **easier, safer and better**.\n\nBig data comes in different forms: numerical, categorical (words) and visual (images, video).\n\n**Challenges:** pre-processing, analytics architecture, evaluation, **class imbalance**, anomaly detection, developing learning methods, **time-evolving data**, compression and visualisation.",
+      "sources": [
+        {
+          "doc": "L1",
+          "page": 53
+        },
+        {
+          "doc": "L1",
+          "page": 54
+        },
+        {
+          "doc": "L1",
+          "page": 55
+        },
+        {
+          "doc": "L1",
+          "page": 56
+        }
+      ]
+    },
+    {
+      "id": "l1-021",
+      "front": "What is change detection in remote sensing, and what is it used for?",
+      "back": "**Change detection** = identifying the differences between **two images of the same geographical area taken at different times**.\n\nIt is used for: monitoring global warming and ice melt (e.g. Greenland), city and urban planning, forestry management, environmental monitoring, land management, natural-disaster monitoring, and observing temperature changes at the poles.",
+      "sources": [
+        {
+          "doc": "L1",
+          "page": 63
+        },
+        {
+          "doc": "L1",
+          "page": 64
+        }
+      ]
+    },
+    {
+      "id": "l1-022",
+      "front": "What is a time series?",
+      "back": "A **time series** is a sequence of data points **indexed in time order**, most commonly taken at **successive, equally spaced points in time** – i.e. discrete-time data.\n\n*Examples:* daily stock prices, hourly temperature readings, monthly sales, wind-power production per hour. AI is used to forecast future values from past ones.",
+      "sources": [
+        {
+          "doc": "L1",
+          "page": 70
+        }
+      ]
+    },
+    {
+      "id": "l1-023",
+      "front": "Name and explain common NLP text-analysis tasks.",
+      "back": "- **Text classification** – assign categories/tags to unstructured text (e.g. spam vs. not spam).\n- **Topic analysis** – find the main themes or subjects of a text.\n- **Sentiment analysis** – detect the emotion/opinion behind a text (e.g. are reviews of your mobile app positive or negative?).\n- **Language detection** – identify which language a text is written in.\n- **Keyword extraction** – pull out the most important words, to index, search or summarise text.\n- **Feature extraction** – identify specific characteristics of a product or service mentioned in the data.",
+      "sources": [
+        {
+          "doc": "L1",
+          "page": 72
+        }
+      ]
+    },
+    {
+      "id": "l1-024",
+      "front": "Which modalities can generative AI produce? Give an example model for each.",
+      "back": "- **Text** → large language models (ChatGPT, Claude)\n- **Images** → Stable Diffusion, DALL·E, MidJourney\n- **Audio** → voice cloning (ElevenLabs) and music generation (Jukebox)\n- **Video** → Runway Gen-2, Pika Labs\n- **Multimodal** → models handling text, images and more together (GPT-4V, Gemini)",
+      "sources": [
+        {
+          "doc": "L1",
+          "page": 73
+        }
+      ]
+    },
+    {
+      "id": "l1-025",
+      "front": "Why do we need AI in our lives? Give three reasons.",
+      "back": "- **Efficiency and innovation** – e.g. in agriculture, logistics and energy (optimising routes, predicting crop yield, balancing power grids).\n- **Accessibility and quality of life** – personalised recommendations, smart-home management, efficient transportation.\n- **Supporting complex decision-making** – analysing far more data than a human can (e.g. medical diagnosis support, finance).",
+      "sources": [
+        {
+          "doc": "L1",
+          "page": 77
+        }
+      ]
+    },
+    {
+      "id": "l1-026",
+      "front": "What is intelligence according to Daniel Gilbert and Jeff Hawkins?",
+      "back": "- **Daniel Gilbert:** the fundamental difference between humans and animals is that the human mind can **think about the future**.\n- **Jeff Hawkins:** intelligence is not defined by behaviour but by **prediction** – the brain constantly predicts what will happen next.\n\nSo both link intelligence to the ability to **predict / imagine the future**.",
+      "sources": [
+        {
+          "doc": "EX2020S",
+          "page": 1,
+          "note": "Question 1"
+        }
+      ]
     }
   ]
 }

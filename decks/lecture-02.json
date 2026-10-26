@@ -1,0 +1,820 @@
+{
+  "id": "lecture-02",
+  "name": "L2 · Intelligent Agents & Knowledge Representation",
+  "description": "Agents, PEAS, environment types, agent types, Wumpus World, logic and FOL",
+  "group": "Lectures",
+  "order": 2,
+  "cards": [
+    {
+      "id": "l2-001",
+      "front": "What is an intelligent agent?",
+      "back": "An intelligent agent is a system that **perceives its environment, processes information and takes actions autonomously** to achieve specific goals.\n\nMore generally, an agent is anything that perceives its environment through **sensors** and acts on it through **actuators**:\n\n- **Human agent:** eyes, ears and other organs as sensors; hands, legs, mouth as actuators.\n- **Robotic agent:** cameras and infrared range finders as sensors; motors as actuators.\n- **Software agent:** keyboard input, files, network packets as sensors; screen output, writing files, sending messages as actuators.",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 3
+        }
+      ]
+    },
+    {
+      "id": "l2-002",
+      "front": "What is the difference between the agent *function* and the agent *program*?",
+      "back": "- **Agent function** – the abstract, mathematical description: it maps every **percept history** to an action, **f : P\\* → A**.\n- **Agent program** – the concrete implementation that runs on the physical **architecture** (computer, robot body) and produces f.\n\n**agent = architecture + program**\n\nAn agent is completely specified by its agent function. Usually only one function (or a small set) is rational, and the aim is to implement that rational function *concisely* – e.g. not as a huge lookup table of every possible percept sequence.",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 4
+        },
+        {
+          "doc": "L2",
+          "page": 28
+        }
+      ]
+    },
+    {
+      "id": "l2-003",
+      "front": "Describe human, software and robotic agents.",
+      "back": "- **Human agents** – biological entities using cognitive abilities like reasoning, memory and decision-making to interact with the environment.\n- **Software agents** – digital entities in virtual environments that perform tasks autonomously: analyse data, automate tasks, talk to other software and decide based on rules or learning. *E.g. a spam filter, a trading bot, a chatbot.*\n- **Robotic agents** – physical entities in the real world that combine sensors, actuators and AI to perform physical actions; from simple machines to complex autonomous robots. *E.g. a robot vacuum, a self-driving car.*",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 5
+        }
+      ]
+    },
+    {
+      "id": "l2-004",
+      "front": "Describe the vacuum-cleaner world and its table-lookup agent.",
+      "back": "- Two squares, **A** and **B**, each can be clean or dirty.\n- **Percepts:** location and contents, e.g. `[A, Dirty]`.\n- **Actions:** Left, Right, Clean (Suck), NoOp.\n\nA **table-lookup agent** stores the action for every percept sequence:\n\n| Percept sequence | Action |\n|---|---|\n| [A, Clean] | Right |\n| [A, Dirty] | Clean |\n| [B, Clean] | Left |\n| [B, Dirty] | Clean |\n\nProblem with table-lookup agents in general: the table grows **exponentially** with the length of the percept history, so it is impossible for realistic problems.",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 6
+        },
+        {
+          "doc": "L2",
+          "page": 10
+        }
+      ]
+    },
+    {
+      "id": "l2-005",
+      "front": "What is a rational agent, and what is a performance measure?",
+      "back": "**Rational agent:** for each possible percept sequence, it selects the action that is **expected to maximize its performance measure**, given the evidence from the percept sequence and its built-in knowledge – it \"does the right thing\".\n\n**Performance measure:** an objective criterion for how successful the agent's behaviour is.\n\n*Example – vacuum cleaner:* amount of dirt cleaned up, time taken, electricity consumed, noise generated…\n\nNote: rational ≠ all-knowing. The agent maximizes *expected* performance with the information it has; it can still be unlucky.",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 7
+        },
+        {
+          "doc": "L2",
+          "page": 8
+        }
+      ]
+    },
+    {
+      "id": "l2-006",
+      "front": "What do *information gathering* and *autonomy* mean for a rational agent?",
+      "back": "- **Information gathering / exploration:** an agent may take actions just to change its future percepts and gain useful information. *E.g. a robot looks around a corner before crossing, or the vacuum moves to check whether square B is dirty.*\n- **Autonomy:** an agent is autonomous if its behaviour is determined by **its own experience** – it can learn and adapt – rather than only by knowledge built in by its designer.",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 9
+        }
+      ]
+    },
+    {
+      "id": "l2-007",
+      "front": "What are the key aspects of an intelligent agent?",
+      "back": "1. **Autonomy** – operates independently without human intervention.\n2. **Perception** – senses and interprets data from its environment.\n3. **Learning and adaptation** – improves its performance from experience.\n4. **Reasoning and decision-making** – evaluates information and picks the best action.\n5. **Actuation** – acts on and changes the environment.\n6. **Communication** – shares information and coordinates with other agents or humans.\n7. **Goal-oriented behaviour** – its actions are purposeful, directed at its objectives.\n8. **Robustness** – keeps working under unexpected situations, errors and changing conditions.\n9. **Memory** – stores and recalls past information for learning and prediction.\n\n*Example (robot vacuum):* it maps the room (perception, memory), plans a route (reasoning), drives and sucks (actuation), docks on its own (autonomy) and copes with a moved chair (robustness).",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 12
+        },
+        {
+          "doc": "L2",
+          "page": 13
+        },
+        {
+          "doc": "L2",
+          "page": 14
+        },
+        {
+          "doc": "L2",
+          "page": 15
+        },
+        {
+          "doc": "L2",
+          "page": 16
+        },
+        {
+          "doc": "EX2024S",
+          "page": 1,
+          "note": "Question 2a"
+        }
+      ]
+    },
+    {
+      "id": "l2-008",
+      "front": "What factors should you consider when designing an intelligent agent?",
+      "back": "Start by specifying the task with **PEAS** – Performance measure, Environment, Actuators, Sensors. In addition consider:\n\n- **Environment type** – observable? deterministic? static? discrete? single/multi-agent? This largely determines the design.\n- **Performance measure** – how success is evaluated.\n- **Agent architecture** – reactive (reflex), deliberative (goal/utility-based planning) or hybrid.\n- **Adaptability** – can it learn and handle unforeseen changes?",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 17
+        },
+        {
+          "doc": "L2",
+          "page": 18
+        },
+        {
+          "doc": "L2",
+          "page": 24
+        },
+        {
+          "doc": "EX2024S",
+          "page": 1,
+          "note": "Question 2b"
+        }
+      ]
+    },
+    {
+      "id": "l2-009",
+      "front": "What is PEAS? Give the PEAS description of an automated taxi driver.",
+      "back": "**PEAS** = **P**erformance measure, **E**nvironment, **A**ctuators, **S**ensors – the first step when designing an agent.\n\n**Automated taxi:**\n- **P:** safe, fast, legal, comfortable trip; maximize profits\n- **E:** roads, other traffic, pedestrians, customers\n- **A:** steering wheel, accelerator, brake, signal, horn\n- **S:** cameras, sonar, speedometer, GPS, odometer, engine sensors, keyboard",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 18
+        },
+        {
+          "doc": "L2",
+          "page": 19
+        }
+      ]
+    },
+    {
+      "id": "l2-010",
+      "front": "Give the PEAS description of a medical diagnosis system and of a part-picking robot.",
+      "back": "**Medical diagnosis system**\n- **P:** healthy patient, minimize costs and lawsuits\n- **E:** patient, hospital, staff\n- **A:** screen display (questions, tests, diagnoses, treatments)\n- **S:** keyboard (entry of symptoms, findings, patient's answers)\n\n**Part-picking robot**\n- **P:** percentage of parts in the correct bins\n- **E:** conveyor belt with parts, bins\n- **A:** jointed arm and hand\n- **S:** camera, joint-angle sensors",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 20
+        },
+        {
+          "doc": "L2",
+          "page": 21
+        }
+      ]
+    },
+    {
+      "id": "l2-011",
+      "front": "Define the six pairs of environment properties.",
+      "back": "- **Fully vs. partially observable** – do the sensors give the *complete state* of the environment at each point in time?\n- **Deterministic vs. stochastic** – is the next state completely determined by the current state and the action? Stochastic = uncertain outcomes.\n- **Episodic vs. sequential** – episodic: experience is split into independent episodes (perceive → one action) and the choice depends only on the current episode. Sequential: current decisions affect all future ones.\n- **Static vs. dynamic** – does the environment stay unchanged while the agent is deliberating? (*Semidynamic:* the environment doesn't change but the performance score does, e.g. chess with a clock.)\n- **Discrete vs. continuous** – a limited number of distinct, clearly defined percepts and actions, or continuous values (positions, speeds)?\n- **Single vs. multi-agent** – is the agent alone, or are other agents (cooperative or competitive) acting too?\n\nThe real world is partially observable, stochastic, sequential, dynamic, continuous and multi-agent.",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 22
+        },
+        {
+          "doc": "L2",
+          "page": 23
+        },
+        {
+          "doc": "L2",
+          "page": 24
+        }
+      ]
+    },
+    {
+      "id": "l2-012",
+      "front": "\"Partially observable\", \"stochastic\", \"episodic\" and \"single-agent\" describe gaps in an agent's knowledge. What knowledge is lacking (or not needed) in each case?",
+      "back": "- **Partially observable** – the agent does **not know the full current state** of the world; its sensors only show part of it (noisy or limited range), so it must remember or infer the rest. *E.g. a poker player can't see the other hands.*\n- **Stochastic** – the agent does **not know the exact outcome of its actions**: the same action in the same state can lead to different next states. *E.g. a robot's wheel may slip.*\n- **Episodic** – the agent has no knowledge of how the current action connects to **past or future episodes** – and doesn't need it, because each episode is independent; it cannot plan ahead across episodes. (In a *sequential* environment the gap is not knowing the long-term consequences of an action.) *E.g. a part-inspection robot judges each part on its own.*\n- **Single-agent** – the agent does not have to model other agents. The corresponding gap in a *multi-agent* world is **not knowing what the other agents will do** (their goals and next moves). *E.g. a solo crossword vs. a chess opponent.*",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 22
+        },
+        {
+          "doc": "L2",
+          "page": 23
+        },
+        {
+          "doc": "EX250114",
+          "page": 2,
+          "note": "Question 2.1"
+        }
+      ]
+    },
+    {
+      "id": "l2-013",
+      "front": "Classify **chess** by the six environment properties.",
+      "back": "| Property | Chess |\n|---|---|\n| Observable | **Fully** – the whole board is visible |\n| Deterministic | **Deterministic** – a move has one fixed outcome (the opponent's reply is the only uncertainty, sometimes called *strategic*) |\n| Episodic | **Sequential** – every move affects the rest of the game |\n| Static | **Static** without a clock; **semidynamic** with a clock |\n| Discrete | **Discrete** – finite squares, pieces and moves |\n| Agents | **Multi-agent** (competitive, two players) |\n\nNote: the lecture's table marks \"chess without a clock\" as *episodic: yes*, but the textbook (AIMA) classifies chess as **sequential**. In the exam, state your choice and explain why.",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 24
+        },
+        {
+          "doc": "EX251030",
+          "page": 2,
+          "note": "Question 2a"
+        }
+      ]
+    },
+    {
+      "id": "l2-014",
+      "front": "Classify a **vacuum-cleaning robot in a home** by the six environment properties.",
+      "back": "- **Partially observable** – its sensors only see nearby dirt and obstacles, not the whole house.\n- **Stochastic** – wheels slip, dirt appears, people move things.\n- **Sequential** – where it cleans now affects what is left to clean later (episodic is arguable for a simple \"see dirt → suck\" robot).\n- **Dynamic** – people and pets move while it works.\n- **Continuous** – real positions and movement (the 2-square textbook vacuum world is *discrete*).\n- **Single-agent** – the robot is the only agent (unless you count people/pets as agents).",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 6
+        },
+        {
+          "doc": "L2",
+          "page": 22
+        },
+        {
+          "doc": "EX251030",
+          "page": 2,
+          "note": "Question 2b"
+        }
+      ]
+    },
+    {
+      "id": "l2-015",
+      "front": "Classify **RoboCup** (robot soccer) by the six environment properties.",
+      "back": "- **Partially observable** – limited sensor range and field of view; a robot can't see the whole field.\n- **Stochastic** – opponents' actions are unpredictable, the ball and motors behave noisily.\n- **Sequential** – each action affects later game situations.\n- **Dynamic** – the field itself is static, but robots and the ball keep moving (positions, orientations, velocities change) while an agent deliberates.\n- **Continuous** (mixed) – game time is divided into discrete periods (halves), but movement and positions are continuous.\n- **Multi-agent** – teammates (cooperative) and opponents (competitive).",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 25
+        },
+        {
+          "doc": "EX251030",
+          "page": 2,
+          "note": "Question 2c"
+        }
+      ]
+    },
+    {
+      "id": "l2-016",
+      "front": "Classify **taxi driving** by the six environment properties.",
+      "back": "Taxi driving is the \"hard\" case – the answer is **No** for every \"easy\" property:\n\n- **Partially observable** – can't see around corners or into other drivers' minds\n- **Stochastic** – traffic, weather, other drivers\n- **Sequential** – decisions affect the rest of the trip\n- **Dynamic** – the world changes while you think\n- **Continuous** – speed, position, steering angle\n- **Multi-agent** – other cars, pedestrians\n\nThis matches the real world in general, and shows why the **environment type largely determines the agent design**.",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 24
+        }
+      ]
+    },
+    {
+      "id": "l2-017",
+      "front": "What are the four basic agent types, in order of increasing generality?",
+      "back": "1. **Simple reflex agents** – act only on the current percept with if-then rules.\n2. **Model-based reflex agents** – also keep an internal model/state of the world.\n3. **Goal-based agents** – choose actions that bring them closer to a goal (planning/search).\n4. **Utility-based agents** – choose actions that maximize a utility (how *good* an outcome is).\n\nEach type adds something to the one before: memory → goals → preferences between outcomes.",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 29
+        }
+      ]
+    },
+    {
+      "id": "l2-018",
+      "front": "How does a simple reflex agent work? Give an example.",
+      "back": "- **Percept** → match a **condition–action rule** (\"if-then\" / production rule) → **action**.\n- It looks **only at the current percept** – no history, **no memory and no learning**.\n\n*Example:* \"If an obstacle is detected in front, then turn left.\" Or the vacuum agent: \"if the current square is dirty, then clean\".\n\n**Works well** only if the right action can be chosen from the current percept alone, i.e. in a (nearly) **fully observable** environment. It can get stuck in loops when it is partially observable.",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 30
+        }
+      ]
+    },
+    {
+      "id": "l2-019",
+      "front": "How does a model-based reflex agent differ from a simple reflex agent?",
+      "back": "It keeps an **internal model of the world**: a state that tracks parts of the environment it **cannot currently see**.\n\n- The model contains *how the world evolves* on its own and *how the agent's own actions affect it*.\n- Each new percept **updates** the internal state; condition–action rules then use **percept + state**.\n\n*Example:* a self-driving car remembers that a car was in its blind spot a second ago, even though the camera can't see it right now, and doesn't change lanes.\n\nThis lets it handle **partially observable** environments.",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 31
+        }
+      ]
+    },
+    {
+      "id": "l2-020",
+      "front": "How does a goal-based agent work?",
+      "back": "A goal-based agent acts to **achieve explicit goals** instead of just reacting.\n\n- **Goals** – a description of desirable states.\n- **State space** – all possible states of the environment and agent.\n- **Planning / search** – find a sequence of actions from the current state to a goal state.\n- **Decision-making** – choose actions by asking *\"what will happen if I do A – does it bring me closer to the goal?\"*\n\n*Example:* a navigation app with the goal \"be at the train station\" searches the road graph for a route.\n\nAdvantage: flexible – change the goal and the same agent does something new. Limitation: a goal is only **reached / not reached**, it can't say which of several routes is *better*.",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 32
+        }
+      ]
+    },
+    {
+      "id": "l2-021",
+      "front": "Explain utility-based agents.",
+      "back": "A utility-based agent doesn't just aim to reach a goal; it **maximizes a utility** – a measure of how \"happy\" or \"satisfied\" it will be in a resulting state.\n\n- A **utility function** maps a state (or sequence of states) to a **real number** describing how desirable it is.\n- Using its model, the agent predicts *what the world will be like if it does action A*, evaluates *how happy it would be in that state*, and picks the action with the **highest expected utility**.\n- This handles **trade-offs** between conflicting goals (speed vs. safety vs. cost) and **uncertainty** (weigh outcomes by their probability).\n\n*Example:* a taxi agent. A goal-based taxi only needs to *reach* the destination; a utility-based taxi prefers the route that is fastest, safest and cheapest, e.g. utility = −(travel time) − 10·(risk) − (fuel cost).",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 33
+        },
+        {
+          "doc": "EX250114",
+          "page": 2,
+          "note": "Question 2.2"
+        }
+      ]
+    },
+    {
+      "id": "l2-022",
+      "front": "How is a goal-based agent different from a utility-based agent? Can you implement a goal-based agent with a utility-based one?",
+      "back": "- **Goal-based:** chooses actions that lead to a goal state – the outcome is binary, goal **reached or not**.\n- **Utility-based:** chooses actions that lead to states with the **highest utility** – it can rank outcomes and pick the *best* way.\n\n*Example:* both can take you from A to B, but a utility-based agent picks the most efficient route, e.g. the shortest path.\n\n**Yes**, a goal-based agent can be built from a utility-based agent: give **goal states a high utility** (e.g. 1) and all other states a low utility (e.g. 0). Maximizing this utility is exactly reaching the goal.",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 32
+        },
+        {
+          "doc": "L2",
+          "page": 33
+        },
+        {
+          "doc": "EX2020S",
+          "page": 1,
+          "note": "Question 2"
+        }
+      ]
+    },
+    {
+      "id": "l2-023",
+      "front": "How would you design a utility-based intelligent agent for a real-world application (e.g. a ride-hailing app)?",
+      "back": "1. **Define the utility function** – quantify the objectives as a mathematical function. *Ride-hailing:* minimize waiting time, cost and distance.\n2. **Define observations and actions** – what it can observe (real-time traffic, user preferences, driver locations) and do (assign drivers, set prices). Reduce the spaces with feature selection.\n3. **Handle adaptation** – use machine learning to improve from feedback and changing conditions; cope with incomplete or noisy data.\n4. **Integrate with the real world** – APIs and scalable architecture; test in simulation before deploying.\n5. **Make it robust and scalable** – handle high load and failures.\n6. **Evaluate and iterate** – measure performance with the utility function and user satisfaction, then refine.",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 33
+        },
+        {
+          "doc": "EX2024S",
+          "page": 1,
+          "note": "Question 2c"
+        },
+        {
+          "doc": "EX2024S",
+          "page": 2
+        }
+      ]
+    },
+    {
+      "id": "l2-024",
+      "front": "Describe the Wumpus World: environment, actions and percepts.",
+      "back": "**Environment:** a 4×4 grid of rooms (a cave). The agent starts in [1,1] facing right. The Wumpus and the gold are placed randomly (not in [1,1]); each other square has a pit with probability 0.2.\n\n**Actuators:** turn left, turn right, move forward, grab (plus shoot an arrow).\n\n**Percepts (sensors):**\n- **Stench** in rooms adjacent to the Wumpus\n- **Breeze** in rooms adjacent to a pit\n- **Glitter** in the room with the gold (and only there)\n- **Scream** heard everywhere when the Wumpus is killed (the agent must face it to shoot)\n\nGoal: find the gold and get out without falling into a pit or being eaten.",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 34
+        },
+        {
+          "doc": "L2",
+          "page": 35
+        }
+      ]
+    },
+    {
+      "id": "l2-025",
+      "front": "What are the environment properties of the Wumpus World?",
+      "back": "- **Partially observable** – the agent only perceives its own/adjacent rooms (stench, breeze), not the whole cave.\n- **Deterministic** – the outcome of every action is known exactly.\n- **Static** – the Wumpus and the pits don't move.\n- **Discrete** – a grid of rooms and a few distinct actions.\n- **Sequential** – earlier moves and what you learned affect later decisions.\n- **Single agent** – the Wumpus is not considered an agent.",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 36
+        },
+        {
+          "doc": "EX2024S",
+          "page": 7,
+          "note": "Question 5a"
+        }
+      ]
+    },
+    {
+      "id": "l2-026",
+      "front": "How does an agent reason about stench and breeze in the Wumpus World? Give an example.",
+      "back": "The agent combines **percepts + memory + logical inference**:\n\n- **No stench** in a room ⇒ no Wumpus in any adjacent room. **No breeze** ⇒ no pit in any adjacent room. Those neighbours are **safe**.\n- **Stench** ⇒ the Wumpus is in *one* of the adjacent rooms. **Breeze** ⇒ a pit is in one of the adjacent rooms.\n- Combining percepts from several rooms narrows it down.\n\n*Example run:*\n1. (1,1): no stench, no breeze → (1,2) and (2,1) are safe. Move to (1,2).\n2. (1,2): stench, no breeze → Wumpus in (1,3) or (2,2); no pits next to (1,2). Don't enter either square yet – go back and try (2,1).\n3. (2,1): no stench → the Wumpus is not in (2,2), so it **must be in (1,3)**. (2,2) has no Wumpus and no pit (no breeze in (1,2)) → safe.\n4. (2,2): no stench, no breeze → (2,3) is safe. Move there, perceive **glitter → grab the gold**.\n\nKey idea: only move into squares that are **proven safe**, and combine percepts from several squares.",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 34
+        },
+        {
+          "doc": "EX2024S",
+          "page": 7,
+          "note": "Question 5b"
+        },
+        {
+          "doc": "EX2024S",
+          "page": 8
+        }
+      ]
+    },
+    {
+      "id": "l2-027",
+      "front": "What is knowledge representation (KR), and why is it important?",
+      "back": "**KR** is the study of **how knowledge and facts about the world can be represented** formally, and **what kinds of reasoning** can be done with that knowledge.\n\nWhy it matters:\n1. **Bridges human knowledge and machines** – humans think in facts and relationships (\"cats are animals\", \"water freezes below 0 °C\"); machines need them structured (logic, graphs, rules).\n2. **Enables reasoning and inference** – new facts can be derived: \"All humans are mortal\" + \"Socrates is a human\" ⇒ \"Socrates is mortal\".\n3. **Supports problem solving** – model real situations (planning, medical diagnosis, games) and reason about actions and consequences instead of memorizing data.\n4. **Makes learning easier** – background knowledge guides learning; *e.g. a self-driving car learns faster if it already knows road rules and object categories.*",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 38
+        },
+        {
+          "doc": "L2",
+          "page": 40
+        },
+        {
+          "doc": "L2",
+          "page": 41
+        },
+        {
+          "doc": "L2",
+          "page": 42
+        }
+      ]
+    },
+    {
+      "id": "l2-028",
+      "front": "What properties should a good knowledge representation have?",
+      "back": "It should be:\n\n- **Rich enough** to express the knowledge needed to solve the problem\n- **Compact, natural and maintainable**\n- **Amenable to efficient computation**\n- Able to **express features** of the problem\n- Able to **trade off accuracy and computation time**",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 43
+        }
+      ]
+    },
+    {
+      "id": "l2-029",
+      "front": "Describe the cycle of knowledge representation in an AI system.",
+      "back": "**Perception → Learning → Knowledge Representation & Reasoning → Planning → Execution**\n\n- **Perception** – retrieves data from the environment (understand the environment).\n- **Learning** – learns from the perceived data (improve from experience).\n- **Knowledge representation** – stores what is known.\n- **Reasoning** – decides what follows from what is known.\n- **Planning** – from an initial state, finds actions (with preconditions and effects) that reach a goal.\n- **Execution** – performs those actions.\n\n**KR & reasoning is the central component** that gives machines human-like intelligence; planning and execution depend on it.\n\n*Example:* a robot sees a cup (perception), knows cups hold liquid (KR), concludes it can pour water in it (reasoning), plans grasp → move → pour (planning), and does it (execution).",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 44
+        },
+        {
+          "doc": "L2",
+          "page": 45
+        }
+      ]
+    },
+    {
+      "id": "l2-030",
+      "front": "What is a semantic network? Give an example.",
+      "back": "A **graph-based knowledge representation**:\n\n- **Nodes** = concepts, objects or entities (Cat, Animal, Fur, Fish)\n- **Edges** = labelled relationships between them (*is-a*, *has*, *part-of*, *eats*)\n\n```\nCat ──is-a──▶ Animal ──is-a──▶ LivingThing\nCat ──has───▶ Fur         Animal ──has──▶ Cells\nCat ──eats──▶ Fish\n```\n\nThrough **inheritance** along *is-a* links you can infer \"a cat has cells\" without storing it directly.\n\n**Applications:** expert systems and knowledge bases, NLP (word meaning, disambiguation), ontologies (Semantic Web, RDF/OWL), cognitive modelling of human memory.",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 70
+        },
+        {
+          "doc": "L2",
+          "page": 71
+        },
+        {
+          "doc": "L2",
+          "page": 72
+        }
+      ]
+    },
+    {
+      "id": "l2-031",
+      "front": "Name two \"other\" logics besides propositional and first-order logic, and what they are for.",
+      "back": "- **Temporal logic** – reasons about **time**: statements like \"always\", \"eventually\", \"until\", \"next\". *E.g. \"the traffic light will eventually turn green\" – used to verify systems and plans.*\n- **Fuzzy logic** – truth is a **degree between 0 and 1** instead of only true/false. *E.g. \"the water is hot\" can be 0.7 true – used in controllers for washing machines, air conditioning, cameras.* (Introduced by Lotfi Zadeh.)",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 73
+        }
+      ]
+    },
+    {
+      "id": "l2-032",
+      "front": "What is propositional logic? Give true and false propositions.",
+      "back": "The simplest logical representation: all statements are made of **propositions** – statements that are either **TRUE or FALSE, never both**. It works with 0/1, so it is also called **Boolean logic**.\n\n- Propositions are written as symbols: A, B, P, Q, R …\n- They are combined with **logical connectives** (operators): ∧, ∨, →, ⇔, ¬.\n\n**True:** \"There are seven days in a week\", \"Stockholm is the capital of Sweden\", \"4 + 2 = 6\".\n**False:** \"The Sun is cold\", \"London is the capital of France\", \"2 − 4 = 7\".",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 48
+        },
+        {
+          "doc": "L2",
+          "page": 49
+        },
+        {
+          "doc": "L2",
+          "page": 50
+        },
+        {
+          "doc": "L2",
+          "page": 51
+        }
+      ]
+    },
+    {
+      "id": "l2-033",
+      "front": "List the logical connectives and give the truth table for implication.",
+      "back": "| Symbol | Word | Technical term | Example |\n|---|---|---|---|\n| ∧ | AND | Conjunction | A ∧ B |\n| ∨ | OR | Disjunction | A ∨ B |\n| → | Implies | Implication | A → B |\n| ⇔ | If and only if | Biconditional | A ⇔ B |\n| ¬ | Not | Negation | ¬A |\n\nTheir meaning is defined by **truth tables**. Implication is the tricky one – it is only false when a true premise leads to a false conclusion:\n\n| A | B | A → B |\n|---|---|---|\n| T | T | T |\n| T | F | **F** |\n| F | T | T |\n| F | F | T |\n\nUseful equivalence: **A → B ≡ ¬A ∨ B**.",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 52
+        },
+        {
+          "doc": "L2",
+          "page": 53
+        }
+      ]
+    },
+    {
+      "id": "l2-034",
+      "front": "What is the main difference between propositional logic and first-order logic?",
+      "back": "- **Propositional logic** only has **whole facts** (propositions) that are true or false. It can't look inside a statement: \"Socrates is mortal\" is just a symbol P.\n- **First-order logic (FOL)** adds **objects, relations (predicates), functions and quantifiers (∀, ∃)**, so it can express general rules about many objects at once.\n\n*Example:* in propositional logic you need a separate symbol for every person being mortal. In FOL one sentence covers everyone: **∀x Human(x) → Mortal(x)**.",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 48
+        },
+        {
+          "doc": "L2",
+          "page": 54
+        },
+        {
+          "doc": "EX2020S",
+          "page": 2,
+          "note": "Question 7a"
+        }
+      ]
+    },
+    {
+      "id": "l2-035",
+      "front": "What are constants, predicates and terms in first-order logic?",
+      "back": "A FOL statement has a **subject** and a **predicate**: in \"x is an integer\", *x* is the subject and *is an integer* the predicate.\n\n- **Constant symbols** refer to **objects** (not propositions): `You`, `Eggs`, `John`, `CS701`.\n- **Predicates** look like function calls; they take objects as arguments and evaluate to **true or false**: `Likes(You, Eggs)`.\n- General form: **Predicate(term₁, term₂, …, termₙ)**.\n\n*Examples:*\n- Ravi and Ajay are brothers → `Brothers(Ravi, Ajay)`\n- Chinky is a cat → `Cat(Chinky)`\n- Lucy is a professor → `IsProf(Lucy)`; John is the dean → `IsDean(John)`\n- If you like eggs and tomatoes, you like shakshuka → `Likes(You, Eggs) ∧ Likes(You, Tomato) → Likes(You, Shakshuka)`",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 54
+        },
+        {
+          "doc": "L2",
+          "page": 55
+        },
+        {
+          "doc": "L2",
+          "page": 56
+        },
+        {
+          "doc": "L2",
+          "page": 57
+        }
+      ]
+    },
+    {
+      "id": "l2-036",
+      "front": "What does the existential quantifier ∃ mean? When is ∃x Smiling(x) true?",
+      "back": "**∃x. formula** is true if the formula is true for **at least one** choice of x (\"there exists\", \"some\").\n\n- ∃x Smiling(x) is **true** if at least one face in the world is smiling; it is **false** only if *no* face smiles.\n- *Example:* ∃x (Even(x) ∧ Prime(x)) is true, because x = 2 works.\n\n**∃ almost always goes with ∧.** \"Some boys play cricket\" is **∃x Boy(x) ∧ Plays(x, Cricket)**.\n(The slide writes it with →, but ∃x Boy(x) → Plays(x, Cricket) would already be true if there were *anything* that isn't a boy, so ∧ is the correct form.)",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 58
+        },
+        {
+          "doc": "L2",
+          "page": 59
+        },
+        {
+          "doc": "L2",
+          "page": 61
+        },
+        {
+          "doc": "L2",
+          "page": 63
+        }
+      ]
+    },
+    {
+      "id": "l2-037",
+      "front": "What does the universal quantifier ∀ mean? When is ∀x Smiling(x) true?",
+      "back": "**∀x. formula** is true if the formula is true for **every** choice of x (\"for all\", \"every\", \"all\").\n\n- ∀x Smiling(x) is **true** only if every face smiles; **one frowning face makes it false** (a counter-example).\n\n**∀ almost always goes with →:**\n- \"All men drink coffee\" → **∀x Man(x) → Drinks(x, Coffee)**\n- \"All birds fly\" → **∀x Bird(x) → Fly(x)**\n\nWhy not ∧? ∀x Bird(x) ∧ Fly(x) would say *everything in the world is a bird and flies*.",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 64
+        },
+        {
+          "doc": "L2",
+          "page": 65
+        },
+        {
+          "doc": "L2",
+          "page": 67
+        },
+        {
+          "doc": "L2",
+          "page": 69
+        }
+      ]
+    },
+    {
+      "id": "l2-038",
+      "front": "Convert to first-order logic: (a) All dogs have tails. (b) John is a student.",
+      "back": "**(a)** ∀x Dog(x) → HasTail(x)\nOr, with tails as objects: ∀x Dog(x) → ∃y (Tail(y) ∧ Has(x, y))\n\n**(b)** Student(John)\n*John* is a **constant** (a specific object), so no quantifier is needed.",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 64
+        },
+        {
+          "doc": "L2",
+          "page": 57
+        },
+        {
+          "doc": "EX250114",
+          "page": 4,
+          "note": "Question 4a–b"
+        },
+        {
+          "doc": "EXQ",
+          "page": 2
+        }
+      ]
+    },
+    {
+      "id": "l2-039",
+      "front": "Convert to first-order logic: Every dog chases some rabbit.",
+      "back": "**∀x Dog(x) → ∃y (Rabbit(y) ∧ Chases(x, y))**\n\nRead it as: for every x, *if* x is a dog, *then* there exists some y that is a rabbit and x chases y.\n\n- ∀ with → (\"every dog…\"), ∃ with ∧ (\"…some rabbit\").\n- The **order matters**: each dog may chase a *different* rabbit. ∃y ∀x (Dog(x) → Rabbit(y) ∧ Chases(x, y)) would mean there is *one* rabbit that every dog chases.",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 58
+        },
+        {
+          "doc": "L2",
+          "page": 64
+        },
+        {
+          "doc": "EX250114",
+          "page": 4,
+          "note": "Question 4c"
+        }
+      ]
+    },
+    {
+      "id": "l2-040",
+      "front": "Convert to first-order logic: Everyone who loves Santa loves any reindeer.",
+      "back": "**∀x Loves(x, Santa) → ∀y (Reindeer(y) → Loves(x, y))**\n\nEquivalent form: ∀x ∀y (Loves(x, Santa) ∧ Reindeer(y)) → Loves(x, y)\n\n- *Santa* is a constant.\n- \"any reindeer\" means *every* reindeer → a second ∀ with →.",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 64
+        },
+        {
+          "doc": "EX250114",
+          "page": 4,
+          "note": "Question 4d"
+        }
+      ]
+    },
+    {
+      "id": "l2-041",
+      "front": "Convert to first-order logic: Anyone who wears maroon-and-white shirts is an Aggie.",
+      "back": "**∀x (∃y Shirt(y) ∧ Maroon(y) ∧ White(y) ∧ Wears(x, y)) → Aggie(x)**\n\nEquivalent form without the inner ∃:\n∀x ∀y (Person(x) ∧ Shirt(y) ∧ MaroonAndWhite(y) ∧ Wears(x, y)) → Aggie(x)\n\nStep by step:\n1. \"Anyone\" = every person x → ∀x … → Aggie(x)\n2. \"wears maroon-and-white shirts\" = there is a shirt y that is maroon and white and x wears it → ∃y with ∧\n3. Define the predicates: Shirt(y), Maroon(y), White(y), Wears(x, y), Aggie(x).",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 58
+        },
+        {
+          "doc": "L2",
+          "page": 64
+        },
+        {
+          "doc": "EX250114",
+          "page": 4,
+          "note": "Question 4e"
+        }
+      ]
+    },
+    {
+      "id": "l2-042",
+      "front": "Convert to first-order logic: (a) Not every person is strong. (b) Every child has a mother.",
+      "back": "**(a)** ¬∀x (Person(x) → Strong(x))\nwhich is equivalent to **∃x Person(x) ∧ ¬Strong(x)** – *there is someone who is a person and not strong.*\n\n(Pushing ¬ through a quantifier flips it: ¬∀x P(x) ≡ ∃x ¬P(x), and ¬(A → B) ≡ A ∧ ¬B.)\n\n**(b)** **∀x Child(x) → ∃y Mother(y, x)**\n*For every child x there exists a y who is the mother of x.*",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 58
+        },
+        {
+          "doc": "L2",
+          "page": 64
+        },
+        {
+          "doc": "EX2020S",
+          "page": 3,
+          "note": "Question 7b"
+        }
+      ]
+    },
+    {
+      "id": "l2-043",
+      "front": "Using FOL: all graduate students must take at least one AI course; John is a graduate student; CS701 is an AI course. Show that John must take CS701 or an equivalent AI course.",
+      "back": "**Predicates:** GraduateStudent(x), AICourse(y), Takes(x, y), Equivalent(y1, y2)\n\n**Knowledge base:**\n1. ∀x GraduateStudent(x) → ∃y (AICourse(y) ∧ Takes(x, y))\n2. GraduateStudent(John)\n3. AICourse(CS701)\n4. (Assumption linking the courses) ∀y AICourse(y) → (y = CS701 ∨ Equivalent(y, CS701))\n\n**Inference:**\n- **Universal instantiation** of 1 with x = John: GraduateStudent(John) → ∃y (AICourse(y) ∧ Takes(John, y))\n- **Modus ponens** with 2: ∃y (AICourse(y) ∧ Takes(John, y))\n- **Existential instantiation**: call that course c: AICourse(c) ∧ Takes(John, c)\n- From 4 with y = c: c = CS701 ∨ Equivalent(c, CS701)\n- **Conclusion:** Takes(John, c) ∧ (c = CS701 ∨ Equivalent(c, CS701)) – John takes CS701 or an equivalent AI course. ∎",
+      "sources": [
+        {
+          "doc": "L2",
+          "page": 54
+        },
+        {
+          "doc": "L2",
+          "page": 64
+        },
+        {
+          "doc": "EX251030",
+          "page": 5,
+          "note": "Question 5"
+        }
+      ]
+    },
+    {
+      "id": "l2-044",
+      "front": "Block world: block a is on the table, block b is on a, the hand is empty. Write predicate statements for this state.",
+      "back": "**Define predicates** (any names are fine, but define them):\n- **On(x, y)** – block x is directly on block y\n- **OnTable(x)** – block x stands on the table\n- **Clear(x)** – nothing is on top of block x\n- **HandEmpty** – the robot's hand holds nothing\n- **Holding(x)** – the robot holds block x\n\n**Current state:**\n- OnTable(a)\n- On(b, a)\n- Clear(b)\n- HandEmpty\n- ¬Clear(a) (since b is on it)",
+      "sources": [
+        {
+          "doc": "EX251030",
+          "page": 3,
+          "note": "Question 3a"
+        },
+        {
+          "doc": "L2",
+          "page": 54
+        }
+      ]
+    },
+    {
+      "id": "l2-045",
+      "front": "Block world: from a on the table, b on a (c, d, e, f on the table), build the stacks a–b–c and e–d–f. Give the action sequence.",
+      "back": "**Actions** (STRIPS style):\n- **PickUp(x)** – pre: OnTable(x) ∧ Clear(x) ∧ HandEmpty → effect: Holding(x), ¬OnTable(x), ¬HandEmpty\n- **Stack(x, y)** – pre: Holding(x) ∧ Clear(y) → effect: On(x, y), Clear(x), HandEmpty, ¬Clear(y), ¬Holding(x)\n\n**Target:** a on table, b on a, **c on b**; e on table, **d on e**, **f on d**.\n\n**Plan** (assuming c, d, e, f start clear on the table):\n1. PickUp(c), Stack(c, b) → On(c, b)\n2. PickUp(d), Stack(d, e) → On(d, e)\n3. PickUp(f), Stack(f, d) → On(f, d)\n\n**Final state:** OnTable(a) ∧ On(b, a) ∧ On(c, b) ∧ Clear(c) ∧ OnTable(e) ∧ On(d, e) ∧ On(f, d) ∧ Clear(f) ∧ HandEmpty\n\nOrder matters: d must be on e before f can go on d.",
+      "sources": [
+        {
+          "doc": "EX251030",
+          "page": 3,
+          "note": "Question 3b"
+        }
+      ]
+    },
+    {
+      "id": "l2-046",
+      "front": "What is resolution? Prove C from: A ∨ B ∨ ¬D,  A ∨ B ∨ C ∨ D,  ¬B ∨ C,  ¬A.",
+      "back": "**Resolution rule:** from two clauses containing a complementary pair (P and ¬P), derive a new clause with everything else:\n(P ∨ X), (¬P ∨ Y) ⊢ (X ∨ Y)\n\n**Proof:**\n1. Resolve A ∨ B ∨ ¬D with A ∨ B ∨ C ∨ D on D → **A ∨ B ∨ C**\n2. Resolve A ∨ B ∨ C with ¬B ∨ C on B → **A ∨ C**\n3. Resolve A ∨ C with ¬A on A → **C** ∎\n\n(Proof by refutation works too: add ¬C to the KB and resolve until you reach the **empty clause {}**, a contradiction.)",
+      "sources": [
+        {
+          "doc": "EX2020S",
+          "page": 3,
+          "note": "Question 9"
+        }
+      ]
+    },
+    {
+      "id": "l2-047",
+      "front": "Resolution trees: what are the results of (1) {A,B,¬C}+{A,B,C}, (2) that + {A,¬B}, (3) that + {¬A}? And (4) {A,B}+{A,¬B}, (5) {¬A,B}+{¬A,¬B}, (6) (4)+(5)?",
+      "back": "Resolve on the complementary literal and keep the rest:\n\n1. {A, B, ¬C} + {A, B, C} → **{A, B}** (C cancels)\n2. {A, B} + {A, ¬B} → **{A}** (B cancels)\n3. {A} + {¬A} → **{ }** – the **empty clause**: a contradiction, so the clause set is unsatisfiable\n4. {A, B} + {A, ¬B} → **{A}**\n5. {¬A, B} + {¬A, ¬B} → **{¬A}**\n6. {A} + {¬A} → **{ }**\n\nChain version: 7. {A,B}+{A,¬B} → {A}; 8. {A}+{¬A,B} → {B}; 9. {B}+{¬A,¬B} → {¬A}; 10. {¬A} + {A} (from 7) → **{ }**.",
+      "sources": [
+        {
+          "doc": "EXQ",
+          "page": 2,
+          "note": "Question 4b"
+        }
+      ]
+    },
+    {
+      "id": "l2-048",
+      "front": "Planning: Init At(Phone,Bag) ∧ Closed(Bag), Goal At(Phone,Table) ∧ Closed(Bag). Actions Open, Pickup, Close, Putdown. Solve with forward state-space search.",
+      "back": "Forward search starts in the initial state and applies actions whose **preconditions** hold:\n\n1. **At(Phone,Bag) ∧ Closed(Bag)** → only *Open(Bag)* applies (pre: Closed(Bag))\n2. **At(Phone,Bag) ∧ Opened(Bag)** → *Pickup(Phone)* (pre: Opened(Bag))\n3. **At(Phone,Hand) ∧ Opened(Bag)** → *Putdown(Phone)* (pre: At(Phone,Hand))\n4. **At(Phone,Table) ∧ Opened(Bag)** → *Close(Bag)* (pre: Opened(Bag))\n5. **At(Phone,Table) ∧ Closed(Bag)** = goal ✓\n\n**Plan:** Open(Bag) → Pickup(Phone) → Putdown(Phone) → Close(Bag)\n(Closing the bag before putting the phone down also works.)\n\n*Backward* search would instead start from the goal and look for actions whose effects achieve it.",
+      "sources": [
+        {
+          "doc": "EX2020S",
+          "page": 4,
+          "note": "Question 10"
+        },
+        {
+          "doc": "L2",
+          "page": 45
+        }
+      ]
+    }
+  ]
+}
