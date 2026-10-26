@@ -52,6 +52,18 @@ The app keeps running on the computer where you started it, and other devices on
 - **Linux:** if the other device can't connect and you use a firewall (e.g. `ufw`), allow the port shown in the link.
 - If the link doesn't work, the dialog may list other addresses for this computer. Try those.
 
+## Getting new and updated cards
+
+Cards are just files in the repository, so to get the latest ones:
+
+```bash
+git pull
+```
+
+Then reload the page (no restart needed). Your ratings are kept: they live outside git and are linked to each card's id, so a reworded card keeps its rating. Newly added decks start unticked if you had saved a selection; tick them, or use **Select all**.
+
+There is one deck per lecture (L1–L10, about 315 cards). Answers are based on the slides and past exams, and worked exam problems (search traces, genetic-algorithm calculations, normalization, regression) are included as cards.
+
 ## Your progress
 
 Ratings are saved in `data/progress.json` on your own computer. That folder is **not** part of git, so everyone who clones the repo starts fresh and never sees anyone else's progress. (`data/settings.json` holds your share key.)

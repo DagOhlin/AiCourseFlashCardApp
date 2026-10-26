@@ -381,6 +381,10 @@
           "note": "Question 8c"
         },
         {
+          "doc": "EX2024S",
+          "page": 14
+        },
+        {
           "doc": "L5",
           "page": 35
         }
@@ -549,6 +553,21 @@
         {
           "doc": "L5",
           "page": 56
+        }
+      ]
+    },
+    {
+      "id": "l5-038",
+      "front": "What are association rules (market-basket analysis), and which data-mining tasks are typical?",
+      "back": "**Association rules** find items that frequently occur together: **\"customers who buy bread often buy butter\"** (bread ⇒ butter). Shops use this for product placement, bundles and recommendations.\n\nTypical data-mining tasks:\n- **Classification** – predict a class (spam / not spam)\n- **Regression** – predict a number (house price)\n- **Clustering** – find groups without labels (customer segments)\n- **Association rules** – find co-occurring items (market basket)\n- **Anomaly detection** – find unusual records (fraud)\n\n**Decision trees** are a classic example because they give **readable if–then rules**.",
+      "sources": [
+        {
+          "doc": "L10",
+          "page": 39
+        },
+        {
+          "doc": "L5",
+          "page": 11
         }
       ]
     }

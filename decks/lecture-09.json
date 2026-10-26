@@ -1,0 +1,311 @@
+{
+  "id": "lecture-09",
+  "name": "L9 · Ethics & Future of AI",
+  "description": "Benefits, technical/societal/security challenges, fairness, bias cases, EU AI Act, future",
+  "group": "Lectures",
+  "order": 9,
+  "cards": [
+    {
+      "id": "l9-001",
+      "front": "In which domains does AI create real value? Give an example for each.",
+      "back": "- **Healthcare** – early detection (cancer in scans), drug discovery, clinical documentation.\n- **Accessibility** – speech-to-text, image descriptions for blind users, real-time translation and captioning.\n- **Science** – protein-structure prediction (AlphaFold), materials discovery, weather and climate modelling.\n- **Productivity** – coding and document support.\n- **Education** – tutoring, feedback, teacher support.\n- **Energy & environment** – balancing the power grid, predictive maintenance, precision agriculture.",
+      "sources": [
+        {
+          "doc": "L9",
+          "page": 7
+        }
+      ]
+    },
+    {
+      "id": "l9-002",
+      "front": "What are key milestones showing AI accelerating science and medicine, and why did they work?",
+      "back": "- **2018** – the first **FDA-authorised autonomous AI diagnostic system** (diabetic-retinopathy screening).\n- **2022** – **AlphaFold** made **200M+ protein structures** freely available, saving researchers years of lab work per structure.\n- **2024** – the **Nobel Prize in Chemistry** was awarded partly for AI-based protein-structure prediction.\n\n**Why protein folding worked so well:**\n- a decades-old **benchmark** (CASP) to measure progress,\n- **huge curated datasets** (the Protein Data Bank),\n- **objective ground truth** to check answers against.",
+      "sources": [
+        {
+          "doc": "L9",
+          "page": 8
+        }
+      ]
+    },
+    {
+      "id": "l9-003",
+      "front": "Describe the MASAI breast-screening trial. What did it show, and what questions remain?",
+      "back": "**Swedish randomised trial (Lund University), 106,000 women.**\n\nWorkflow: scan acquired → **AI triages the scans** (sorts them by risk) → a **radiologist reads them**, with AI marking suspicious findings → recall and assessment → outcomes monitored.\n\n**Results:**\n- **29 % more** screen-detected cancers\n- **44 % less** screen-reading workload for radiologists\n\n**Questions before wider use:**\n- Will the results **transfer to another region** (different machines and populations)?\n- **Who reviews errors** and patient outcomes?\n\nLesson: AI value requires **evidence of better outcomes in the actual setting of use**, with a human in the loop.",
+      "sources": [
+        {
+          "doc": "L9",
+          "page": 9
+        },
+        {
+          "doc": "L9",
+          "page": 27
+        }
+      ]
+    },
+    {
+      "id": "l9-004",
+      "front": "What are the main technical reasons AI systems fail in the real world?",
+      "back": "- **Hallucination** – generative models produce **fluent but false** content: invented facts, citations or code. *E.g. lawyers submitted court briefs with cases invented by ChatGPT (Mata v. Avianca, 2023).*\n- **Distribution shift** – the model degrades when deployment data differs from training data (new users, devices, time). *E.g. a model trained on one hospital's X-ray machines fails at another hospital.*\n- **Data quality** – noisy, incomplete or unrepresentative labels: **\"garbage in, garbage out\"**.\n- **Opacity** – deep models are hard to explain, so errors are hard to diagnose, audit or contest.",
+      "sources": [
+        {
+          "doc": "L9",
+          "page": 11
+        }
+      ]
+    },
+    {
+      "id": "l9-005",
+      "front": "What societal challenges does AI bring?",
+      "back": "- **Work and jobs** – the ILO (2025) estimates that **1 in 4 workers** is in an occupation with some generative-AI exposure.\n- **Misinformation and deepfakes** – cheap synthetic text, audio and video enable scams and impersonation, and **erode trust in genuine evidence**.\n- **Concentration of power** – frontier AI needs vast compute and data, concentrating capability in a few firms and nations.\n- **Environmental footprint** – the IEA (2025) projects data centres could use **945 TWh in 2030**, over twice 2024 use (all data centres, not only AI). Electricity isn't the same as emissions, and water use depends on location and cooling.",
+      "sources": [
+        {
+          "doc": "L9",
+          "page": 12
+        }
+      ]
+    },
+    {
+      "id": "l9-006",
+      "front": "Name the main AI security threats and misuse risks.",
+      "back": "- **Adversarial examples** – crafted inputs make a model misclassify (e.g. a few stickers make a stop sign read as \"speed limit\").\n- **Prompt injection** – untrusted documents contain instructions that redirect an AI agent.\n- **Data poisoning** – corrupted training data plants backdoors or distorts outputs.\n- **AI-assisted attacks** – AI helps attackers scale phishing and find vulnerabilities.\n- **Unsafe agent actions** – tools and broad permissions turn model errors into real-world actions.\n- **Data leakage** – sensitive prompts or excessive database access expose information.\n\n*Case:* a document tells a university AI agent to email student records. Prevent harm with **least-privilege permissions**, **human approval** before sensitive actions, and **logging**.",
+      "sources": [
+        {
+          "doc": "L9",
+          "page": 13
+        }
+      ]
+    },
+    {
+      "id": "l9-007",
+      "front": "What are the six principles that most AI-ethics frameworks share?",
+      "back": "1. **Fairness** – avoid unjust discrimination across groups.\n2. **Transparency** – people know when AI is used and can understand the key reasons.\n3. **Accountability** – a human or organisation is answerable for the outcomes.\n4. **Privacy** – data is collected lawfully, minimised and protected.\n5. **Safety & robustness** – systems work reliably and fail safely.\n6. **Human autonomy** – people keep meaningful control and can contest decisions.\n\nSources: OECD AI Principles (2019/2024), UNESCO Recommendation (2021), EU High-Level Expert Group (2019).\nPrinciples are **easy to agree on and hard to put into practice**.",
+      "sources": [
+        {
+          "doc": "L9",
+          "page": 15
+        }
+      ]
+    },
+    {
+      "id": "l9-008",
+      "front": "Write down three (or four) ethical aspects of AI, explain each with an example, and say why it is essential to address them.",
+      "back": "1. **Bias and fairness** – AI can inherit or amplify bias in its training data and discriminate. *E.g. Amazon's résumé screener penalised women because it learned from male-dominated hiring data.* **Why address it:** prevents discrimination, ensures equal opportunities, builds trust.\n2. **Privacy and data security** – AI needs lots of personal data, which can be leaked or misused; models can even memorise it. *E.g. a chatbot revealing personal data from its training set.* **Why:** protects individuals, maintains trust, complies with **GDPR**.\n3. **Transparency and accountability** – \"black-box\" models make decisions hard to explain, so it's unclear who is responsible for mistakes. *E.g. a loan rejected by an unexplainable model.* **Why:** humans stay responsible; people can challenge and audit decisions.\n4. **Job displacement and economic impact** – automation may remove jobs and widen inequality. *E.g. 1 in 4 workers have some GenAI exposure.* **Why:** plan retraining and share the benefits fairly.\n\n(Safety, misinformation/deepfakes and human autonomy are also valid answers.)",
+      "sources": [
+        {
+          "doc": "L9",
+          "page": 15
+        },
+        {
+          "doc": "L9",
+          "page": 17
+        },
+        {
+          "doc": "L9",
+          "page": 12
+        },
+        {
+          "doc": "EX2024S",
+          "page": 14,
+          "note": "Question 9"
+        },
+        {
+          "doc": "EX2024S",
+          "page": 15
+        },
+        {
+          "doc": "EX250114",
+          "page": 5,
+          "note": "Question 5"
+        }
+      ]
+    },
+    {
+      "id": "l9-009",
+      "front": "Explain the three core principles of AI ethics – Fairness, Accountability and Transparency (FAT) – with a real-world example of how each can be applied.",
+      "back": "- **Fairness** – the system should not unjustly discriminate between groups. *Applied:* audit a hiring or credit model's error rates **per subgroup** (gender, ethnicity) before deployment, as Gender Shades showed is necessary for face recognition; choose and document a fairness metric.\n- **Accountability** – a human or organisation is **answerable** for the outcomes, along the chain developer → deployer → operator → regulator. *Applied:* a hospital names who reviews AI-flagged scans and who handles errors (as in the MASAI trial), and keeps logs for audits.\n- **Transparency** – people **know when AI is used** and can understand the key reasons for a decision. *Applied:* a bank tells applicants that an AI scored them and which factors mattered, so they can contest it; chatbots and deepfakes must be labelled under the EU AI Act.",
+      "sources": [
+        {
+          "doc": "L9",
+          "page": 15
+        },
+        {
+          "doc": "L9",
+          "page": 20
+        },
+        {
+          "doc": "L9",
+          "page": 21
+        },
+        {
+          "doc": "EX251030",
+          "page": 8,
+          "note": "Question 8b"
+        }
+      ]
+    },
+    {
+      "id": "l9-010",
+      "front": "Where can bias enter the AI lifecycle? Give the question to ask at each stage.",
+      "back": "1. **Data collection** – who is missing or under-represented?\n2. **Labelling** – whose judgement defines the \"ground truth\"?\n3. **Features & model** – do **proxies** (postcode, name) encode protected traits?\n4. **Evaluation** – is accuracy reported **per subgroup**?\n5. **Deployment** – is it used on a different population or for a different purpose?\n6. **Feedback loop** – do the model's decisions shape future training data?\n\n*Feedback-loop example:* predictive policing sends more patrols to an area → more crime gets recorded there → the model sends even more patrols.",
+      "sources": [
+        {
+          "doc": "L9",
+          "page": 16
+        }
+      ]
+    },
+    {
+      "id": "l9-011",
+      "front": "Explain the US healthcare-algorithm bias found by Obermeyer et al. (2019).",
+      "back": "A widely used algorithm used **past healthcare spending as a proxy for health needs**.\n\nBecause historically **less money was spent on Black patients with the same level of illness**, the model **underestimated their needs** – it rated them healthier than equally sick white patients, so they were less likely to get extra care.\n\n**Lesson:** a seemingly neutral **proxy variable can encode historical inequality**.",
+      "sources": [
+        {
+          "doc": "L9",
+          "page": 16
+        }
+      ]
+    },
+    {
+      "id": "l9-012",
+      "front": "What are the three case studies every AI practitioner should know (COMPAS, Amazon, Gender Shades)?",
+      "back": "- **COMPAS (2016, criminal justice)** – a recidivism-risk tool. ProPublica found that Black defendants who did *not* reoffend were far more likely to be labelled high-risk than white defendants. **Lesson: fairness definitions conflict.**\n- **Amazon hiring tool (2018, recruitment)** – an experimental résumé screener learned from a decade of male-dominated hiring data and **penalised signals associated with women**; it was abandoned. **Lesson: historical data encodes historical bias.**\n- **Gender Shades (2018, computer vision)** – commercial face-analysis systems had **much higher error rates for darker-skinned women** than for lighter-skinned men. **Lesson: always evaluate by subgroup.**",
+      "sources": [
+        {
+          "doc": "L9",
+          "page": 17
+        }
+      ]
+    },
+    {
+      "id": "l9-013",
+      "front": "COMPAS illustration: 60 % of flagged defendants reoffend in both groups, but 40 % of Black vs 20 % of white non-reoffenders are wrongly flagged. Is the system fair?",
+      "back": "It depends on the fairness definition:\n\n- **Question 1 – how reliable is a warning?** In both groups 60 % of flagged people reoffended → **equal predictive value** (calibration). Fair by this measure.\n- **Question 2 – who gets a mistaken warning?** Of people who did *not* reoffend, 40 % of Black and 20 % of white defendants were flagged → **unequal false-positive rates**. Unfair by this measure.\n\n**Takeaway:** a warning can be **equally reliable across groups while the mistakes fall more heavily on one group**. The vendor optimised calibration; ProPublica measured error-rate balance. Both were right by their own definition.\n\n(Illustrative numbers, not the original COMPAS results.)",
+      "sources": [
+        {
+          "doc": "L9",
+          "page": 18
+        },
+        {
+          "doc": "L9",
+          "page": 19
+        }
+      ]
+    },
+    {
+      "id": "l9-014",
+      "front": "What are demographic parity, equalised odds and calibration? What is the impossibility result?",
+      "back": "| Definition | Meaning | Example question |\n|---|---|---|\n| **Demographic parity** | Each group gets positive outcomes at the **same rate** | Are loans approved at equal rates across groups? |\n| **Equalised odds** | **Error rates** (false positives and false negatives) are equal across groups | Are innocent people wrongly flagged equally often? |\n| **Calibration** | A given score means the **same risk** regardless of group | Does \"70 % risk\" mean 70 % for everyone? |\n\n**Impossibility result:** when **base rates differ** between groups, a classifier generally **cannot satisfy calibration and equal error rates at the same time**.\n\nSo **choosing a fairness definition is a value judgement**, not a purely technical one – and you must document it.",
+      "sources": [
+        {
+          "doc": "L9",
+          "page": 19
+        },
+        {
+          "doc": "L9",
+          "page": 27
+        }
+      ]
+    },
+    {
+      "id": "l9-015",
+      "front": "What does privacy mean for AI, and who is responsible in the accountability chain?",
+      "back": "**Data rights and protection**\n- **Personal data** needs a lawful basis and a purpose, and people have rights over it (**GDPR**).\n- **Copyright** – rights to use protected works for training.\n- **Confidentiality** – protect restricted information.\n- Models can **memorise and reveal personal data**.\n→ **Minimise data**: use only the information necessary for the task, and test the privacy safeguards.\n\n**The accountability chain**\n1. **Developer** – builds and tests the model\n2. **Deployer** – chooses the use and context\n3. **Operator / user** – acts on the output\n4. **Regulator** – sets and enforces the rules",
+      "sources": [
+        {
+          "doc": "L9",
+          "page": 20
+        }
+      ]
+    },
+    {
+      "id": "l9-016",
+      "front": "Describe the EU AI Act's risk categories and timeline.",
+      "back": "The **world's first comprehensive legal framework for AI**; it regulates AI systems by their **potential societal risk**:\n\n1. **Unacceptable risk – prohibited:** e.g. **social scoring**, cognitive manipulation.\n2. **High risk – strict requirements:** e.g. AI **screening job applications**, **critical infrastructure**.\n3. **Limited risk – transparency duties:** e.g. **chatbots and deepfakes** must be disclosed (with exceptions).\n4. **Minimal risk – unregulated:** e.g. **spam filters** (other laws still apply).\n\n**Timeline:** entered into force **August 2024**; transparency rules and general provisions from **August 2026** (AI Omnibus in force July 2026); extended deadlines for high-risk uses and embedded product-safety systems in **2027–2028**.",
+      "sources": [
+        {
+          "doc": "L9",
+          "page": 21
+        }
+      ]
+    },
+    {
+      "id": "l9-017",
+      "front": "Deepfakes and algorithmic amplification on social media are AI misuse. Discuss two major ethical risks and suggest a regulatory or technical solution for each.",
+      "back": "**Risk 1 – Misinformation, fraud and loss of trust (deepfakes).** Cheap synthetic audio/video enables scams (a cloned CEO's voice ordering a payment), political disinformation and impersonation, and makes people doubt *genuine* evidence.\n- **Regulatory:** the **EU AI Act** requires deepfakes and AI-generated content to be **labelled**.\n- **Technical:** **watermarking / content provenance** (e.g. C2PA signatures) and deepfake-detection models.\n\n**Risk 2 – Polarisation and harm through amplification.** Engagement-optimising recommender algorithms amplify sensational, extreme or false content, create filter bubbles, and can harm mental health. They are **opaque**, so users can't see why content is shown.\n- **Regulatory:** transparency and audit duties for large platforms (EU **Digital Services Act**), giving users a non-personalised feed option.\n- **Technical:** optimise for quality/diversity instead of pure engagement, down-rank content flagged by fact-checkers, add friction before resharing.\n\nOther valid risks: privacy violations (non-consensual deepfakes), manipulation of elections.",
+      "sources": [
+        {
+          "doc": "L9",
+          "page": 12
+        },
+        {
+          "doc": "L9",
+          "page": 21
+        },
+        {
+          "doc": "EX251030",
+          "page": 8,
+          "note": "Question 8a"
+        }
+      ]
+    },
+    {
+      "id": "l9-018",
+      "front": "Case: a university wants to flag students at risk of failing so advisors can offer support. What should you consider before deploying it?",
+      "back": "1. **Who benefits, who could be harmed, and what data is necessary?** Students get early help, but a flag could stigmatise them; only use the data that is needed (data minimisation).\n2. **Which fairness measure and evidence would justify a pilot?** Check error rates per subgroup (e.g. international students, gender) and run a monitored pilot.\n3. **What must students know, and how can they contest a flag?** Transparency about the AI's use, an explanation, and an appeal route.\n4. **What is permitted, what is prohibited, and when must it stop?** Education is a **high-risk** area under the EU AI Act; define stop criteria and human oversight.",
+      "sources": [
+        {
+          "doc": "L9",
+          "page": 22
+        },
+        {
+          "doc": "L9",
+          "page": 21
+        }
+      ]
+    },
+    {
+      "id": "l9-019",
+      "front": "What current AI trends does the lecture highlight, and what open question comes with each?",
+      "back": "- **AI agents** – they already use tools. *Which actions need approval, and how do we detect failure?*\n- **Multimodality** – text, image, audio and video expand access, but also misuse opportunities.\n- **AI for science** – accelerating discovery in biology, materials, mathematics and climate.\n- **Efficient & on-device AI** – local processing can reduce data transfer; privacy and efficiency still need testing.\n- **Open vs. closed models** – open weights help inspection and adaptation, but **don't by themselves establish safety**.",
+      "sources": [
+        {
+          "doc": "L9",
+          "page": 24
+        }
+      ]
+    },
+    {
+      "id": "l9-020",
+      "front": "What future scenarios for AI do experts debate?",
+      "back": "- **Broad benefit** – productivity and scientific breakthroughs are widely shared; strong institutions manage risks as they appear; AI **augments** rather than replaces most workers.\n- **Muddling through** – real gains but uneven distribution; recurring incidents drive **reactive regulation**; trust in information ecosystems weakens.\n- **Serious harm** – misuse at scale (cyber, bio, fraud); **loss of human oversight** over powerful systems; extreme concentration of economic power.\n\n**Live questions:** when (if ever) will AI match humans across most cognitive tasks? Can we reliably **align** advanced systems with human values? **Who should decide?**",
+      "sources": [
+        {
+          "doc": "L9",
+          "page": 25
+        }
+      ]
+    },
+    {
+      "id": "l9-021",
+      "front": "What is in the responsible AI practitioner's toolkit?",
+      "back": "- **Document** – record purpose, data, model version, limits and evidence of performance (model cards, datasheets).\n- **Audit for bias** – evaluate by subgroup; choose and justify a fairness metric.\n- **Red-team** – test prompt injection and misuse; restrict tool and data permissions.\n- **Meaningful human oversight** – name the reviewer, the approval points and who has authority to stop unsafe actions.\n- **Monitor in production** – log actions and errors; set thresholds for pausing, rollback and review.\n- **Engage stakeholders** – involve affected people early; provide explanations and appeal routes.",
+      "sources": [
+        {
+          "doc": "L9",
+          "page": 26
+        }
+      ]
+    },
+    {
+      "id": "l9-022",
+      "front": "What are the five things to remember from the AI-ethics lecture?",
+      "back": "1. AI value requires **evidence of better outcomes in the actual setting** of use.\n2. **Test known failure modes** and **restrict the actions** an AI system can take.\n3. Fairness has **competing definitions**; choosing one is a value judgement you must **document**.\n4. Know **which rules apply** to the model, the use and your role – check dates and scope.\n5. Deployment choices should remain **open to evidence, challenge and revision**.",
+      "sources": [
+        {
+          "doc": "L9",
+          "page": 27
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,290 @@
+{
+  "id": "lecture-10",
+  "name": "L10 · Generative AI & LLMs",
+  "description": "GenAI families, how LLMs work, transformers, diffusion, using LLMs, pathology case study",
+  "group": "Lectures",
+  "order": 10,
+  "cards": [
+    {
+      "id": "l10-001",
+      "front": "Where do generative AI and LLMs fit within AI?",
+      "back": "Nested circles, from broadest to narrowest:\n\n- **Artificial intelligence** – machines doing tasks that seem to need intelligence\n- **Machine learning** – learns patterns from data instead of hand-written rules\n- **Deep learning** – ML with large, many-layered neural networks\n- **Generative AI** – creates **new content**: text, images, audio, code\n- **Large language models (LLMs)** – generative models for **language**, trained on huge amounts of text\n\nEveryday examples of GenAI: chat assistants (ChatGPT, Claude, Gemini), writing help and autocomplete, translation, image generation, auto-captions and AI meeting notes.",
+      "sources": [
+        {
+          "doc": "L10",
+          "page": 3
+        },
+        {
+          "doc": "L10",
+          "page": 4
+        }
+      ]
+    },
+    {
+      "id": "l10-002",
+      "front": "What is the difference between discriminative and generative AI?",
+      "back": "| **Discriminative AI** | **Generative AI** |\n|---|---|\n| Learns to **tell categories apart** – answers \"which one?\" | Learns **what the data looks like** – and makes new data |\n| Output: a **label**, e.g. \"Malignant · 92 %\" | Output: **new content**, e.g. a plain-language explanation of a biopsy report |\n\nThey use the **same deep-learning building blocks** with a different goal: **decide vs. create**.",
+      "sources": [
+        {
+          "doc": "L10",
+          "page": 5
+        }
+      ]
+    },
+    {
+      "id": "l10-003",
+      "front": "What kinds of output can generative AI produce?",
+      "back": "- **Text** – chat, summaries, translation, emails (ChatGPT, Claude, Gemini)\n- **Images** – pictures from a text prompt (Stable Diffusion, DALL·E, Midjourney)\n- **Code** – writing and fixing software (coding assistants)\n- **Audio & speech** – natural voices, music, live transcription\n- **Video** – short clips generated from text or an image\n- **Science & medicine** – protein structures, drug candidates, synthetic medical images",
+      "sources": [
+        {
+          "doc": "L10",
+          "page": 6
+        }
+      ]
+    },
+    {
+      "id": "l10-004",
+      "front": "Give the short history of generative AI from 2014 to today.",
+      "back": "- **2014 – GANs:** two networks compete (one fakes, one judges); the first realistic generated faces.\n- **2017 – Transformer**, *\"Attention Is All You Need\"*: the architecture behind every LLM. **The turning point** – it made training on far more data practical.\n- **2020 – GPT-3:** 175 billion parameters; fluent text from a short prompt.\n- **2022 – Diffusion & ChatGPT:** image generation goes public; ChatGPT reaches millions of users in weeks.\n- **2023 – Multimodal models:** GPT-4, Claude, Gemini, Llama read images as well as text.\n- **2024–26 – Reasoning & agents:** models that work step by step and use tools to finish tasks.",
+      "sources": [
+        {
+          "doc": "L10",
+          "page": 7
+        }
+      ]
+    },
+    {
+      "id": "l10-005",
+      "front": "Name the five families of generative models and what each is good at.",
+      "back": "| Family | Idea | Good at | Examples |\n|---|---|---|---|\n| **GANs** (2014) | A generator and a critic compete | Sharp images, image-to-image translation | StyleGAN, CycleGAN |\n| **VAEs** (2013) | Compress to a short code, then rebuild | Smooth variations, spotting anomalies | Inside Stable Diffusion |\n| **Diffusion** (2020) | Learn to remove noise step by step | Top-quality images and video | Stable Diffusion, DALL·E, Imagen |\n| **Autoregressive transformers** (2018) | Predict the next token, repeat | Text, code, also audio | GPT, Claude, Gemini, Llama |\n| **Vision–language models** (2021) | Join images and text in one space | Image search, captions, chat about images | CLIP, CONCH, PathChat |\n\nReal systems combine them: an image generator uses a **transformer** to read the prompt, a **VAE** to compress, and **diffusion** to paint.",
+      "sources": [
+        {
+          "doc": "L10",
+          "page": 8
+        }
+      ]
+    },
+    {
+      "id": "l10-006",
+      "front": "How does a GAN work? Use the forger and art-critic analogy.",
+      "back": "- **Generator = the forger:** turns **random noise** into fake images.\n- **Discriminator = the critic:** looks at real and fake images and outputs \"real or fake?\" (e.g. 0.3 = probably fake).\n- **Feedback:** both learn every round – the critic gets better at spotting fakes, the forger gets better at fooling it.\n- **Training ends** when the critic can no longer tell fake from real.\n\n*In pathology:* generating synthetic tissue tiles for **rare subtypes**, and **stain normalisation** between labs (CycleGAN).",
+      "sources": [
+        {
+          "doc": "L10",
+          "page": 9
+        },
+        {
+          "doc": "L7",
+          "page": 76
+        }
+      ]
+    },
+    {
+      "id": "l10-007",
+      "front": "How does an LLM generate text?",
+      "back": "An LLM is a **next-word (next-token) predictor**.\n\n*\"The biopsy showed that the tumour was …\"* → malignant 41 %, benign 27 %, invasive 14 %, small 9 %, other 9 %\n\nWriting a whole answer:\n1. **Score every possible next word** (a probability distribution).\n2. **Pick one**, with a little randomness controlled by the **temperature** (low = safe and predictable, high = more creative and varied).\n3. **Add it to the text and repeat.**\n\nThat's the whole trick – done with **billions of parameters**, trained on **trillions of words**.",
+      "sources": [
+        {
+          "doc": "L10",
+          "page": 10
+        }
+      ]
+    },
+    {
+      "id": "l10-008",
+      "front": "What are tokens and embeddings?",
+      "back": "1. **Tokens:** text is split into **tokens** – a word or a piece of one (\"Large language models read\" → \"Large\", \"language\", \"models\", \"read\"; \"tokens\" → \"tok\" + \"ens\"). Each token gets an ID number.\n2. **Embeddings:** each token is turned into a **vector** of thousands of numbers, e.g. \"tumour\" → [0.12, −0.83, 0.47, …] – its **meaning as coordinates**.\n3. **Similar meanings sit close together** in this space: tumour, cancer, carcinoma form one group; cat, dog, horse another; Paris, Tokyo, Stockholm a third.\n\nThe **context window** is how many tokens the model can consider at once.",
+      "sources": [
+        {
+          "doc": "L10",
+          "page": 11
+        },
+        {
+          "doc": "L10",
+          "page": 44
+        }
+      ]
+    },
+    {
+      "id": "l10-009",
+      "front": "What is attention, and why did the Transformer architecture matter?",
+      "back": "**Attention:** every word looks at every other word and decides **which ones help explain it**.\n\n*\"The animal didn't cross the street because **it** was too tired\"* → \"it\" attends most strongly to **animal**, medium to **tired**, weakly to **street** – so the model understands what \"it\" refers to.\n\n**Transformer:**\n- **Dozens of attention layers** stacked.\n- Processes **all words at once** (in parallel, unlike an RNN going word by word) – so it **scales** to huge datasets.\n\n**Not just words:** cut an image into **patches** and the same idea works – **Vision Transformers (ViT)**.",
+      "sources": [
+        {
+          "doc": "L10",
+          "page": 12
+        },
+        {
+          "doc": "L7",
+          "page": 80
+        }
+      ]
+    },
+    {
+      "id": "l10-010",
+      "front": "What are the three stages of training an LLM assistant?",
+      "back": "1. **Pre-training** – read a huge slice of the internet, books and code; learn to **predict the next token**. Result: a **base model** that knows language but isn't a helpful assistant yet.\n2. **Instruction tuning** – train on many examples of good questions and answers written by people. Result: it **follows instructions** and answers like an assistant.\n3. **Human feedback (RLHF)** – people **rank the model's answers**, and it learns to prefer the better ones. Result: more **helpful, honest and safe**.\n\nAnalogy: **read the library → apprenticeship → feedback from a mentor**.",
+      "sources": [
+        {
+          "doc": "L10",
+          "page": 13
+        },
+        {
+          "doc": "L10",
+          "page": 44
+        }
+      ]
+    },
+    {
+      "id": "l10-011",
+      "front": "How do diffusion models generate images?",
+      "back": "**Creating by removing noise:**\n\n- **Training:** take millions of real images and **add noise step by step**; the model learns to **undo each step**.\n- **Generating:** start from **pure noise** and remove it step by step (e.g. step 250 → 500 → 750 → final image), **guided by the text prompt** (e.g. \"H&E-stained breast tissue, high magnification\").\n\nExamples: Stable Diffusion, DALL·E, Imagen – today's best for top-quality images and video.",
+      "sources": [
+        {
+          "doc": "L10",
+          "page": 15
+        }
+      ]
+    },
+    {
+      "id": "l10-012",
+      "front": "What are the four ways to put an LLM to work? Give an example of each.",
+      "back": "From **easier and cheaper** to **more effort, more control**:\n\n1. **Prompting** – clear instructions, context, examples and the format you want. *\"You are a tutor. Explain this to a nurse in 5 bullet points.\"*\n2. **RAG (retrieval-augmented generation)** – first **look up your own documents**, then answer from them. *A chatbot that answers from the hospital's own guidelines.* Reduces hallucination and keeps answers up to date.\n3. **Fine-tuning** – train an existing model a little further on **your own examples**. *A model that writes in your clinic's report style.*\n4. **Agents** – the LLM **plans steps and calls tools** (search, code, databases). *Pulls the data, runs the analysis, drafts the report.*\n\n**Start simple** (prompting → RAG → fine-tuning → agents) and **always verify**.",
+      "sources": [
+        {
+          "doc": "L10",
+          "page": 16
+        },
+        {
+          "doc": "L10",
+          "page": 25
+        }
+      ]
+    },
+    {
+      "id": "l10-013",
+      "front": "What can go wrong with generative AI?",
+      "back": "- **Hallucinations** – confident but wrong answers; invented references.\n- **Bias** – copies imbalances and stereotypes in its training data.\n- **Privacy** – never paste patient or confidential data into public tools.\n- **Copyright** – open questions about the training data and who owns the outputs.\n- **Security** – jailbreaks and hidden **prompt-injection** instructions.\n- **Cost & energy** – large models need a lot of computing power and electricity.\n\n**Rule of thumb:** treat GenAI output as a **first draft** and keep a **human in the loop**.",
+      "sources": [
+        {
+          "doc": "L10",
+          "page": 17
+        }
+      ]
+    },
+    {
+      "id": "l10-014",
+      "front": "Why is reading a breast-cancer biopsy hard, and why is it a good target for AI?",
+      "back": "A pathologist examines **H&E-stained tissue** and decides: benign or malignant? Which subtype? What grade?\n\nChallenges:\n- **Gigapixel images** – one scanned slide can hold **billions of pixels**; it is cut into thousands of tiles (e.g. 256 × 256 px).\n- **Workload** – growing case numbers, too few pathologists.\n- **Variability** – experts sometimes disagree on borderline cases.\n- **Few labels** – expert annotations are slow and expensive.",
+      "sources": [
+        {
+          "doc": "L10",
+          "page": 19
+        }
+      ]
+    },
+    {
+      "id": "l10-015",
+      "front": "What are the five ways generative AI can help in pathology?",
+      "back": "1. **Foundation models** – pre-trained on millions of **unlabelled** tissue images, reused for many tasks with few labels (*UNI, Virchow*).\n2. **Image + text models** – classify or search images by **describing the classes in words**, zero-shot (*CONCH*).\n3. **Chat assistants** – ask questions about an image in plain language and get explanations (*PathChat*).\n4. **Synthetic data** – diffusion models or GANs create realistic tiles for **rare classes**, to augment small datasets and for teaching.\n5. **Report drafting** – an LLM turns findings into a structured report or a patient-friendly summary; the **pathologist edits and signs**.",
+      "sources": [
+        {
+          "doc": "L10",
+          "page": 20
+        }
+      ]
+    },
+    {
+      "id": "l10-016",
+      "front": "Describe the foundation-model pipeline from slide to suggestion (e.g. UNI).",
+      "back": "1. **Whole-slide image** – scan the glass slide.\n2. **Tiles** – cut it into thousands of patches.\n3. **Foundation model** (GenAI) – turns each tile into an **embedding**.\n4. **Small classifier** – combines all tiles; **needs few labels**.\n5. **Prediction + heatmap** – benign/malignant, subtype – and **where**.\n6. **Draft report** (GenAI) – an LLM writes it; the **pathologist reviews**.\n\n**Why it helps:** one pre-trained encoder serves many tasks (subtyping, grading, biomarkers) with far fewer labelled slides.\n**UNI (Nature Medicine, 2024):** self-supervised on **100 million+ tissue images** from 100,000+ slides; outperformed earlier models across **34 tasks**.",
+      "sources": [
+        {
+          "doc": "L10",
+          "page": 21
+        }
+      ]
+    },
+    {
+      "id": "l10-017",
+      "front": "How can an image + text model like CONCH classify images without task-specific training?",
+      "back": "**Images and text share one embedding space**, so you can classify by **finding the closest written description** (zero-shot):\n\n- \"an H&E image of invasive ductal carcinoma\" → similarity **0.81** (best match)\n- \"an H&E image of benign breast tissue\" → 0.12\n- \"an H&E image of invasive lobular carcinoma\" → 0.07\n\n→ predicted class: **invasive ductal carcinoma**. No new labelled training data is needed for new classes – you just write new descriptions.\n\n**CONCH** (Nature Medicine, 2024) was trained on **1.17 million image–caption pairs**.",
+      "sources": [
+        {
+          "doc": "L10",
+          "page": 22
+        }
+      ]
+    },
+    {
+      "id": "l10-018",
+      "front": "What is PathChat?",
+      "back": "A **chat assistant for pathology** (Nature, 2024): you ask about an image region in plain language, and it describes and interprets it, e.g. *\"atypical epithelial cells infiltrate the stroma… features suggest invasive carcinoma – please confirm with a pathologist.\"*\n\n- Built from a **pathology image encoder (UNI) + a large language model**.\n- **Fine-tuned on 456,000+ image–instruction examples**.\n- **Beat general assistants such as GPT-4V** on diagnostic questions in the study; pathologists preferred its answers.\n- Uses: teaching, research, **human-in-the-loop** support.",
+      "sources": [
+        {
+          "doc": "L10",
+          "page": 23
+        }
+      ]
+    },
+    {
+      "id": "l10-019",
+      "front": "What must happen before pathology AI can reach patients?",
+      "back": "The research is promising but **not yet autopilot**:\n\n- **Validate** on other hospitals, scanners and stains (distribution shift).\n- **Check for bias** across patient groups.\n- **Explain decisions** – show *where* with heatmaps.\n- **Regulatory approval** – FDA, EU MDR, EU AI Act.\n- **AI suggests, the pathologist decides.**\n\n(A 2025 benchmark of 19 models found the image + text model CONCH best overall on 31 tasks, with Virchow2 a close second.)",
+      "sources": [
+        {
+          "doc": "L10",
+          "page": 24
+        }
+      ]
+    },
+    {
+      "id": "l10-020",
+      "front": "What are the four things to remember about generative AI and LLMs?",
+      "back": "1. **GenAI creates content.** An LLM is a **next-word predictor trained at enormous scale**.\n2. **Transformers and attention** power both language and image models.\n3. **Start simple:** prompting → RAG → fine-tuning → agents. **Always verify.**\n4. In pathology, **foundation and image + text models cut the need for labels** – humans stay in charge.",
+      "sources": [
+        {
+          "doc": "L10",
+          "page": 25
+        }
+      ]
+    },
+    {
+      "id": "l10-021",
+      "front": "Define these LLM terms: token, context window, hallucination, RAG, multimodal, RLHF.",
+      "back": "- **Token** – a piece of a word; the unit an LLM reads and writes.\n- **Context window** – how much text (how many tokens) the model can consider at once.\n- **Hallucination** – confident but false output.\n- **RAG** – retrieval-augmented generation: retrieve trusted documents, then answer from them.\n- **Multimodal** – works with text, images and audio.\n- **RLHF** – reinforcement learning from human feedback: people rank answers and the model learns to prefer the better ones.",
+      "sources": [
+        {
+          "doc": "L10",
+          "page": 44
+        }
+      ]
+    },
+    {
+      "id": "l10-022",
+      "front": "What is the format of the written exam?",
+      "back": "- **On campus, computer-based** (Inspera).\n- **No coding.**\n- Questions relate to the content of the course: **lectures, assignments and labs**.\n- There can be **simple calculations** – bring your **own calculator** (mobile phones are **not** allowed as calculators).\n- Register for the exam once the date is announced.\n\nPast exams repeatedly ask about: the four views of AI and the Turing Test, environment properties and agent types, BFS/DFS/A* on a graph, first-order logic, genetic-algorithm calculations, supervised vs. unsupervised learning, and AI ethics.",
+      "sources": [
+        {
+          "doc": "L10",
+          "page": 50
+        },
+        {
+          "doc": "L10",
+          "page": 29
+        }
+      ]
+    },
+    {
+      "id": "l10-023",
+      "front": "Course revision: give the key milestones of AI from 1950 to 2022.",
+      "back": "- **1950** – Turing asks \"Can machines think?\" – the Turing Test\n- **1956** – the Dartmouth workshop names the field \"artificial intelligence\"\n- **1970s–80s** – the expert-systems boom, then funding cuts: the \"AI winters\"\n- **1997** – IBM Deep Blue beats chess champion Kasparov\n- **2012** – deep-learning breakthrough in image recognition (AlexNet)\n- **2022** – ChatGPT brings generative AI to everyone\n\nAI today is **narrow AI** – excellent at specific tasks (healthcare, finance, transport, recommendations, assistants); general human-level AI is still a goal. The course takes the **rational agent** view.",
+      "sources": [
+        {
+          "doc": "L10",
+          "page": 33
+        }
+      ]
+    }
+  ]
+}

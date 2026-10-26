@@ -512,6 +512,25 @@
           "note": "Question 4"
         }
       ]
+    },
+    {
+      "id": "l3-032",
+      "front": "How does greedy best-first search differ from A*?",
+      "back": "Both are **informed** searches using a heuristic h(n) = estimated distance to the goal.\n\n- **Greedy best-first search** expands the node with the **lowest h(n)** – whatever *looks* closest to the goal. It ignores the cost already paid, so it is often **fast but not optimal** (and can be led into dead ends).\n- **A*** expands the node with the **lowest f(n) = g(n) + h(n)** – cost so far **plus** estimate to go. With an admissible h it is **optimal**.\n\n*Romania example:* greedy goes Arad → Sibiu → Fagaras → Bucharest (Fagaras has a smaller h than Rimnicu Vilcea) = 450 km; A* finds the 418 km route via Rimnicu Vilcea and Pitesti.",
+      "sources": [
+        {
+          "doc": "L10",
+          "page": 37
+        },
+        {
+          "doc": "L3",
+          "page": 47
+        },
+        {
+          "doc": "L3",
+          "page": 57
+        }
+      ]
     }
   ]
 }
