@@ -1,0 +1,1995 @@
+{
+  "id": "exam-questions",
+  "name": "Past exam questions",
+  "description": "Every unique question from the past exams, with the official solution where one exists",
+  "group": "Exams",
+  "order": 0,
+  "cards": [
+    {
+      "id": "x25a-q1a",
+      "front": "What is acting rationally? (2 points)",
+      "back": "*No official solution exists – suggested answer:*\n\nActing rationally means the agent **chooses the action that is expected to maximize its performance measure / goal achievement**, given what it perceives and knows – \"doing the right thing\". It is the **rational agent** approach.\n\n*Example:* a self-driving car that sees a pedestrian step onto the road brakes, because braking best serves the goal of driving safely.",
+      "sources": [
+        {
+          "doc": "EX250114",
+          "page": 1,
+          "note": "Question 1a"
+        },
+        {
+          "doc": "EX250605",
+          "page": 1,
+          "note": "Question 1a"
+        },
+        {
+          "doc": "EXQ",
+          "page": 1,
+          "note": "Question 1a"
+        },
+        {
+          "doc": "L1",
+          "page": 38
+        },
+        {
+          "doc": "L1",
+          "page": 39
+        },
+        {
+          "doc": "L1",
+          "page": 24
+        }
+      ]
+    },
+    {
+      "id": "x25a-q1b",
+      "front": "What is thinking rationally? (2 points)",
+      "back": "*No official solution exists – suggested answer:*\n\nThinking rationally (the **\"laws of thought\"** approach) means the system **reasons logically**: it derives conclusions from facts and rules using **formal logic**, so its conclusions are always correct given its premises.\n\n*Example:* \"All humans are mortal\" + \"Socrates is a human\" ⇒ \"Socrates is mortal\"; or a medical expert system: IF fever AND sore throat THEN consider throat infection.",
+      "sources": [
+        {
+          "doc": "EX250114",
+          "page": 1,
+          "note": "Question 1b"
+        },
+        {
+          "doc": "EX250605",
+          "page": 1,
+          "note": "Question 1b"
+        },
+        {
+          "doc": "EXQ",
+          "page": 1,
+          "note": "Question 1b"
+        },
+        {
+          "doc": "L1",
+          "page": 36
+        },
+        {
+          "doc": "L1",
+          "page": 37
+        }
+      ]
+    },
+    {
+      "id": "x25a-q1c",
+      "front": "How can an agent act rationally without thinking rationally? (2 points)",
+      "back": "*No official solution exists – suggested answer:*\n\nRational **action** does not require logical **deliberation**: what counts is that the action is the best one. The right action can come from:\n\n- **Reflexes** – e.g. pulling your hand away from a hot stove, or blinking: correct and fast, with no reasoning (deliberating would even be too slow).\n- **Simple condition–action rules or learned behaviour** – e.g. a thermostat, or a trained neural network mapping the situation directly to a good action.\n\nThinking should serve rational action, but it is only one way to achieve it.",
+      "sources": [
+        {
+          "doc": "EX250114",
+          "page": 1,
+          "note": "Question 1c"
+        },
+        {
+          "doc": "EX250605",
+          "page": 1,
+          "note": "Question 1c"
+        },
+        {
+          "doc": "EXQ",
+          "page": 1,
+          "note": "Question 1c"
+        },
+        {
+          "doc": "L1",
+          "page": 38
+        }
+      ]
+    },
+    {
+      "id": "x25a-q2a",
+      "front": "An agent might be placed into an environment that is fully or partially observable, deterministic or stochastic, single- or multi-player, episodic or sequential. \"Partially observable\", \"stochastic\", \"episodic\" and \"single-agent\" describe different types of gaps in the agent's knowledge. Define each of these four adjectives: what type of knowledge about the environment is lacking in each case? (8 points)",
+      "back": "*No official solution exists – suggested answer:*\n\n- **Partially observable** – the sensors don't give the complete state, so the agent **doesn't know the full current state** of the world and must remember or infer the rest. *E.g. poker: you can't see the other players' cards.*\n- **Stochastic** – the next state is not fully determined by the current state and action, so the agent **doesn't know the outcome of its actions** in advance. *E.g. a robot's wheels may slip.*\n- **Episodic** – experience is split into independent episodes (perceive → one action), and the agent **lacks knowledge of how its action relates to past or future episodes** – it doesn't need it, since episodes don't affect each other, but it also can't plan ahead. (In a *sequential* environment the gap is not knowing the long-term consequences of an action.) *E.g. inspecting parts on an assembly line.*\n- **Single-agent** – no other agents act in the environment, so the agent doesn't have to model them. (The corresponding gap in a *multi-agent* environment is **not knowing what the other agents will do**.) *E.g. a crossword puzzle vs. chess.*",
+      "sources": [
+        {
+          "doc": "EX250114",
+          "page": 2,
+          "note": "Question 2.1"
+        },
+        {
+          "doc": "EX250605",
+          "page": 2,
+          "note": "Question 2.1"
+        },
+        {
+          "doc": "EXQ",
+          "page": 1,
+          "note": "Question 2"
+        },
+        {
+          "doc": "L2",
+          "page": 22
+        },
+        {
+          "doc": "L2",
+          "page": 23
+        }
+      ]
+    },
+    {
+      "id": "x25a-q2b",
+      "front": "Explain utility-based agents. (5 points)",
+      "back": "*No official solution exists – suggested answer:*\n\nA **utility-based agent** does not only try to reach a goal; it **maximizes a utility function** – a measure of how desirable (\"how happy\") a resulting state is.\n\n- A **utility function** maps a state (or sequence of states) to a **real number**.\n- Using its model of the world, the agent predicts *what the world will be like if it does action A*, evaluates *how happy it would be in that state*, and picks the action with the **highest expected utility**.\n- This lets it handle **trade-offs** between conflicting goals (speed vs. safety vs. cost) and **uncertainty** (weighting outcomes by their probability).\n\n*Example:* a goal-based taxi only needs to reach the destination; a utility-based taxi chooses the route that is fastest, safest and cheapest.\n\nAgent types in increasing generality: simple reflex → model-based reflex → goal-based → **utility-based**.",
+      "sources": [
+        {
+          "doc": "EX250114",
+          "page": 2,
+          "note": "Question 2.2"
+        },
+        {
+          "doc": "EX250605",
+          "page": 2,
+          "note": "Question 2.2"
+        },
+        {
+          "doc": "L2",
+          "page": 33
+        },
+        {
+          "doc": "L2",
+          "page": 29
+        },
+        {
+          "doc": "L2",
+          "page": 32
+        }
+      ]
+    },
+    {
+      "id": "x25a-q3a",
+      "front": "State space: S→A (cost 1), S→G (12), A→B (3), A→C (1), B→D (3), C→D (1), C→G (2), D→G (3). Ties are broken alphabetically. What path would BFS return? Explain in detail. (3 points)",
+      "back": "*No official solution exists – suggested answer:*\n\n**BFS returns S → G** (1 edge, cost 12).\n\n- Queue (FIFO) starts with S.\n- Expand S: its successors are **A** and **G** (alphabetical) → queue [A, G]. (If you goal-test nodes when they are generated, BFS stops here, with the same answer.)\n- Expand A: add B and C → queue [G, B, C].\n- Dequeue **G** → goal reached. Path S → G.\n\nBFS expands level by level and returns the path with the **fewest edges**; it ignores the edge costs, so it returns this expensive path (the cheapest is S → A → C → G = 4).",
+      "sources": [
+        {
+          "doc": "EX250114",
+          "page": 3,
+          "note": "Question 3a"
+        },
+        {
+          "doc": "EX250605",
+          "page": 3,
+          "note": "Question 3a"
+        },
+        {
+          "doc": "EXQ",
+          "page": 1,
+          "note": "Question 3a"
+        },
+        {
+          "doc": "L3",
+          "page": 36
+        },
+        {
+          "doc": "L3",
+          "page": 37
+        }
+      ]
+    },
+    {
+      "id": "x25a-q3b",
+      "front": "Same state space (S→A 1, S→G 12, A→B 3, A→C 1, B→D 3, C→D 1, C→G 2, D→G 3), ties broken alphabetically. What path would DFS return? Explain in detail. (3 points)",
+      "back": "*No official solution exists – suggested answer:*\n\n**DFS returns S → A → B → D → G** (cost 1 + 3 + 3 + 3 = 10).\n\n- DFS always expands the **deepest** node first (stack, LIFO).\n- From S, the successors are A and G → choose **A** (alphabetical).\n- From A: B and C → choose **B**.\n- From B: the only successor is **D**.\n- From D: **G** → goal.\n\nDFS follows the first branch as deep as it goes and doesn't consider cost, so it is not optimal either (the cheapest path is S → A → C → G = 4).",
+      "sources": [
+        {
+          "doc": "EX250114",
+          "page": 3,
+          "note": "Question 3b"
+        },
+        {
+          "doc": "EX250605",
+          "page": 3,
+          "note": "Question 3b"
+        },
+        {
+          "doc": "EXQ",
+          "page": 1,
+          "note": "Question 3b"
+        },
+        {
+          "doc": "L3",
+          "page": 30
+        },
+        {
+          "doc": "L3",
+          "page": 31
+        }
+      ]
+    },
+    {
+      "id": "x25a-q3c",
+      "front": "In general, discuss the relative strengths and weaknesses of breadth-first search (BFS) vs. depth-first search (DFS) for AI problems. (4 points)",
+      "back": "*No official solution exists – suggested answer:*\n\n|  | **BFS** | **DFS** |\n|---|---|---|\n| **Strength** | **Complete** – always finds a goal if one exists; finds the **shallowest** goal (fewest steps), so it is optimal when all steps cost the same | **Low memory** – only stores the current path and unexplored siblings (O(b·m)); can find deep goals quickly |\n| **Weakness** | **Memory-hungry** – stores the whole frontier, which grows exponentially with depth (O(bᵈ)); slow if the goal is deep | **Not optimal**; can get lost in very deep or infinite branches (not complete there); result depends on neighbour order |\n\n**Iterative deepening** combines DFS's low memory with BFS's completeness.",
+      "sources": [
+        {
+          "doc": "EX250114",
+          "page": 3,
+          "note": "Question 3c"
+        },
+        {
+          "doc": "EX250605",
+          "page": 3,
+          "note": "Question 3c"
+        },
+        {
+          "doc": "EXQ",
+          "page": 2,
+          "note": "Question 3c"
+        },
+        {
+          "doc": "L3",
+          "page": 35
+        },
+        {
+          "doc": "L3",
+          "page": 37
+        },
+        {
+          "doc": "L3",
+          "page": 46
+        }
+      ]
+    },
+    {
+      "id": "x25a-q4a",
+      "front": "Convert to first-order logic: All dogs have tails. (2 points)",
+      "back": "*No official solution exists – suggested answer:*\n\n**∀x Dog(x) → HasTail(x)**\n\nor, with tails as objects: ∀x Dog(x) → ∃y (Tail(y) ∧ Has(x, y))\n\n\"All\" → ∀ combined with →.",
+      "sources": [
+        {
+          "doc": "EX250114",
+          "page": 4,
+          "note": "Question 4a"
+        },
+        {
+          "doc": "EX250605",
+          "page": 4,
+          "note": "Question 4a"
+        },
+        {
+          "doc": "EXQ",
+          "page": 2,
+          "note": "Question 4a-a"
+        },
+        {
+          "doc": "L2",
+          "page": 54
+        },
+        {
+          "doc": "L2",
+          "page": 58
+        },
+        {
+          "doc": "L2",
+          "page": 59
+        },
+        {
+          "doc": "L2",
+          "page": 64
+        },
+        {
+          "doc": "L2",
+          "page": 65
+        }
+      ]
+    },
+    {
+      "id": "x25a-q4b",
+      "front": "Convert to first-order logic: John is a student. (2 points)",
+      "back": "*No official solution exists – suggested answer:*\n\n**Student(John)**\n\nJohn is a **constant** (a specific object), so no quantifier is needed.",
+      "sources": [
+        {
+          "doc": "EX250114",
+          "page": 4,
+          "note": "Question 4b"
+        },
+        {
+          "doc": "EX250605",
+          "page": 4,
+          "note": "Question 4b"
+        },
+        {
+          "doc": "EXQ",
+          "page": 2,
+          "note": "Question 4a-b"
+        },
+        {
+          "doc": "L2",
+          "page": 54
+        },
+        {
+          "doc": "L2",
+          "page": 57
+        }
+      ]
+    },
+    {
+      "id": "x25a-q4c",
+      "front": "Convert to first-order logic: Every dog chases some rabbit. (4 points)",
+      "back": "*No official solution exists – suggested answer:*\n\n**∀x Dog(x) → ∃y (Rabbit(y) ∧ Chases(x, y))**\n\n- \"Every dog\" → ∀ with →; \"some rabbit\" → ∃ with ∧.\n- The order matters: each dog may chase a *different* rabbit. ∃y ∀x … would mean one single rabbit that every dog chases.",
+      "sources": [
+        {
+          "doc": "EX250114",
+          "page": 4,
+          "note": "Question 4c"
+        },
+        {
+          "doc": "EX250605",
+          "page": 4,
+          "note": "Question 4c"
+        },
+        {
+          "doc": "EXQ",
+          "page": 2,
+          "note": "Question 4a-c"
+        },
+        {
+          "doc": "L2",
+          "page": 54
+        },
+        {
+          "doc": "L2",
+          "page": 58
+        },
+        {
+          "doc": "L2",
+          "page": 59
+        },
+        {
+          "doc": "L2",
+          "page": 64
+        },
+        {
+          "doc": "L2",
+          "page": 65
+        }
+      ]
+    },
+    {
+      "id": "x25a-q4d",
+      "front": "Convert to first-order logic: Everyone who loves Santa loves any reindeer. (4 points)",
+      "back": "*No official solution exists – suggested answer:*\n\n**∀x Loves(x, Santa) → ∀y (Reindeer(y) → Loves(x, y))**\n\nEquivalent: ∀x ∀y (Loves(x, Santa) ∧ Reindeer(y)) → Loves(x, y)\n\nSanta is a constant; \"any reindeer\" means every reindeer → a second ∀ with →.",
+      "sources": [
+        {
+          "doc": "EX250114",
+          "page": 4,
+          "note": "Question 4d"
+        },
+        {
+          "doc": "EX250605",
+          "page": 4,
+          "note": "Question 4d"
+        },
+        {
+          "doc": "EXQ",
+          "page": 2,
+          "note": "Question 4a-d"
+        },
+        {
+          "doc": "L2",
+          "page": 54
+        },
+        {
+          "doc": "L2",
+          "page": 58
+        },
+        {
+          "doc": "L2",
+          "page": 59
+        },
+        {
+          "doc": "L2",
+          "page": 64
+        },
+        {
+          "doc": "L2",
+          "page": 65
+        }
+      ]
+    },
+    {
+      "id": "x25a-q4e",
+      "front": "Convert to first-order logic: Anyone who wears maroon-and-white shirts is an Aggie. (6 points)",
+      "back": "*No official solution exists – suggested answer:*\n\n**∀x (∃y Shirt(y) ∧ Maroon(y) ∧ White(y) ∧ Wears(x, y)) → Aggie(x)**\n\nEquivalent without the inner ∃:\n∀x ∀y (Person(x) ∧ Shirt(y) ∧ MaroonAndWhite(y) ∧ Wears(x, y)) → Aggie(x)\n\n1. \"Anyone\" = every person x → ∀x … → Aggie(x)\n2. \"wears maroon-and-white shirts\" = there is a shirt y that is maroon and white and x wears it → ∃y with ∧\n3. Define the predicates you use: Shirt(y), Maroon(y), White(y), Wears(x, y), Aggie(x).",
+      "sources": [
+        {
+          "doc": "EX250114",
+          "page": 4,
+          "note": "Question 4e"
+        },
+        {
+          "doc": "EX250605",
+          "page": 4,
+          "note": "Question 4e"
+        },
+        {
+          "doc": "EXQ",
+          "page": 2,
+          "note": "Question 4a-e"
+        },
+        {
+          "doc": "L2",
+          "page": 54
+        },
+        {
+          "doc": "L2",
+          "page": 58
+        },
+        {
+          "doc": "L2",
+          "page": 59
+        },
+        {
+          "doc": "L2",
+          "page": 64
+        },
+        {
+          "doc": "L2",
+          "page": 65
+        }
+      ]
+    },
+    {
+      "id": "x25a-q5",
+      "front": "Write down three ethical aspects of artificial intelligence and explain each of them with examples. (9 points)",
+      "back": "*No official solution exists – suggested answer:*\n\n1. **Bias and fairness** – AI learns from historical data and can reproduce or amplify discrimination. *E.g. Amazon's experimental résumé screener penalised women because it was trained on a decade of male-dominated hiring; commercial face analysis had much higher error rates for darker-skinned women (Gender Shades).* → Audit performance per subgroup and document the fairness metric.\n2. **Privacy and data protection** – AI needs large amounts of personal data and models can memorise and leak it. *E.g. surveillance with face recognition; a chatbot revealing personal data from its training set.* → Data minimisation, lawful basis under GDPR.\n3. **Transparency and accountability** – deep models are \"black boxes\", so decisions are hard to explain or contest, and it is unclear who is responsible for errors. *E.g. a loan or bail decision by an unexplainable model (COMPAS).* → Explanations, human oversight, a clear accountability chain (developer → deployer → user → regulator).\n\nOther valid aspects: safety and misuse (deepfakes, cyberattacks), job displacement, human autonomy.",
+      "sources": [
+        {
+          "doc": "EX250114",
+          "page": 5,
+          "note": "Question 5"
+        },
+        {
+          "doc": "EX250605",
+          "page": 5,
+          "note": "Question 5"
+        },
+        {
+          "doc": "L9",
+          "page": 15
+        },
+        {
+          "doc": "L9",
+          "page": 16
+        },
+        {
+          "doc": "L9",
+          "page": 17
+        },
+        {
+          "doc": "L9",
+          "page": 20
+        },
+        {
+          "doc": "L9",
+          "page": 12
+        }
+      ]
+    },
+    {
+      "id": "x25a-q6a",
+      "front": "GA with chromosomes x = abcdefgh (genes 0–9), fitness f(x) = (a + b) − (c + d) + (e + f) − (g + h), population x1 = 6 5 4 1 3 5 3 2, x2 = 8 7 1 2 6 6 0 1, x3 = 2 3 9 2 1 2 8 5, x4 = 4 1 8 5 2 0 9 4. (a) Evaluate the fitness of each individual, showing all your workings, and arrange them with the fittest first and the least fit last. (2 points)",
+      "back": "*No official solution exists – suggested answer:*\n\n```\nx1 = 6 5 4 1 3 5 3 2:  (6+5) − (4+1) + (3+5) − (3+2) = 11 − 5 + 8 − 5  =   9\nx2 = 8 7 1 2 6 6 0 1:  (8+7) − (1+2) + (6+6) − (0+1) = 15 − 3 + 12 − 1 =  23\nx3 = 2 3 9 2 1 2 8 5:  (2+3) − (9+2) + (1+2) − (8+5) = 5 − 11 + 3 − 13 = −16\nx4 = 4 1 8 5 2 0 9 4:  (4+1) − (8+5) + (2+0) − (9+4) = 5 − 13 + 2 − 13 = −19\n```\n\n**Order:** x2 (23), x1 (9), x3 (−16), x4 (−19)",
+      "sources": [
+        {
+          "doc": "EX250114",
+          "page": 6,
+          "note": "Question 6a"
+        },
+        {
+          "doc": "EX250605",
+          "page": 6,
+          "note": "Question 6a"
+        },
+        {
+          "doc": "L4",
+          "page": 12
+        },
+        {
+          "doc": "L4",
+          "page": 17
+        }
+      ]
+    },
+    {
+      "id": "x25a-q6b",
+      "front": "GA with chromosomes x = abcdefgh (genes 0–9), fitness f(x) = (a + b) − (c + d) + (e + f) − (g + h), population x1 = 6 5 4 1 3 5 3 2, x2 = 8 7 1 2 6 6 0 1, x3 = 2 3 9 2 1 2 8 5, x4 = 4 1 8 5 2 0 9 4. (b) (i) Cross the two fittest with one-point crossover at the middle. (ii) Cross the 2nd and 3rd fittest with two-point crossover (points b and f). (iii) Mutate the least fit individual, changing one gene. (6 points)",
+      "back": "*No official solution exists – suggested answer:*\n\n**(i) x2 × x1, cut after gene d:**\n```\nx2 = 8 7 1 2 | 6 6 0 1      O1 = 8 7 1 2 3 5 3 2\nx1 = 6 5 4 1 | 3 5 3 2  →   O2 = 6 5 4 1 6 6 0 1\n```\n\n**(ii) x1 × x3, cut after b and after f (swap genes c–f):**\n```\nx1 = 6 5 | 4 1 3 5 | 3 2    O3 = 6 5 9 2 1 2 3 2\nx3 = 2 3 | 9 2 1 2 | 8 5 →  O4 = 2 3 4 1 3 5 8 5\n```\n\n**(iii) Mutate x4**, e.g. gene g: 9 → 0:\n```\nx4 = 4 1 8 5 2 0 9 4  →   O5 = 4 1 8 5 2 0 0 4\n```\nAny single-gene change is accepted.",
+      "sources": [
+        {
+          "doc": "EX250114",
+          "page": 6,
+          "note": "Question 6b"
+        },
+        {
+          "doc": "EX250605",
+          "page": 6,
+          "note": "Question 6b"
+        },
+        {
+          "doc": "L4",
+          "page": 22
+        },
+        {
+          "doc": "L4",
+          "page": 23
+        },
+        {
+          "doc": "L4",
+          "page": 25
+        },
+        {
+          "doc": "L4",
+          "page": 26
+        }
+      ]
+    },
+    {
+      "id": "x25a-q6c",
+      "front": "GA with chromosomes x = abcdefgh (genes 0–9), fitness f(x) = (a + b) − (c + d) + (e + f) − (g + h), population x1 = 6 5 4 1 3 5 3 2, x2 = 8 7 1 2 6 6 0 1, x3 = 2 3 9 2 1 2 8 5, x4 = 4 1 8 5 2 0 9 4. (c) The new population is the five offspring from (b): O1 = 87123532, O2 = 65416601, O3 = 65921232, O4 = 23413585, O5 = 41852004 (mutated x4). Evaluate their fitness. Has the overall fitness improved? (5 points)",
+      "back": "*No official solution exists – suggested answer:*\n\n```\nO1 = 8 7 1 2 3 5 3 2:  15 − 3 + 8 − 5   =  15\nO2 = 6 5 4 1 6 6 0 1:  11 − 5 + 12 − 1  =  17\nO3 = 6 5 9 2 1 2 3 2:  11 − 11 + 3 − 5  =  −2\nO4 = 2 3 4 1 3 5 8 5:  5 − 5 + 8 − 13   =  −5\nO5 = 4 1 8 5 2 0 0 4:  5 − 13 + 2 − 4   = −10\n```\n\n- Old population: total −3, average −0.75\n- New population: total 15, average **3.0**\n\n**Yes – the overall (average) fitness improved**, and the worst individual went from −19 to −10. The best individual got worse, though (23 → 17), because x2 itself was not kept (no elitism).\n\n(Your O5 depends on which mutation you chose.)",
+      "sources": [
+        {
+          "doc": "EX250114",
+          "page": 6,
+          "note": "Question 6c"
+        },
+        {
+          "doc": "EX250605",
+          "page": 6,
+          "note": "Question 6c"
+        },
+        {
+          "doc": "L4",
+          "page": 12
+        },
+        {
+          "doc": "L4",
+          "page": 17
+        },
+        {
+          "doc": "L4",
+          "page": 29
+        }
+      ]
+    },
+    {
+      "id": "x25a-q6d",
+      "front": "GA with chromosomes x = abcdefgh (genes 0–9), fitness f(x) = (a + b) − (c + d) + (e + f) − (g + h), population x1 = 6 5 4 1 3 5 3 2, x2 = 8 7 1 2 6 6 0 1, x3 = 2 3 9 2 1 2 8 5, x4 = 4 1 8 5 2 0 9 4. (d) Considering that genes can only be digits 0–9, find the chromosome with the maximum fitness and the value of that fitness. (5 points)",
+      "back": "*No official solution exists – suggested answer:*\n\nThe positive terms are a, b, e, f → make them as large as possible (9). The negative terms are c, d, g, h → make them as small as possible (0).\n\n**x = 9 9 0 0 9 9 0 0**\nf = (9 + 9) − (0 + 0) + (9 + 9) − (0 + 0) = **36**",
+      "sources": [
+        {
+          "doc": "EX250114",
+          "page": 6,
+          "note": "Question 6d"
+        },
+        {
+          "doc": "EX250605",
+          "page": 6,
+          "note": "Question 6d"
+        },
+        {
+          "doc": "L4",
+          "page": 8
+        },
+        {
+          "doc": "L4",
+          "page": 17
+        }
+      ]
+    },
+    {
+      "id": "x25a-q6e",
+      "front": "GA with chromosomes x = abcdefgh (genes 0–9), fitness f(x) = (a + b) − (c + d) + (e + f) − (g + h), population x1 = 6 5 4 1 3 5 3 2, x2 = 8 7 1 2 6 6 0 1, x3 = 2 3 9 2 1 2 8 5, x4 = 4 1 8 5 2 0 9 4. (e) By looking at the initial population, can you say whether the algorithm will be able to reach the optimal solution? (4 points)",
+      "back": "*No official solution exists – suggested answer:*\n\n**Not by crossover alone.** Crossover only rearranges gene values that **already exist at each position** in the population:\n\n- position a: {6, 8, 2, 4} – no 9\n- position b: {5, 7, 3, 1} – no 9\n- position c: {4, 1, 9, 8} – no 0\n- position e: {3, 6, 1, 2} – no 9, and so on\n\nThe optimum 99009900 needs values that don't exist in those positions, so it can only be reached through **mutation**, which introduces new gene values. With a low mutation rate this may take many generations, and the population could converge prematurely to a sub-optimum.",
+      "sources": [
+        {
+          "doc": "EX250114",
+          "page": 6,
+          "note": "Question 6e"
+        },
+        {
+          "doc": "EX250605",
+          "page": 6,
+          "note": "Question 6e"
+        },
+        {
+          "doc": "L4",
+          "page": 16
+        },
+        {
+          "doc": "L4",
+          "page": 25
+        },
+        {
+          "doc": "L4",
+          "page": 26
+        }
+      ]
+    },
+    {
+      "id": "x25a-q7",
+      "front": "Grid maze (S = start, G = goal, # = wall), moves up/down/left/right, cost 1 per step:\n```\n##########\n#S...#...#\n###.#.#.#.#\n#....#.#G#\n##########\n```\n1. Represent the maze for an AI search algorithm. 2. Solve it with A* using Manhattan distance. 3. Show the solution step by step. 4. Write the sequence of moves. 5. (Optional) mark the path with *. (16 points)",
+      "back": "*No official solution exists – suggested answer:*\n\n⚠ **The maze is misprinted in the exam:** row 3 has 11 characters while the others have 10, and G is surrounded by walls. I checked every way of removing the extra character: a wall column always separates S's region from G's, so **as printed it has no solution**. In the exam, state this and your assumption, then show the method:\n\n1. **Representation:** a graph – every open cell (row, col) is a node; edges connect up/down/left/right neighbours that aren't walls; every edge costs 1. (Or a matrix with 0 = open, 1 = wall.)\n2. **Heuristic:** Manhattan distance **h(n) = |r − r_G| + |c − c_G|** – admissible, because without diagonal moves you need at least that many steps.\n3. **A* steps:** open list = {S} with f = g + h. Repeatedly expand the node with the lowest f, add its open neighbours with g + 1, keep the cheapest g per cell, put the expanded node on the closed list, and stop when G is selected. Show a table of the open list and the f, g, h values at each step.\n4. **Moves:** follow the parent pointers from G back to S and write the moves (Right, Down, …).\n5. **Visualisation:** replace the path cells with *.\n\nThe L3 deck has a card that works through this method in full on a small valid maze (the grid-maze / Manhattan-distance card).",
+      "sources": [
+        {
+          "doc": "EX250114",
+          "page": 7,
+          "note": "Question 7"
+        },
+        {
+          "doc": "EX250605",
+          "page": 7,
+          "note": "Question 7"
+        },
+        {
+          "doc": "L3",
+          "page": 48
+        },
+        {
+          "doc": "L3",
+          "page": 49
+        },
+        {
+          "doc": "L3",
+          "page": 50
+        },
+        {
+          "doc": "L3",
+          "page": 52
+        }
+      ]
+    },
+    {
+      "id": "x25a-q8",
+      "front": "What are the differences between supervised and unsupervised learning? (write down only 3) (6 points)",
+      "back": "*No official solution exists – suggested answer:*\n\n1. **Labelled vs. unlabelled data** – supervised learning trains on inputs **with the correct outputs (labels)**; unsupervised learning only has inputs.\n2. **Goal** – supervised learns a mapping to **predict** labels/values for new data; unsupervised **discovers hidden structure** (groups, patterns, anomalies).\n3. **Tasks and algorithms** – supervised: **classification and regression** (logistic regression, SVM, random forest, neural networks); unsupervised: **clustering, dimensionality reduction, anomaly detection** (k-means, DBSCAN, PCA, autoencoders).\n\n(Also valid: supervised can be evaluated directly against known answers (accuracy, MSE), unsupervised is harder to evaluate. Examples: predicting whether a tumour is malignant vs. grouping news articles by topic.)",
+      "sources": [
+        {
+          "doc": "EX250114",
+          "page": 8,
+          "note": "Question 8"
+        },
+        {
+          "doc": "EX250605",
+          "page": 8,
+          "note": "Question 8"
+        },
+        {
+          "doc": "EXQ",
+          "page": 3,
+          "note": "Question 6a"
+        },
+        {
+          "doc": "L6",
+          "page": 13
+        },
+        {
+          "doc": "L6",
+          "page": 18
+        },
+        {
+          "doc": "L6",
+          "page": 63
+        },
+        {
+          "doc": "L6",
+          "page": 64
+        }
+      ]
+    },
+    {
+      "id": "xq-q4b",
+      "front": "Resolution: what are the results at the question marks? Tree 1: (1) {A, B, ¬C} + {A, B, C}; (2) result of 1 + {A, ¬B}; (3) result of 2 + {¬A}. Tree 2: (4) {A, B} + {A, ¬B}; (5) {¬A, B} + {¬A, ¬B}; (6) 4 + 5. Tree 3 with {A, B}, {A, ¬B}, {¬A, B}, {¬A, ¬B}: steps 7–10. Describe how you got 1, 5 and 10.",
+      "back": "*No official solution exists – suggested answer:*\n\nResolution: take two clauses with a complementary literal (P and ¬P), remove that pair and join the rest.\n\n1. {A, B, ¬C} + {A, B, C} → **{A, B}** – C and ¬C cancel.\n2. {A, B} + {A, ¬B} → **{A}**\n3. {A} + {¬A} → **{ }** – the empty clause (contradiction)\n4. {A, B} + {A, ¬B} → **{A}**\n5. {¬A, B} + {¬A, ¬B} → **{¬A}** – B and ¬B cancel, ¬A remains.\n6. {A} + {¬A} → **{ }**\n7. {A, B} + {A, ¬B} → **{A}**\n8. {A} + {¬A, B} → **{B}**\n9. {B} + {¬A, ¬B} → **{¬A}**\n10. {¬A} + {A} (from step 7) → **{ }** – the empty clause.\n\nDeriving the empty clause proves the original set of clauses is **unsatisfiable** (that's how proof by refutation works).",
+      "sources": [
+        {
+          "doc": "EXQ",
+          "page": 2,
+          "note": "Question 4b"
+        },
+        {
+          "doc": "L2",
+          "page": 52
+        },
+        {
+          "doc": "L2",
+          "page": 53
+        }
+      ]
+    },
+    {
+      "id": "xq-q5a",
+      "front": "A maze has four positions in a row-and-column layout: positions 1, 2, 3 in a row and 4 below 2. Position 2 is the start (S); positions 1, 3 and 4 each contain a goal (G1, G2, G3). Search ends when the agent has reached all three goals with the fewest steps. (a) Define a notation for the state of this agent. How many distinct non-terminal states are there? (6 points)",
+      "back": "*No official solution exists – suggested answer:*\n\n**State = (position, which goals have been visited)**, e.g. **(p, v1, v2, v3)** with p ∈ {1, 2, 3, 4} and vᵢ ∈ {T, F} saying whether Gᵢ has been reached. Start state: (2, F, F, F).\n\n**Counting:** without restrictions 4 × 2³ = 32 combinations. But standing on a goal square means that goal is visited (p = 1 ⇒ v1 = T, p = 3 ⇒ v2 = T, p = 4 ⇒ v3 = T), and states with all goals visited are terminal:\n\n- p = 2: 2³ = 8 flag combinations, minus (T, T, T) → **7**\n- p = 1: v1 = T, v2 and v3 free → 4, minus all-true → **3**\n- p = 3: **3**, p = 4: **3**\n\n**Total: 7 + 3 + 3 + 3 = 16 distinct non-terminal states.** (Saying \"4 × 2³ = 32 possible states\" and then explaining the restrictions also shows the idea.)",
+      "sources": [
+        {
+          "doc": "EXQ",
+          "page": 3,
+          "note": "Question 5a"
+        },
+        {
+          "doc": "L3",
+          "page": 9
+        },
+        {
+          "doc": "L3",
+          "page": 12
+        },
+        {
+          "doc": "L3",
+          "page": 14
+        }
+      ]
+    },
+    {
+      "id": "xq-q5b",
+      "front": "Same 4-position maze (S at 2; G1 at 1, G2 at 3, G3 at 4; 2 connects to 1, 3 and 4). (b) Draw a search tree out to a depth of 3 moves, including repeated states. Circle the repeated states. (10 points)",
+      "back": "*No official solution exists – suggested answer:*\n\nState = (position, visited flags G1 G2 G3); from 2 you can move to 1, 3 or 4; from 1, 3 or 4 you can only move back to 2.\n\n```\ndepth 0:            (2,FFF)\n              /        |        \\\ndepth 1:  (1,TFF)   (3,FTF)    (4,FFT)\n             |         |          |\ndepth 2:  (2,TFF)   (2,FTF)    (2,FFT)\n         /  |   \\    /  |  \\     /  |  \\\ndepth 3: ((1,TFF)) (3,TTF) (4,TFT)  (1,TTF) ((3,FTF)) (4,FTT)  (1,TFT) (3,FTT) ((4,FFT))\n```\n\n**Repeated states (circled, shown in double brackets):** (1,TFF), (3,FTF) and (4,FFT) at depth 3 – going back to a goal you just left gives exactly the same state as at depth 1. Every other depth-3 node is new because a second goal has been visited.",
+      "sources": [
+        {
+          "doc": "EXQ",
+          "page": 3,
+          "note": "Question 5b"
+        },
+        {
+          "doc": "L3",
+          "page": 11
+        },
+        {
+          "doc": "L3",
+          "page": 24
+        }
+      ]
+    },
+    {
+      "id": "xq-q6b",
+      "front": "Draw an artificial neural network model with a single perceptron that has 4 inputs and 1 output.",
+      "back": "*No official solution exists – suggested answer:*\n\n```\n x1 ──w1──╮\n x2 ──w2──┤\n          ├──▶ ( Σ wᵢxᵢ + b ) ──▶ [ f ] ──▶ y\n x3 ──w3──┤        ▲\n x4 ──w4──╯        │\n              bias b (x0 = +1, weight w0)\n```\n\nLabel: the **inputs** x1–x4, the **weights** w1–w4 (and the bias), the **summation** v = w1x1 + w2x2 + w3x3 + w4x4 + b, the **activation function** f (e.g. step or sigmoid) and the **single output** y = f(v). There is no hidden layer.",
+      "sources": [
+        {
+          "doc": "EXQ",
+          "page": 3,
+          "note": "Question 6b"
+        },
+        {
+          "doc": "L7",
+          "page": 15
+        },
+        {
+          "doc": "L7",
+          "page": 21
+        },
+        {
+          "doc": "L7",
+          "page": 22
+        },
+        {
+          "doc": "L7",
+          "page": 65
+        }
+      ]
+    },
+    {
+      "id": "x25b-q1a",
+      "front": "Describe the Turing Test and explain its significance in evaluating artificial intelligence. (3 points)",
+      "back": "*No official solution exists – suggested answer:*\n\n**The test (Alan Turing, 1950):** a human interrogator chats through a text terminal, without physical interaction, with either a human or a computer. If the interrogator **cannot reliably tell** whether the answers come from a person or a machine, the machine is considered intelligent. It is the **acting humanly** approach.\n\n**Significance:**\n- It gave an **operational, testable definition** of intelligence – judge the behaviour instead of arguing about what \"thinking\" is.\n- It set a broad research agenda: passing needs language, knowledge, reasoning and learning.\n- Limitation: it measures **imitation of humans**, not understanding; a machine can be intelligent without being human-like.",
+      "sources": [
+        {
+          "doc": "EX251030",
+          "page": 1,
+          "note": "Question 1a"
+        },
+        {
+          "doc": "EX260112",
+          "page": 1,
+          "note": "Question 1a"
+        },
+        {
+          "doc": "EX260605",
+          "page": 1,
+          "note": "Question 1a"
+        },
+        {
+          "doc": "EX2024S",
+          "page": 1,
+          "note": "2024 version: Question 1a"
+        },
+        {
+          "doc": "L1",
+          "page": 25
+        },
+        {
+          "doc": "L1",
+          "page": 27
+        },
+        {
+          "doc": "L1",
+          "page": 28
+        },
+        {
+          "doc": "L1",
+          "page": 29
+        }
+      ]
+    },
+    {
+      "id": "x25b-q1b",
+      "front": "List and briefly explain four essential capabilities that a computer must possess to pass the Turing Test. (4 points)",
+      "back": "*No official solution exists – suggested answer:*\n\n1. **Natural language processing** – to communicate successfully in a human language.\n2. **Knowledge representation** – to store what it knows or hears.\n3. **Automated reasoning** – to use the stored information to answer questions and draw new conclusions.\n4. **Machine learning** – to adapt to new circumstances and detect and extrapolate patterns.\n\n(The *total* Turing Test adds computer vision and robotics.)",
+      "sources": [
+        {
+          "doc": "EX251030",
+          "page": 1,
+          "note": "Question 1b"
+        },
+        {
+          "doc": "EX260112",
+          "page": 1,
+          "note": "Question 1b"
+        },
+        {
+          "doc": "EX260605",
+          "page": 1,
+          "note": "Question 1b"
+        },
+        {
+          "doc": "L1",
+          "page": 31
+        },
+        {
+          "doc": "L1",
+          "page": 32
+        }
+      ]
+    },
+    {
+      "id": "x25b-q2a",
+      "front": "Classify a chess game by the environment properties: fully/partially observable, deterministic/stochastic, episodic/sequential, static/dynamic, discrete/continuous, single/multi-agent. (3 points)",
+      "back": "*No official solution exists – suggested answer:*\n\n- **Fully observable** – the whole board is visible.\n- **Deterministic** – each move has one fixed outcome (only the opponent is uncertain, sometimes called *strategic*).\n- **Sequential** – every move affects the rest of the game.\n- **Static** without a clock (**semidynamic** with a clock).\n- **Discrete** – a finite number of squares, pieces and moves.\n- **Multi-agent** – two competing players.\n\nNote: the lecture's table marks chess as *episodic*, while the textbook says **sequential**. State your choice with a reason.",
+      "sources": [
+        {
+          "doc": "EX251030",
+          "page": 2,
+          "note": "Question 2a"
+        },
+        {
+          "doc": "EX260112",
+          "page": 2,
+          "note": "Question 2a"
+        },
+        {
+          "doc": "EX260605",
+          "page": 2,
+          "note": "Question 2a"
+        },
+        {
+          "doc": "L2",
+          "page": 22
+        },
+        {
+          "doc": "L2",
+          "page": 23
+        },
+        {
+          "doc": "L2",
+          "page": 24
+        }
+      ]
+    },
+    {
+      "id": "x25b-q2b",
+      "front": "Classify a vacuum-cleaning robot at home by the environment properties: observable, deterministic, episodic, static, discrete, single/multi-agent. (3 points)",
+      "back": "*No official solution exists – suggested answer:*\n\n- **Partially observable** – its sensors only see nearby dirt and obstacles, not the whole home.\n- **Stochastic** – wheels slip, new dirt appears, people move things.\n- **Sequential** – cleaning one area now affects what remains later.\n- **Dynamic** – people and pets move while it works.\n- **Continuous** – real positions and movements (the 2-square textbook vacuum world is discrete).\n- **Single-agent** – the robot is the only agent (unless people/pets are counted as agents).",
+      "sources": [
+        {
+          "doc": "EX251030",
+          "page": 2,
+          "note": "Question 2b"
+        },
+        {
+          "doc": "EX260112",
+          "page": 2,
+          "note": "Question 2b"
+        },
+        {
+          "doc": "EX260605",
+          "page": 2,
+          "note": "Question 2b"
+        },
+        {
+          "doc": "L2",
+          "page": 6
+        },
+        {
+          "doc": "L2",
+          "page": 22
+        },
+        {
+          "doc": "L2",
+          "page": 23
+        }
+      ]
+    },
+    {
+      "id": "x25b-q2c",
+      "front": "Classify the RoboCup soccer-playing game by the environment properties: observable, deterministic, episodic, static, discrete, single/multi-agent. (5 points)",
+      "back": "*No official solution exists – suggested answer:*\n\n- **Partially observable** – limited sensor range and field of view.\n- **Stochastic** – opponents' behaviour is unpredictable; ball and motors are noisy.\n- **Sequential** – each action affects later game situations.\n- **Dynamic** – the field is static, but the robots and ball keep moving (positions, orientations, velocities change) while an agent deliberates.\n- **Continuous** (mixed) – game time comes in discrete halves, but movement and positions are continuous.\n- **Multi-agent** – cooperative teammates and competitive opponents.",
+      "sources": [
+        {
+          "doc": "EX251030",
+          "page": 2,
+          "note": "Question 2c"
+        },
+        {
+          "doc": "EX260112",
+          "page": 2,
+          "note": "Question 2c"
+        },
+        {
+          "doc": "EX260605",
+          "page": 2,
+          "note": "Question 2c"
+        },
+        {
+          "doc": "L2",
+          "page": 25
+        },
+        {
+          "doc": "L2",
+          "page": 22
+        }
+      ]
+    },
+    {
+      "id": "x25b-q3a",
+      "front": "Block world with six blocks a–f and a robot hand. Part of the initial state: the table is clear, block a is on the table, block b is on block a, the robot's hand is empty. (a) Write four different predicate-logic statements that represent the current state. Choose any predicate names, but define each in a few words. (8 points)",
+      "back": "*No official solution exists – suggested answer:*\n\n**Predicates:**\n- **OnTable(x)** – block x stands directly on the table\n- **On(x, y)** – block x is directly on block y\n- **Clear(x)** – nothing is on top of block x\n- **HandEmpty** – the robot hand holds nothing (and **Holding(x)** – the hand holds x)\n\n**Four statements for the current state:**\n1. **OnTable(a)**\n2. **On(b, a)**\n3. **Clear(b)**\n4. **HandEmpty**\n\n(Also true: ¬Clear(a), since b is on it.)",
+      "sources": [
+        {
+          "doc": "EX251030",
+          "page": 3,
+          "note": "Question 3a"
+        },
+        {
+          "doc": "EX260112",
+          "page": 3,
+          "note": "Question 3a"
+        },
+        {
+          "doc": "EX260605",
+          "page": 3,
+          "note": "Question 3a"
+        },
+        {
+          "doc": "L2",
+          "page": 54
+        },
+        {
+          "doc": "L2",
+          "page": 57
+        },
+        {
+          "doc": "L2",
+          "page": 45
+        }
+      ]
+    },
+    {
+      "id": "x25b-q3b",
+      "front": "Same block world (a on the table, b on a, hand empty; c, d, e, f on the table). (b) Using your predicates, give a sequence of actions that builds the configuration in Figure 1: a stack a (bottom) – b – c (top), and a stack e (bottom) – d – f (top). (8 points)",
+      "back": "*No official solution exists – suggested answer:*\n\n**Actions:**\n- **PickUp(x)** – pre: OnTable(x) ∧ Clear(x) ∧ HandEmpty → eff: Holding(x), ¬OnTable(x), ¬HandEmpty\n- **Stack(x, y)** – pre: Holding(x) ∧ Clear(y) → eff: On(x, y), Clear(x), HandEmpty, ¬Clear(y), ¬Holding(x)\n\n**Plan** (assuming c, d, e, f start on the table and clear):\n1. PickUp(c) → Stack(c, b) — gives On(c, b)\n2. PickUp(d) → Stack(d, e) — gives On(d, e)\n3. PickUp(f) → Stack(f, d) — gives On(f, d)\n\n**Goal state:** OnTable(a) ∧ On(b, a) ∧ On(c, b) ∧ Clear(c) ∧ OnTable(e) ∧ On(d, e) ∧ On(f, d) ∧ Clear(f) ∧ HandEmpty\n\nd must be on e before f can be placed on d.",
+      "sources": [
+        {
+          "doc": "EX251030",
+          "page": 3,
+          "note": "Question 3b"
+        },
+        {
+          "doc": "EX260112",
+          "page": 3,
+          "note": "Question 3b"
+        },
+        {
+          "doc": "EX260605",
+          "page": 3,
+          "note": "Question 3b"
+        },
+        {
+          "doc": "L2",
+          "page": 45
+        },
+        {
+          "doc": "EX2020S",
+          "page": 4,
+          "note": "Similar planning problem: 2020 Question 10"
+        }
+      ]
+    },
+    {
+      "id": "x25b-q4a",
+      "front": "Graph with edges A–B 6, A–F 3, B–C 3, B–D 2, C–D 1, C–E 5, D–E 8, E–I 5, E–J 5, F–G 1, F–H 7, G–I 3, H–I 2, I–J 3 and heuristics A 10, B 8, C 5, D 7, E 3, F 6, G 5, H 3, I 1, J 0. Design an agent that finds the shortest path from A to J with (a) Breadth-First Search. Show the solution in detail. (5 points)",
+      "back": "*No official solution exists – suggested answer:*\n\nQueue (FIFO), neighbours added alphabetically, each node added only once:\n\n```\nExpand A → add B, F          queue: B F\nExpand B → add C, D          queue: F C D\nExpand F → add G, H          queue: C D G H\nExpand C → add E             queue: D G H E\nExpand D → (C, E known)      queue: G H E\nExpand G → add I             queue: H E I\nExpand H → (I known)         queue: E I\nExpand E → add J  → goal\n```\n\n**Path (via parents): A → B → C → E → J** – 4 edges, cost 6 + 3 + 5 + 5 = **19**.\n\nBFS minimises the number of edges, not the cost: A → F → G → I → J also has 4 edges but costs only 10. BFS finds B's branch first because of the alphabetical order.",
+      "sources": [
+        {
+          "doc": "EX251030",
+          "page": 4,
+          "note": "Question 4a"
+        },
+        {
+          "doc": "EX260112",
+          "page": 4,
+          "note": "Question 4a"
+        },
+        {
+          "doc": "EX260605",
+          "page": 4,
+          "note": "Question 4a"
+        },
+        {
+          "doc": "L3",
+          "page": 36
+        },
+        {
+          "doc": "L3",
+          "page": 37
+        },
+        {
+          "doc": "L3",
+          "page": 46
+        }
+      ]
+    },
+    {
+      "id": "x25b-q4b",
+      "front": "Graph with edges A–B 6, A–F 3, B–C 3, B–D 2, C–D 1, C–E 5, D–E 8, E–I 5, E–J 5, F–G 1, F–H 7, G–I 3, H–I 2, I–J 3 and heuristics A 10, B 8, C 5, D 7, E 3, F 6, G 5, H 3, I 1, J 0. (b) Find the shortest path from A to J with the A* algorithm. Show the solution in detail. (8 points)",
+      "back": "*No official solution exists – suggested answer:*\n\nf(n) = g(n) + h(n); always expand the open node with the lowest f:\n\n```\nExpand A (f=10):  B: 6+8=14     F: 3+6=9\nExpand F (f=9):   G: 4+5=9      H: 10+3=13\nExpand G (f=9):   I: 7+1=8\nExpand I (f=8):   J: 10+0=10    E: 12+3=15\n                  H: 9+3=12  (cheaper than 13 → update H)\nExpand J (f=10) → GOAL\n```\n\n**Path: A → F → G → I → J, cost 3 + 1 + 3 + 3 = 10** – the optimal path.\n\nThe heuristic never overestimates (e.g. h(I) = 1 ≤ 3, h(F) = 6 ≤ 7), so it is admissible and A* is guaranteed optimal.",
+      "sources": [
+        {
+          "doc": "EX251030",
+          "page": 4,
+          "note": "Question 4b"
+        },
+        {
+          "doc": "EX260112",
+          "page": 4,
+          "note": "Question 4b"
+        },
+        {
+          "doc": "EX260605",
+          "page": 4,
+          "note": "Question 4b"
+        },
+        {
+          "doc": "L3",
+          "page": 48
+        },
+        {
+          "doc": "L3",
+          "page": 49
+        },
+        {
+          "doc": "L3",
+          "page": 50
+        },
+        {
+          "doc": "L3",
+          "page": 52
+        }
+      ]
+    },
+    {
+      "id": "x25b-q5",
+      "front": "Using first-order predicate logic, represent the following facts and infer the conclusion: All graduate students must take at least one AI course. John is a graduate student. CS701 is an AI course. Show the logical steps that lead to the inference that John must take CS701 or an equivalent AI course. Predicates: GraduateStudent(x), AICourse(y), Takes(x, y), Equivalent(y1, y2). (12 points)",
+      "back": "*No official solution exists – suggested answer:*\n\n**Knowledge base:**\n1. ∀x GraduateStudent(x) → ∃y (AICourse(y) ∧ Takes(x, y))\n2. GraduateStudent(John)\n3. AICourse(CS701)\n4. (Linking assumption) ∀y AICourse(y) → (y = CS701 ∨ Equivalent(y, CS701))\n\n**Inference:**\n1. **Universal instantiation** of (1) with x = John: GraduateStudent(John) → ∃y (AICourse(y) ∧ Takes(John, y))\n2. **Modus ponens** with (2): ∃y (AICourse(y) ∧ Takes(John, y))\n3. **Existential instantiation** – call that course c: AICourse(c) ∧ Takes(John, c)\n4. From (4) with y = c: c = CS701 ∨ Equivalent(c, CS701)\n5. **Conclusion:** Takes(John, c) ∧ (c = CS701 ∨ Equivalent(c, CS701)) – John takes CS701 or an equivalent AI course. ∎",
+      "sources": [
+        {
+          "doc": "EX251030",
+          "page": 5,
+          "note": "Question 5"
+        },
+        {
+          "doc": "EX260112",
+          "page": 5,
+          "note": "Question 5"
+        },
+        {
+          "doc": "EX260605",
+          "page": 5,
+          "note": "Question 5"
+        },
+        {
+          "doc": "L2",
+          "page": 54
+        },
+        {
+          "doc": "L2",
+          "page": 58
+        },
+        {
+          "doc": "L2",
+          "page": 64
+        }
+      ]
+    },
+    {
+      "id": "x25b-q6",
+      "front": "Maximize f(x) = 2x³ − 15x² + 36x for integer 0 ≤ x ≤ 15 with a genetic algorithm. (1) Represent x with 4-bit binary chromosomes (0 → 0000, 15 → 1111). (2) Randomly generate 4 chromosomes. (3) Decode each into its integer value. (4) Calculate the fitness f(x) of each. (5) Identify the chromosome with the highest fitness. (15 points, 3 per sub-question)",
+      "back": "*No official solution exists – suggested answer:*\n\n**1. Representation:** x as a 4-bit binary string; decode with place values 8-4-2-1 (e.g. 1100 = 8 + 4 = 12).\n\n**2–4. Example random population, decoded and evaluated:**\n```\n0101 → x = 5:   2·125 − 15·25 + 36·5    =  250 − 375 + 180  =   55\n1010 → x = 10:  2·1000 − 15·100 + 36·10 = 2000 − 1500 + 360 =  860\n0011 → x = 3:   2·27 − 15·9 + 36·3      =   54 − 135 + 108  =   27\n1100 → x = 12:  2·1728 − 15·144 + 36·12 = 3456 − 2160 + 432 = 1728\n```\n\n**5. Best:** **1100** (x = 12, f = 1728).\n\n(Any random chromosomes are fine if decoded and evaluated correctly. The global maximum in the range is **1111 → x = 15, f = 3915**.)",
+      "sources": [
+        {
+          "doc": "EX251030",
+          "page": 6,
+          "note": "Question 6"
+        },
+        {
+          "doc": "EX260112",
+          "page": 6,
+          "note": "Question 6"
+        },
+        {
+          "doc": "EX260605",
+          "page": 6,
+          "note": "Question 6"
+        },
+        {
+          "doc": "L4",
+          "page": 15
+        },
+        {
+          "doc": "L4",
+          "page": 16
+        },
+        {
+          "doc": "L4",
+          "page": 17
+        },
+        {
+          "doc": "L4",
+          "page": 43
+        }
+      ]
+    },
+    {
+      "id": "x25b-q7a",
+      "front": "A GA has population size N = 40, crossover probability pc = 0.7, mutation probability pm = 0.05 and G = 80 generations. Every individual's fitness is evaluated once per generation, after crossover and mutation; no elitism or re-evaluation of unchanged individuals; each evaluation takes 0.02 s. (1) Compute the total number of fitness evaluations. (2) Estimate the total computation time. (5 points)",
+      "back": "*No official solution exists – suggested answer:*\n\n1. **Evaluations** = N × G = 40 × 80 = **3200**\n2. **Time** = 3200 × 0.02 s = **64 s**\n\n(If you also count evaluating the initial population: 3240 evaluations, 64.8 s – state your assumption.) pc and pm don't change the count, since every individual is evaluated every generation.",
+      "sources": [
+        {
+          "doc": "EX251030",
+          "page": 7,
+          "note": "Question 7a"
+        },
+        {
+          "doc": "EX260112",
+          "page": 7,
+          "note": "Question 7a"
+        },
+        {
+          "doc": "EX260605",
+          "page": 7,
+          "note": "Question 7a"
+        },
+        {
+          "doc": "L4",
+          "page": 50
+        },
+        {
+          "doc": "L4",
+          "page": 13
+        }
+      ]
+    },
+    {
+      "id": "x25b-q7b",
+      "front": "Given parent chromosomes P1 = (10011010) and P2 = (01100101), perform a single-point crossover after the 4th bit. Write down the two offspring. (5 points)",
+      "back": "*No official solution exists – suggested answer:*\n\n```\nP1 = 1001 | 1010        C1 = 1001 | 0101 = 10010101\nP2 = 0110 | 0101   →    C2 = 0110 | 1010 = 01101010\n```\nEach child takes the first 4 bits from one parent and the last 4 bits from the other.",
+      "sources": [
+        {
+          "doc": "EX251030",
+          "page": 7,
+          "note": "Question 7b"
+        },
+        {
+          "doc": "EX260112",
+          "page": 7,
+          "note": "Question 7b"
+        },
+        {
+          "doc": "EX260605",
+          "page": 7,
+          "note": "Question 7b"
+        },
+        {
+          "doc": "L4",
+          "page": 21
+        },
+        {
+          "doc": "L4",
+          "page": 22
+        }
+      ]
+    },
+    {
+      "id": "x25b-q8a",
+      "front": "Deepfake technology and algorithmic amplification on social media are examples of AI misuse. Discuss two major ethical risks posed by such technologies, and suggest one regulatory or technical solution for each. (8 points)",
+      "back": "*No official solution exists – suggested answer:*\n\n**Risk 1 – Misinformation, fraud and loss of trust.** Cheap synthetic audio and video enable scams (a cloned voice ordering a payment), impersonation and political disinformation, and make people doubt *genuine* evidence.\n- *Regulatory:* the **EU AI Act** requires deepfakes and AI-generated content to be **disclosed/labelled**.\n- *Technical:* **watermarking and content provenance** (signed media), plus deepfake-detection models.\n\n**Risk 2 – Polarisation and manipulation through amplification.** Engagement-optimising recommender algorithms amplify sensational, extreme or false content and create filter bubbles; they are opaque, so users can't see why content is shown.\n- *Regulatory:* transparency and audit duties for large platforms (e.g. the EU Digital Services Act), plus a non-personalised feed option.\n- *Technical:* optimise for quality and diversity instead of pure engagement, down-rank fact-checked falsehoods, add friction before resharing.\n\n(Privacy violations, e.g. non-consensual deepfakes, are another valid risk.)",
+      "sources": [
+        {
+          "doc": "EX251030",
+          "page": 8,
+          "note": "Question 8a"
+        },
+        {
+          "doc": "EX260112",
+          "page": 8,
+          "note": "Question 8a"
+        },
+        {
+          "doc": "EX260605",
+          "page": 8,
+          "note": "Question 8a"
+        },
+        {
+          "doc": "L9",
+          "page": 12
+        },
+        {
+          "doc": "L9",
+          "page": 13
+        },
+        {
+          "doc": "L9",
+          "page": 21
+        }
+      ]
+    },
+    {
+      "id": "x25b-q8b",
+      "front": "Explain the three core principles of AI ethics – Fairness, Accountability and Transparency (FAT) – and give one real-world example of how each can be applied in practice. (8 points)",
+      "back": "*No official solution exists – suggested answer:*\n\n- **Fairness** – avoid unjust discrimination between groups. *Applied:* before deploying a hiring or credit model, measure its error rates **per subgroup** (as Gender Shades showed is necessary for face recognition), then choose and document a fairness metric.\n- **Accountability** – a human or organisation is **answerable** for the outcomes, along the chain developer → deployer → operator → regulator. *Applied:* a hospital names who reviews AI-flagged scans and who handles errors (as in the MASAI screening trial), and logs decisions for audit.\n- **Transparency** – people **know when AI is used** and can understand the key reasons for a decision. *Applied:* a bank tells loan applicants that an AI scored them and which factors mattered, so they can contest it; chatbots and deepfakes must be labelled under the EU AI Act.",
+      "sources": [
+        {
+          "doc": "EX251030",
+          "page": 8,
+          "note": "Question 8b"
+        },
+        {
+          "doc": "EX260112",
+          "page": 8,
+          "note": "Question 8b"
+        },
+        {
+          "doc": "EX260605",
+          "page": 8,
+          "note": "Question 8b"
+        },
+        {
+          "doc": "L9",
+          "page": 15
+        },
+        {
+          "doc": "L9",
+          "page": 17
+        },
+        {
+          "doc": "L9",
+          "page": 20
+        },
+        {
+          "doc": "L9",
+          "page": 21
+        }
+      ]
+    },
+    {
+      "id": "x20-q1",
+      "front": "What, according to Daniel Gilbert and Jeff Hawkins, is the right definition of intelligence? (2 points)",
+      "back": "**Official solution:**\n\nAccording to **Daniel Gilbert**, the fundamental difference between humans and animals is that the human mind can **think of the future**. **Jeff Hawkins** reinforced this concept: intelligence is defined not by behaviour but by **prediction** (which humans can do).\n\n> Gilbert and Hawkins are not in this year's slides – the 2020 exam was for an older version of the course (DV2557). Lecture 1 covers intelligence and definitions of AI.",
+      "sources": [
+        {
+          "doc": "EX2020S",
+          "page": 1,
+          "note": "Question 1 + solution"
+        },
+        {
+          "doc": "L1",
+          "page": 17
+        },
+        {
+          "doc": "L1",
+          "page": 18
+        }
+      ]
+    },
+    {
+      "id": "x20-q2",
+      "front": "How is a goal-based agent different from a utility-based agent? Can you implement a goal-based agent using a utility-based agent – and if yes, how? (3 points)",
+      "back": "**Official solution:**\n\nA **goal-based agent** executes actions that lead it closer to specific goals. A **utility-based agent** executes actions that move it to states with the best or higher **utilities**. For example, both can take you from A to B, but a utility-based agent does it more efficiently, e.g. through the shortest path.\n\n**Yes**, a goal-based agent can be realised with a utility-based agent – e.g. by **setting a high utility for the goal state**.",
+      "sources": [
+        {
+          "doc": "EX2020S",
+          "page": 1,
+          "note": "Question 2 + solution"
+        },
+        {
+          "doc": "L2",
+          "page": 32
+        },
+        {
+          "doc": "L2",
+          "page": 33
+        }
+      ]
+    },
+    {
+      "id": "x20-q3",
+      "front": "Which method gives the best of breadth-first search and depth-first search? Explain how it works with the help of a (short) figurative example. (3 points)",
+      "back": "**Official solution:**\n\n**Iterative deepening** gives the best of breadth-first and depth-first search. It is relatively fast and has a **low memory requirement like DFS**, but it saves you from getting stuck in a deep branch by **setting a maximum depth and increasing it iteratively**. (Explain with a figure.)\n\n> **Example figure:** with the goal at depth 2 – limit 0: check only the root; limit 1: the root and its children; limit 2: root, children and grandchildren → goal found. Like BFS it finds the shallowest goal; like DFS it only stores one path.",
+      "sources": [
+        {
+          "doc": "EX2020S",
+          "page": 1,
+          "note": "Question 3 + solution"
+        },
+        {
+          "doc": "L3",
+          "page": 29
+        },
+        {
+          "doc": "L3",
+          "page": 35
+        },
+        {
+          "doc": "L3",
+          "page": 37
+        }
+      ]
+    },
+    {
+      "id": "x20-q4",
+      "front": "What is the \"min-conflicts\" approach in the context of local constraint satisfaction problems? State the most useful property of solving problems with min-conflicts. (3 points)",
+      "back": "**Official solution:**\n\nMin-conflicts is a **local search algorithm for CSPs**. Values must be assigned to a number of variables so that certain constraints are respected. The algorithm starts by **assigning a random value to each variable**. In each iteration, a random (conflicting) variable is selected and **updated to the value that causes the least number of conflicts** with its neighbours. This repeats until the problem is solved or a maximum number of iterations is reached.\n\n**Most useful property:** the time taken to solve a problem is **roughly independent of the size of the problem**, and it can solve hard problems – e.g. the N-queens problem for various (large) N.\n\n> Min-conflicts and CSPs are not in this year's slides – the 2020 exam was for an older version of the course (DV2557). The 8-queens problem is listed as an example problem in Lecture 3.",
+      "sources": [
+        {
+          "doc": "EX2020S",
+          "page": 1,
+          "note": "Question 4 + solution"
+        },
+        {
+          "doc": "L3",
+          "page": 6,
+          "note": "8-queens listed as an example problem"
+        }
+      ]
+    },
+    {
+      "id": "x20-q5",
+      "front": "Create a decision tree for GoForDrive from: (Low, Sunny) NO; (Medium, Sunny) NO; (High, Sunny) YES; (Medium, Rainy) NO; (High, Rainy) NO; (High, Overcast) YES; (Low, Overcast) NO; (Medium, Overcast) NO. (Temperature, Outlook) → GoForDrive. (4 points)",
+      "back": "**Official solution:**\n\n```\nTemperature\n├── Low    → NO\n├── Medium → NO\n└── High   → Outlook\n             ├── Overcast → YES\n             ├── Sunny    → YES\n             └── Rainy    → NO\n```\n\n*More than one correct tree is possible; any of them is considered right.*\n\n> Why Temperature first: the Low and Medium branches are already pure (all NO), so only High needs a further split, and Outlook separates it perfectly.",
+      "sources": [
+        {
+          "doc": "EX2020S",
+          "page": 2,
+          "note": "Question 5 + solution"
+        },
+        {
+          "doc": "L6",
+          "page": 55
+        },
+        {
+          "doc": "L6",
+          "page": 87
+        }
+      ]
+    },
+    {
+      "id": "x20-q6",
+      "front": "What are genetic algorithms? Briefly explain all the steps involved in a genetic algorithm. (3 points)",
+      "back": "**Official solution:**\n\nGenetic algorithms are a class of **optimization algorithms** where a varied population, evolved independently, is mixed together to obtain a solution. The major steps:\n\n1. **Problem representation** in a format usable by the GA\n2. **Computation of the fitness value** of the population\n3. **Crossover** between individuals selected based on their fitness scores\n4. **Mutation** of the generated population\n\n> Also worth naming: random initialization of the population, selection (e.g. roulette wheel), and repeating until a termination criterion is met.",
+      "sources": [
+        {
+          "doc": "EX2020S",
+          "page": 2,
+          "note": "Question 6 + solution"
+        },
+        {
+          "doc": "L4",
+          "page": 7
+        },
+        {
+          "doc": "L4",
+          "page": 12
+        },
+        {
+          "doc": "L4",
+          "page": 13
+        }
+      ]
+    },
+    {
+      "id": "x20-q7a",
+      "front": "What is the major difference between propositional logic and first-order logic? (2 points)",
+      "back": "**Official solution:**\n\nWhereas **propositional logic is limited to facts (symbols)**, **first-order logic allows one to define relations and functions** using these facts.\n\n> I.e. FOL adds objects, predicates and quantifiers (∀, ∃), so one sentence like ∀x Human(x) → Mortal(x) covers all objects.",
+      "sources": [
+        {
+          "doc": "EX2020S",
+          "page": 2,
+          "note": "Question 7a + solution"
+        },
+        {
+          "doc": "L2",
+          "page": 48
+        },
+        {
+          "doc": "L2",
+          "page": 54
+        }
+      ]
+    },
+    {
+      "id": "x20-q7b",
+      "front": "Write in first-order logic: (1) Not every person is strong. (2) Every child has a mother. (4 points)",
+      "back": "**Official solution:** *(any other valid variation is also accepted)*\n\n1. Not every person is strong: **∃x Person(x) ∧ ¬Strong(x)**\n2. Every child has a mother: **∀x ∃y Child(x) ∧ Lady(y) ⇒ Mother(y, x)**\n\n> **Note:** the official version of (2) is loosely written – read literally, (Child(x) ∧ Lady(y)) ⇒ Mother(y, x) is made true by picking any y who isn't a lady. A cleaner version is **∀x Child(x) ⇒ ∃y Mother(y, x)**. For (1), ¬∀x (Person(x) ⇒ Strong(x)) is equivalent.",
+      "sources": [
+        {
+          "doc": "EX2020S",
+          "page": 3,
+          "note": "Question 7b + solution"
+        },
+        {
+          "doc": "L2",
+          "page": 58
+        },
+        {
+          "doc": "L2",
+          "page": 64
+        }
+      ]
+    },
+    {
+      "id": "x20-q8",
+      "front": "Give one disadvantage each of top-down and bottom-up parsing with a grammar in NLP. (2 points)",
+      "back": "**Official solution:**\n\n- **Top-down parsing** can get **stuck in infinite loops** because of the grammar rules, and it also takes a lot of **time and space** (listing any one shortcoming is enough).\n- **Bottom-up parsing** finds it **hard to backtrack** to re-parse once a wrong parse has been made.",
+      "sources": [
+        {
+          "doc": "EX2020S",
+          "page": 3,
+          "note": "Question 8 + solution"
+        },
+        {
+          "doc": "L8",
+          "page": 48
+        }
+      ]
+    },
+    {
+      "id": "x20-q9",
+      "front": "Prove Φ = C using resolution, given the knowledge base Φ1 = A ∨ B ∨ ¬D, Φ2 = A ∨ B ∨ C ∨ D, Φ3 = ¬B ∨ C, Φ4 = ¬A. (3 points)",
+      "back": "**Official solution:**\n\n```\nA ∨ B ∨ ¬D   with   A ∨ B ∨ C ∨ D   →   A ∨ B ∨ C\nA ∨ B ∨ C    with   ¬B ∨ C          →   A ∨ C\nA ∨ C        with   ¬A              →   C\n```\n**Φ = C is proved.**\n\n> Each step resolves on a complementary pair: first D/¬D, then B/¬B, then A/¬A.",
+      "sources": [
+        {
+          "doc": "EX2020S",
+          "page": 3,
+          "note": "Question 9 + solution"
+        },
+        {
+          "doc": "L2",
+          "page": 52
+        }
+      ]
+    },
+    {
+      "id": "x20-q10",
+      "front": "Planning problem: Init At(Phone, Bag) ∧ Closed(Bag); Goal At(Phone, Table) ∧ Closed(Bag). Actions: Open(Bag) pre Closed(Bag) eff Opened(Bag); Pickup(Phone) pre Opened(Bag) eff At(Phone, Hand); Close(Bag) pre Opened(Bag) eff Closed(Bag); Putdown(Phone) pre At(Phone, Hand) eff At(Phone, Table). Solve it with forward or backward state-space search. (4 points)",
+      "back": "**Official solution:** *(solved with forward state-space search)*\n\n```\nAt(Phone,Bag) ∧ Closed(Bag)\n   │ Open(Bag)\nAt(Phone,Bag) ∧ Opened(Bag)\n   │ Pickup(Phone)\nAt(Phone,Hand) ∧ Opened(Bag)\n   │ Putdown(Phone)\nAt(Phone,Table) ∧ Opened(Bag)\n   │ Close(Bag)\nAt(Phone,Table) ∧ Closed(Bag)   ← goal\n```\n\nBackward search is equally acceptable. You can also close the bag first and then put the phone on the table; any other valid variation is fine.",
+      "sources": [
+        {
+          "doc": "EX2020S",
+          "page": 4,
+          "note": "Question 10 + solution"
+        },
+        {
+          "doc": "L2",
+          "page": 45
+        }
+      ]
+    },
+    {
+      "id": "x24-q1a",
+      "front": "Introduce the Turing Test in AI. (2 points; wording from the solution heading)",
+      "back": "**Official solution:**\n\nThe Turing Test, proposed by **Alan Turing in 1950**, evaluates a machine's ability to exhibit intelligent behaviour **indistinguishable from that of a human**. A human judge interacts with both a machine and a human through **text-based communication**. If the judge **cannot reliably tell the two apart**, the machine is said to have passed the test, demonstrating human-like intelligence.\n\n*Example:* a chatbot like ChatGPT conversing with a person. If the person can't determine whether they are talking to a machine or a human, the chatbot passes the Turing Test.",
+      "sources": [
+        {
+          "doc": "EX2024S",
+          "page": 1,
+          "note": "Question 1a + solution"
+        },
+        {
+          "doc": "L1",
+          "page": 25
+        },
+        {
+          "doc": "L1",
+          "page": 27
+        }
+      ]
+    },
+    {
+      "id": "x24-q1b",
+      "front": "What are the commonalities between acting rationally, acting humanly, thinking humanly and thinking rationally in AI? (5 points; wording from the solution heading)",
+      "back": "**Official solution:**\n\n1. **Goal-oriented behaviour** – all approaches aim to achieve specific objectives or solve problems efficiently.\n2. **Knowledge representation** – they need to store and use knowledge to make decisions.\n3. **Learning from experience** – adapting and improving over time through learning is integral.\n4. **Decision-making processes** – they involve reasoning and decision-making to choose the best action.\n\n> The lecture slide also lists *evaluation of outcomes* and *ethics and fairness considerations*.",
+      "sources": [
+        {
+          "doc": "EX2024S",
+          "page": 1,
+          "note": "Question 1b + solution"
+        },
+        {
+          "doc": "L1",
+          "page": 43
+        }
+      ]
+    },
+    {
+      "id": "x24-q2a",
+      "front": "What are the key aspects of an intelligent agent? (5 points; wording from the solution heading)",
+      "back": "**Official solution:**\n\n1. **Perception** – perceiving the environment through sensors or data input.\n2. **Reasoning** – processing information and making decisions based on knowledge and logic.\n3. **Learning** – learning from experience and adapting over time.\n4. **Autonomy** – operating independently, without constant human intervention.\n5. **Goal-directed behaviour** – acting in pursuit of specific objectives or tasks.\n\n> The lecture also lists actuation, communication, robustness and memory.",
+      "sources": [
+        {
+          "doc": "EX2024S",
+          "page": 1,
+          "note": "Question 2a + solution"
+        },
+        {
+          "doc": "L2",
+          "page": 12
+        },
+        {
+          "doc": "L2",
+          "page": 13
+        },
+        {
+          "doc": "L2",
+          "page": 14
+        },
+        {
+          "doc": "L2",
+          "page": 15
+        },
+        {
+          "doc": "L2",
+          "page": 16
+        }
+      ]
+    },
+    {
+      "id": "x24-q2b",
+      "front": "What factors should you consider when designing an intelligent agent? (4 points; wording from the solution heading)",
+      "back": "**Official solution:**\n\n1. **Environment** – understand its nature (static or dynamic, deterministic or stochastic, discrete or continuous).\n2. **Performance measure** – define the metrics by which the agent's success is evaluated.\n3. **Agent architecture** – select a structure (reactive, deliberative or hybrid) suited to the application.\n4. **Adaptability** – make sure the agent can handle unforeseen changes and evolve with new data.\n\n> In the lecture this is framed as **PEAS**: Performance measure, Environment, Actuators, Sensors.",
+      "sources": [
+        {
+          "doc": "EX2024S",
+          "page": 1,
+          "note": "Question 2b + solution"
+        },
+        {
+          "doc": "L2",
+          "page": 17
+        },
+        {
+          "doc": "L2",
+          "page": 18
+        },
+        {
+          "doc": "L2",
+          "page": 19
+        }
+      ]
+    },
+    {
+      "id": "x24-q2c",
+      "front": "Describe how you would design a utility-based intelligent agent for a real-world application (utility function, observation and action spaces, adaptation, integration). (6 points; wording reconstructed from the solution)",
+      "back": "**Official solution:**\n\n1. **Define the utility function** – identify and quantify the goals; create a mathematical representation that assigns utility values to states/outcomes. *E.g. in a ride-hailing app, utility depends on minimising waiting time, cost and distance.*\n2. **Manage observation and action spaces** – make sure the agent observes the relevant variables (real-time traffic, user preferences); define the action space (assigning drivers, pricing); use feature selection and dimensionality reduction to optimise these spaces.\n3. **Address the challenges of adaptation** – use machine learning for continuous improvement from user feedback and environmental changes; handle incomplete or noisy data robustly.\n4. **Integrate into the real-world environment** – use APIs and scalable architectures; test in simulation before deploying.\n5. **Ensure robustness and scalability** – handle high data volumes and unexpected failures; optimise computational resources.\n6. **Evaluate and iterate** – assess performance with the utility function and user-satisfaction metrics, and use the feedback to refine.",
+      "sources": [
+        {
+          "doc": "EX2024S",
+          "page": 1,
+          "note": "Question 2c + solution"
+        },
+        {
+          "doc": "EX2024S",
+          "page": 2
+        },
+        {
+          "doc": "L2",
+          "page": 33
+        }
+      ]
+    },
+    {
+      "id": "x24-q3",
+      "front": "A robot assistant helps you prepare a meal. Using the four AI paradigms, describe how it would function: acting humanly (imitating a human chef), thinking humanly (replicating human thought to choose ingredients and order), acting rationally (best result as efficiently as possible), thinking rationally (logical reasoning and algorithms to plan ingredients, timing and steps). (10 points)",
+      "back": "**Official solution:**\n\n1. **Acting humanly** – it mimics how a human chef chops vegetables, measures ingredients and stirs the pot, possibly making small talk or commentary; it might even mimic human imperfections (hesitating to check the recipe, cleaning up spills) and gestures such as tasting with a spoon.\n2. **Thinking humanly** – it analyses recipes with cognitive processes similar to a human's: recalling past experiences (a recipe it \"learned\"), using sensory input such as smell to judge whether food is burning, and prioritising steps like humans do (boiling water while chopping, because people multitask).\n3. **Acting rationally** – it finds the fastest, most energy-efficient way to prepare the meal (pre-chopped ingredients, timers for optimal cooking times). It doesn't mimic humans but maximises the outcome (e.g. a sous-vide machine for precision), and may skip unnecessary actions like tasting, relying on calibrated measurements.\n4. **Thinking rationally** – it treats the recipe as a logical problem-solving task, broken into steps (\"select ingredients\", \"prepare\", \"cook\"); it uses algorithms to compute cooking times, adjust for portion sizes and sequence the steps (sauté onions before garlic because they take longer), and monitors temperature to adjust dynamically.",
+      "sources": [
+        {
+          "doc": "EX2024S",
+          "page": 2,
+          "note": "Question 3 + solution"
+        },
+        {
+          "doc": "EX2024S",
+          "page": 3
+        },
+        {
+          "doc": "L1",
+          "page": 23
+        },
+        {
+          "doc": "L1",
+          "page": 24
+        },
+        {
+          "doc": "L1",
+          "page": 33
+        },
+        {
+          "doc": "L1",
+          "page": 36
+        },
+        {
+          "doc": "L1",
+          "page": 38
+        }
+      ]
+    },
+    {
+      "id": "x24-q4a",
+      "front": "Directed graph: S→A 4, S→B 10, S→C 11, A→B 8, A→D 5, B→D 15, C→D 8, C→E 20, C→F 2, D→F 1, D→H 16, D→I 20, E→G 19, F→G 13, H→I 1, H→J 2, I→G 5, I→J 5, I→K 13, J→K 7, K→G 16. Apply Breadth-First Search to find the shortest path from S to G. Show the solution in detail. (4 points)",
+      "back": "**Official solution:**\n\nBFS explores level by level from S:\n1. Start at S: queue = [S]\n2. Dequeue S, enqueue its unvisited neighbours: [A, B, C]\n3. Dequeue A: [B, C, D]\n4. Dequeue B: [C, D, E]\n5. Dequeue C: [D, E, F]\n6. Dequeue D: [E, F, I]\n7. Dequeue E: [F, I, G]\n8. Dequeue F: [I, G]\n9. Dequeue I: [G]\n10. Dequeue G – goal reached.\n\n**Solution path** (traced back via the shortest route in BFS order): **S → C → F → G**\n\n> **Note:** the official steps are a bit sloppy – B has no successor E (E comes from C), and D also adds H. With neighbours in alphabetical order, C adds E before F, so a strict BFS returns **S → C → E → G**. Both paths have 3 edges, which is the minimum; S → C → F → G is the cheaper one (26 vs 50). BFS does **not** find the cheapest path (that is S → A → D → F → G = 23).",
+      "sources": [
+        {
+          "doc": "EX2024S",
+          "page": 4,
+          "note": "Question 4a + solution"
+        },
+        {
+          "doc": "EX2024S",
+          "page": 5
+        },
+        {
+          "doc": "L3",
+          "page": 36
+        },
+        {
+          "doc": "L3",
+          "page": 37
+        },
+        {
+          "doc": "L3",
+          "page": 46
+        }
+      ]
+    },
+    {
+      "id": "x24-q4b",
+      "front": "Directed graph: S→A 4, S→B 10, S→C 11, A→B 8, A→D 5, B→D 15, C→D 8, C→E 20, C→F 2, D→F 1, D→H 16, D→I 20, E→G 19, F→G 13, H→I 1, H→J 2, I→G 5, I→J 5, I→K 13, J→K 7, K→G 16. Heuristics: S 15, A 14, B 12, C 10, D 8, E 6, F 5, G 0, H 10, I 7, J 12, K 6. Apply the A* algorithm to find the shortest path from S to G. Show the solution in detail. (6 points)",
+      "back": "**Official solution:**\n\nf(n) = g(n) + h(n); expand the node with the lowest f.\n1. **Start at S:** g(S) = 0, f(S) = 15. Expand S: f(A) = 4 + 14 = 18, f(B) = 10 + 12 = 22, f(C) = 11 + 10 = 21.\n2. **Expand A** (g = 4): f(B) = (4 + 8) + 12 = 24 (already in the frontier, no update); f(D) = (4 + 5) + 8 = 17.\n3. **Expand D** (g = 9): f(B) = (9 + 15) + 12 = 36 (worse, no update); f(F) = (9 + 1) + 5 = 15; f(I) = (9 + 20) + 7 = 36.\n4. **Expand F** (g = 10): f(G) = (10 + 5) + 0 = 15.\n\n**Path: S → A → D → F → G**, total cost 4 + 5 + 1 + 5 = 15.\n\n> **Correction:** the official solution uses cost 5 for F→G, but the graph shows **F→G = 13** (5 is the I→G edge). With the correct cost, f(G) = (10 + 13) + 0 = **23**. A* then also expands C (21) and B (22) before selecting G (23), and neither improves anything. **The path S → A → D → F → G is still optimal, with cost 23** (Dijkstra confirms it). Also note h(I) = 7 > 5 and h(H) = 10 > 6, so this heuristic is not actually admissible, though the result is optimal here anyway.",
+      "sources": [
+        {
+          "doc": "EX2024S",
+          "page": 5,
+          "note": "Question 4b + solution"
+        },
+        {
+          "doc": "EX2024S",
+          "page": 6
+        },
+        {
+          "doc": "L3",
+          "page": 48
+        },
+        {
+          "doc": "L3",
+          "page": 49
+        },
+        {
+          "doc": "L3",
+          "page": 52
+        }
+      ]
+    },
+    {
+      "id": "x24-q5a",
+      "front": "What are the properties of the environment of the Wumpus problem? (3 points)",
+      "back": "**Official solution:**\n\n1. **Discrete** – the environment is a grid; each cell is a specific location.\n2. **Partially observable** – the agent only perceives its immediate surroundings (stench, breeze, glitter) and must infer the rest.\n3. **Deterministic** – the effects of the agent's actions (moving, shooting, grabbing) are predictable; there is no randomness in the outcomes.\n4. **Static** – the environment doesn't change while the agent deliberates; the Wumpus and the hazards stay in fixed positions.\n5. **Episodic/Sequential** – the agent behaves sequentially: actions and decisions build on each other.\n\n> The lecture adds: **single agent** (the Wumpus is not counted as an agent).",
+      "sources": [
+        {
+          "doc": "EX2024S",
+          "page": 7,
+          "note": "Question 5a + solution"
+        },
+        {
+          "doc": "L2",
+          "page": 34
+        },
+        {
+          "doc": "L2",
+          "page": 36
+        }
+      ]
+    },
+    {
+      "id": "x24-q5b",
+      "front": "Given the grid layout of a Wumpus World, what steps should the agent take to collect the gold and avoid the Wumpus? Describe the agent's movements and the decisions made based on its percepts. (10 points)",
+      "back": "**Official solution:** *(the agent uses sensing, detecting, decision-making and memory)*\n\n1. **(1,1):** no stench, no breeze → no Wumpus and no pits in (1,2), (2,1). Mark (1,1) visited and safe. Move to (1,2).\n2. **(1,2):** stench, no breeze → the Wumpus is in (1,3) or (2,2); no pits in (1,1), (1,3), (2,2). Remember (1,3) as a possible Wumpus location. Move to (2,2), which is unexplored.\n3. **(2,2):** no stench, no breeze → no Wumpus and no pits in (2,3), (3,2). Mark it safe; (2,3) is safe to explore. Move to (2,3).\n4. **(2,3):** breeze and stench → a pit in (3,3) or (2,4); the Wumpus is in (1,3). Mark (2,3) visited, next to a pit.\n\n**Gold is detected at (2,3) and the goal is achieved.**\n\n> **Note:** in step 2 the official solution moves into (2,2) even though the Wumpus could still be there – risky. Safer reasoning: first visit (2,1); no stench there proves the Wumpus is not in (2,2), so it must be in (1,3), and (2,2) is proven safe. Only enter squares that are **proven safe**.",
+      "sources": [
+        {
+          "doc": "EX2024S",
+          "page": 7,
+          "note": "Question 5b + solution"
+        },
+        {
+          "doc": "EX2024S",
+          "page": 8
+        },
+        {
+          "doc": "L2",
+          "page": 34
+        },
+        {
+          "doc": "L2",
+          "page": 35
+        }
+      ]
+    },
+    {
+      "id": "x24-q6a",
+      "front": "GA with 12-bit chromosomes x = abc (a, b, c are 4-bit numbers), fitness f(x) = (a − b)² + c, population x1 = 0110 1001 0011, x2 = 1011 0110 0100, x3 = 0010 1110 0111, x4 = 1100 0101 1000. (a) Evaluate the fitness of each chromosome and arrange them by fitness. (question reconstructed from the solution)",
+      "back": "**Official solution:**\n\n```\nx1: a = 0110 = 6,  b = 1001 = 9,  c = 0011 = 3 → (6 − 9)²  + 3 =   9 + 3 =  12\nx2: a = 1011 = 11, b = 0110 = 6,  c = 0100 = 4 → (11 − 6)² + 4 =  25 + 4 =  29\nx3: a = 0010 = 2,  b = 1110 = 14, c = 0111 = 7 → (2 − 14)² + 7 = 144 + 7 = 151\nx4: a = 1100 = 12, b = 0101 = 5,  c = 1000 = 8 → (12 − 5)² + 8 =  49 + 8 =  57\n```\n\n**Order:** x3 (151, fittest), x4 (57), x2 (29), x1 (12, least fit)",
+      "sources": [
+        {
+          "doc": "EX2024S",
+          "page": 8,
+          "note": "Question 6a + solution"
+        },
+        {
+          "doc": "EX2024S",
+          "page": 9
+        },
+        {
+          "doc": "L4",
+          "page": 15
+        },
+        {
+          "doc": "L4",
+          "page": 17
+        }
+      ]
+    },
+    {
+      "id": "x24-q6b",
+      "front": "GA with 12-bit chromosomes x = abc (a, b, c are 4-bit numbers), fitness f(x) = (a − b)² + c, population x1 = 0110 1001 0011, x2 = 1011 0110 0100, x3 = 0010 1110 0111, x4 = 1100 0101 1000. (b) Select the second and third fittest chromosomes and perform crossover at the midpoint. (question reconstructed from the solution)",
+      "back": "**Official solution:**\n\n- Second fittest: **x4** = 1100 0101 1000; third fittest: **x2** = 1011 0110 0100\n- Midpoint = after 6 bits (chromosome length 12)\n\n```\nx4 = 1100 01 | 01 1000        Offspring 1 = 1100 01 | 10 0100 = 1100 0110 0100\nx2 = 1011 01 | 10 0100   →    Offspring 2 = 1011 01 | 01 1000 = 1011 0101 1000\n```",
+      "sources": [
+        {
+          "doc": "EX2024S",
+          "page": 9,
+          "note": "Question 6b + solution"
+        },
+        {
+          "doc": "L4",
+          "page": 21
+        },
+        {
+          "doc": "L4",
+          "page": 22
+        }
+      ]
+    },
+    {
+      "id": "x24-q6c",
+      "front": "GA with 12-bit chromosomes x = abc (a, b, c are 4-bit numbers), fitness f(x) = (a − b)² + c, population x1 = 0110 1001 0011, x2 = 1011 0110 0100, x3 = 0010 1110 0111, x4 = 1100 0101 1000. (c) Evaluate the offspring from (b) (1100 0110 0100 and 1011 0101 1000) and compare the overall fitness. (question reconstructed from the solution)",
+      "back": "**Official solution:**\n\n- Offspring 1 = 1100 0110 0100: a = 12, b = 6, c = 4 → (12 − 6)² + 4 = 36 + 4 = **40**\n- Offspring 2 = 1011 0101 1000: a = 11, b = 5, c = 8 → (11 − 5)² + 8 = 36 + 8 = **44**\n\nOriginal population fitness = 12 + 29 + 151 + 57 = **249**\nNew population (offspring replacing x4 and x2) = 12 + 40 + 44 + 151 = **247**\n\nObservation: overall fitness **slightly decreased**.\n\n> Why it dropped: the offspring (40 + 44 = 84) replaced their own parents x4 and x2 (57 + 29 = 86). The best individual (x3 = 151) is unchanged. With a different replacement strategy – e.g. replacing the least fit individuals x1 (12) and x2 (29) – the total would rise to 151 + 57 + 40 + 44 = 292.",
+      "sources": [
+        {
+          "doc": "EX2024S",
+          "page": 10,
+          "note": "Question 6c + solution"
+        },
+        {
+          "doc": "L4",
+          "page": 30
+        }
+      ]
+    },
+    {
+      "id": "x24-q6d",
+      "front": "GA with 12-bit chromosomes x = abc (a, b, c are 4-bit numbers), fitness f(x) = (a − b)² + c, population x1 = 0110 1001 0011, x2 = 1011 0110 0100, x3 = 0010 1110 0111, x4 = 1100 0101 1000. (d) What is the optimal chromosome and its fitness? (question reconstructed from the solution)",
+      "back": "**Official solution:**\n\nTo maximise (a − b)² + c: make the difference a − b as large as possible and c as large as possible:\n- a = **1111** (15), b = **0000** (0), c = **1111** (15)\n- a − b = 15 − 0 = 15 → (15)² = 225 → f(x) = 225 + 15 = **240**\n\n**Optimal chromosome: 1111 0000 1111, f = 240**\n\n> a = 0000, b = 1111 gives the same (a − b)² = 225, so **0000 1111 1111** is equally optimal.",
+      "sources": [
+        {
+          "doc": "EX2024S",
+          "page": 10,
+          "note": "Question 6d + solution"
+        },
+        {
+          "doc": "EX2024S",
+          "page": 11
+        },
+        {
+          "doc": "L4",
+          "page": 8
+        },
+        {
+          "doc": "L4",
+          "page": 17
+        }
+      ]
+    },
+    {
+      "id": "x24-q6e",
+      "front": "GA with 12-bit chromosomes x = abc (a, b, c are 4-bit numbers), fitness f(x) = (a − b)² + c, population x1 = 0110 1001 0011, x2 = 1011 0110 0100, x3 = 0010 1110 0111, x4 = 1100 0101 1000. (e) Will the genetic algorithm converge to a good solution? What does convergence depend on? (question reconstructed from the solution)",
+      "back": "**Official solution:**\n\nConvergence depends on:\n- **Population diversity** – the initial population is diverse, but if later generations focus only on fitter individuals, diversity can drop and the GA risks **premature convergence**.\n- **Crossover points** – a single crossover point preserves much of the genetic information but may not explore new combinations effectively.\n- **Mutation** – introduces variability and prevents stagnation; without mutation the algorithm may not escape local optima.\n\n**Analysis:** the GA is likely to converge to a good solution if mutation is used to maintain diversity and prevent premature convergence. Without mutation it risks getting stuck in suboptimal solutions because it explores too little of the solution space.",
+      "sources": [
+        {
+          "doc": "EX2024S",
+          "page": 11,
+          "note": "Question 6e + solution"
+        },
+        {
+          "doc": "L4",
+          "page": 26
+        },
+        {
+          "doc": "L4",
+          "page": 28
+        },
+        {
+          "doc": "L4",
+          "page": 51
+        }
+      ]
+    },
+    {
+      "id": "x24-q7",
+      "front": "Linear regression: training data x = [1, 2, 3, 4, 5, 6, 7, 8], y = [3, 5, 7, 6, 9, 11, 12, 14]. (a) Fit a linear regression model. (b) Predict y for x = 9 and x = 10 and compute the mean squared error against the true values y = [15, 17]. (13 points; question reconstructed from the solution)",
+      "back": "**Official solution:**\n\n**(a) Linear regression model**\n- Intercept **b = 1.5714**\n- Slope **m = 1.5119**\n- **y = 1.5714 + 1.5119·x**\n\n**(b) Predictions**\n- x = 9: y_pred = 1.5714 + 1.5119 · 9 = **15.1786**\n- x = 10: y_pred = 1.5714 + 1.5119 · 10 = **16.6905**\n\n**MSE** = (1/n) Σ (y_true − y_pred)² with y_true = [15, 17]: **MSE = 0.0638**\n\n> How to get the coefficients by hand: x̄ = 4.5, ȳ = 8.375, Σ(x − x̄)(y − ȳ) = 63.5, Σ(x − x̄)² = 42 → slope = 63.5 / 42 = 1.5119, intercept = 8.375 − 1.5119 · 4.5 = 1.5714. MSE = [(15 − 15.1786)² + (17 − 16.6905)²] / 2 = (0.0319 + 0.0958) / 2 = 0.0638.",
+      "sources": [
+        {
+          "doc": "EX2024S",
+          "page": 12,
+          "note": "Question 7 + solution"
+        },
+        {
+          "doc": "L5",
+          "page": 51
+        },
+        {
+          "doc": "L6",
+          "page": 44
+        }
+      ]
+    },
+    {
+      "id": "x24-q8a",
+      "front": "House prices range from $150,000 to $1,500,000. Perform min-max normalization to scale the values to the range 1–5, and calculate the normalized value for a house priced at $800,000. (3 points)",
+      "back": "**Official solution:**\n\n**Normalized value = New min + (Value − Min) / (Max − Min) · (New max − New min)**\n\nGiven Min = 150,000, Max = 1,500,000, new range [1, 5], value 800,000:\n\n= 1 + (800,000 − 150,000) / (1,500,000 − 150,000) · (5 − 1)\n= 1 + 650,000 / 1,350,000 · 4\n= 1 + 0.4815 · 4 = **2.9259**",
+      "sources": [
+        {
+          "doc": "EX2024S",
+          "page": 12,
+          "note": "Question 8a"
+        },
+        {
+          "doc": "EX2024S",
+          "page": 13,
+          "note": "solution"
+        },
+        {
+          "doc": "L5",
+          "page": 34
+        },
+        {
+          "doc": "L5",
+          "page": 35
+        }
+      ]
+    },
+    {
+      "id": "x24-q8b",
+      "front": "Explain a potential limitation of min-max normalization. What happens to the normalized values if a new house price of $1,600,000 is added to the dataset (original range $150,000–$1,500,000, scaled to 1–5)? (6 points)",
+      "back": "**Official solution:**\n\n**Limitation:** min-max normalization is **sensitive to outliers**. If the range of the dataset changes, e.g. when new extreme values are added, **all previously normalized values must be recalculated**.\n\n**Example:** adding a house price of $1,600,000:\n- The dataset maximum becomes 1,600,000.\n- The normalized values of all prices change, because the new maximum changes the scaling factor.\n- For 800,000: 1 + (800,000 − 150,000) / (1,600,000 − 150,000) · (5 − 1) = **2.7931** (was 2.9259).",
+      "sources": [
+        {
+          "doc": "EX2024S",
+          "page": 12,
+          "note": "Question 8b"
+        },
+        {
+          "doc": "EX2024S",
+          "page": 13,
+          "note": "solution"
+        },
+        {
+          "doc": "L5",
+          "page": 36
+        }
+      ]
+    },
+    {
+      "id": "x24-q8c",
+      "front": "In a dataset of student exam scores the mean is 75 and the standard deviation 10. Apply z-score normalization to a score of 85: calculate the z-score and how many standard deviations it is above or below the mean. (3 points)",
+      "back": "**Official solution:**\n\n**z = (Value − Mean) / Standard deviation** = (85 − 75) / 10 = 10 / 10 = **1.0**\n\nThe score is **one standard deviation above the mean**.",
+      "sources": [
+        {
+          "doc": "EX2024S",
+          "page": 12,
+          "note": "Question 8c"
+        },
+        {
+          "doc": "EX2024S",
+          "page": 14,
+          "note": "solution"
+        },
+        {
+          "doc": "L5",
+          "page": 34
+        },
+        {
+          "doc": "L5",
+          "page": 35
+        }
+      ]
+    },
+    {
+      "id": "x24-q9",
+      "front": "Write down four ethical considerations surrounding AI. Why is it essential to address them in AI development and deployment? (10 points)",
+      "back": "**Official solution:**\n\n1. **Bias and fairness** – AI systems can inherit or amplify biases in their training data, leading to unfair or discriminatory outcomes (e.g. biased hiring algorithms disadvantaging certain groups). *Why address it:* prevents discrimination, ensures equal opportunities and builds trust.\n2. **Privacy and data security** – AI often needs large amounts of personal data; mishandling it leads to privacy breaches and misuse of sensitive information. *Why:* protecting privacy and data maintains user trust, complies with regulations like **GDPR**, and prevents misuse or harm.\n3. **Transparency and accountability** – AI systems can be \"black boxes\" whose decisions are hard to interpret or explain, raising concerns about accountability when mistakes or harm occur. *Why:* keeps humans responsible for AI decisions, fosters trust, and lets users challenge or audit outcomes.\n4. **Job displacement and economic impact** – automation may displace workers, causing job losses in certain industries and economic disparities. *Why:* addressing it proactively helps create retraining strategies and spreads the benefits of AI fairly across society.",
+      "sources": [
+        {
+          "doc": "EX2024S",
+          "page": 14,
+          "note": "Question 9 + solution"
+        },
+        {
+          "doc": "EX2024S",
+          "page": 15
+        },
+        {
+          "doc": "L9",
+          "page": 12
+        },
+        {
+          "doc": "L9",
+          "page": 15
+        },
+        {
+          "doc": "L9",
+          "page": 16
+        },
+        {
+          "doc": "L9",
+          "page": 20
+        }
+      ]
+    }
+  ]
+}

@@ -64,6 +64,13 @@ Then reload the page (no restart needed). Your ratings are kept: they live outsi
 
 There is one deck per lecture (L1–L10, about 315 cards). Answers are based on the slides and past exams, and worked exam problems (search traces, genetic-algorithm calculations, normalization, regression) are included as cards.
 
+The **Past exam questions** deck has one card for every unique question in the past exams (71 cards):
+
+- Questions that appear in several exams are one card that links to every exam where they appear.
+- Each card links to the question in the exam, to the official solution when there is one, and to the slides on that topic.
+- Answers start with **Official solution** (2020 and 2024 exams) or *No official solution exists – suggested answer*.
+- Where an official solution contains a mistake, or an exam question is misprinted, the card says so in a note.
+
 ## Your progress
 
 Ratings are saved in `data/progress.json` on your own computer. That folder is **not** part of git, so everyone who clones the repo starts fresh and never sees anyone else's progress. (`data/settings.json` holds your share key.)
