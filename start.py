@@ -8,18 +8,22 @@ Only the Python 3 standard library is used, so there is nothing to install.
 """
 
 import argparse
+import hmac
 import json
 import mimetypes
 import os
+import secrets
+import socket
 import sys
 import tempfile
 import threading
 import time
 import webbrowser
 from datetime import datetime, timezone
+from http.cookies import CookieError, SimpleCookie
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import unquote, urlparse
+from urllib.parse import parse_qs, unquote, urlparse
 
 if sys.version_info < (3, 7):
     sys.exit("Exam Flashcards needs Python 3.7 or newer.")
@@ -29,12 +33,15 @@ WEB_DIR = ROOT / "web"
 DECKS_DIR = ROOT / "decks"
 DATA_DIR = ROOT / "data"
 PROGRESS_FILE = DATA_DIR / "progress.json"
+SETTINGS_FILE = DATA_DIR / "settings.json"
 MATERIALS_FILE = ROOT / "materials.json"
 
 LEVELS = ("not", "partial", "understand")
 DEFAULT_PORT = 8765
+SHARE_COOKIE = "flashcards_key"
 
 progress_lock = threading.Lock()
+share = None  # LanShare, created in main()
 
 
 # ---------------------------------------------------------------- data files
@@ -173,7 +180,13 @@ def card_key(deck_id, card_id):
 # ------------------------------------------------------------------- server
 
 class Handler(SimpleHTTPRequestHandler):
+    """Requests from this computer (the server only listens on 127.0.0.1)."""
+
     server_version = "ExamFlashcards/1.0"
+    is_local = True
+    # Set explicitly: module scripts (PDF.js) are refused without a JavaScript type.
+    extensions_map = dict(SimpleHTTPRequestHandler.extensions_map)
+    extensions_map.update({".js": "text/javascript", ".mjs": "text/javascript", ".pdf": "application/pdf"})
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(WEB_DIR), **kwargs)
@@ -184,8 +197,11 @@ class Handler(SimpleHTTPRequestHandler):
             super().log_request(code, size)
 
     def end_headers(self):
-        # Always serve fresh app files and decks; slide PDFs may be cached (see send_material).
-        if not self.path.startswith("/files/"):
+        # Always serve fresh app files and decks; slide PDFs (see send_material)
+        # and the bundled PDF.js library may be cached.
+        if self.path.startswith("/vendor/"):
+            self.send_header("Cache-Control", "max-age=86400")
+        elif not self.path.startswith("/files/"):
             self.send_header("Cache-Control", "no-store")
         super().end_headers()
 
@@ -220,6 +236,8 @@ class Handler(SimpleHTTPRequestHandler):
                 "levels": LEVELS,
                 "errors": errors,
             })
+        if path == "/api/share":
+            return self.send_json(dict(share.status(), local=self.is_local))
         if path.startswith("/files/"):
             return self.send_material(unquote(path[len("/files/"):]))
         return super().do_GET()
@@ -276,6 +294,15 @@ class Handler(SimpleHTTPRequestHandler):
                 write_json_atomic(PROGRESS_FILE, data)
             return self.send_json({"removed": removed})
 
+        if path == "/api/share":
+            if not self.is_local:
+                return self.send_json({"error": "sharing can only be changed on the computer running the app"}, 403)
+            try:
+                status = share.set_enabled(bool(body.get("enabled")))
+            except OSError as e:
+                return self.send_json({"error": "Could not open a network port: {}".format(e)}, 500)
+            return self.send_json(dict(status, local=True))
+
         return self.send_json({"error": "not found"}, 404)
 
     def send_material(self, rel):
@@ -306,32 +333,172 @@ class Handler(SimpleHTTPRequestHandler):
                     break
 
 
-def make_server(port):
+class LanHandler(Handler):
+    """Requests from other devices on the network. Each one must carry the
+    share key: first as ?key=... in the share link, then via a cookie."""
+
+    is_local = False
+    new_cookie = False
+
+    def has_key(self):
+        given = parse_qs(urlparse(self.path).query).get("key", [""])[0]
+        if given and hmac.compare_digest(given, share.token):
+            self.new_cookie = True
+            return True
+        cookie = SimpleCookie()
+        try:
+            cookie.load(self.headers.get("Cookie", ""))
+        except CookieError:
+            return False
+        morsel = cookie.get(SHARE_COOKIE)
+        return bool(morsel) and hmac.compare_digest(morsel.value, share.token)
+
+    def deny(self):
+        body = ("<!doctype html><meta charset='utf-8'><meta name='viewport' content='width=device-width'>"
+                "<title>Exam Flashcards</title><body style='font-family:system-ui;padding:2rem;max-width:32rem'>"
+                "<h2>This link is missing its key</h2><p>On the computer running Exam Flashcards, open "
+                "<b>Other devices</b> and copy the full link from there.</p>").encode("utf-8")
+        self.send_response(403)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def end_headers(self):
+        if self.new_cookie:
+            self.send_header("Set-Cookie", "{}={}; Max-Age=31536000; Path=/; SameSite=Strict; HttpOnly".format(
+                SHARE_COOKIE, share.token))
+        super().end_headers()
+
+    def do_GET(self):
+        if not self.has_key():
+            return self.deny()
+        super().do_GET()
+
+    def do_HEAD(self):
+        if not self.has_key():
+            return self.deny()
+        super().do_HEAD()
+
+    def do_POST(self):
+        if not self.has_key():
+            return self.deny()
+        super().do_POST()
+
+
+def bind_server(host, port, handler):
     """Bind to `port`, or the next free one if it is taken."""
     last_error = None
     for candidate in range(port, port + 20):
         try:
-            return ThreadingHTTPServer(("127.0.0.1", candidate), Handler)
+            return ThreadingHTTPServer((host, candidate), handler)
         except OSError as e:
             last_error = e
-    sys.exit("Could not find a free port near {}: {}".format(port, last_error))
+    raise OSError("no free port near {}: {}".format(port, last_error))
+
+
+def lan_addresses():
+    """This computer's IPv4 addresses on the local network, most likely first."""
+    found = []
+
+    def add(ip):
+        if ip and not ip.startswith(("127.", "169.254.")) and ip not in found:
+            found.append(ip)
+
+    try:
+        # "Connecting" a UDP socket sends nothing, but picks the interface
+        # that has the default route - normally the Wi-Fi / Ethernet one.
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            s.connect(("192.0.2.1", 80))
+            add(s.getsockname()[0])
+        finally:
+            s.close()
+    except OSError:
+        pass
+    try:
+        for info in socket.getaddrinfo(socket.gethostname(), None, socket.AF_INET):
+            add(info[4][0])
+    except OSError:
+        pass
+    return found
+
+
+class LanShare:
+    """The "share on home network" switch. The main server only listens on
+    127.0.0.1; switching sharing on starts a second server on all network
+    interfaces (on its own port) that requires the secret share key."""
+
+    def __init__(self, main_port):
+        self.lock = threading.Lock()
+        self.httpd = None
+        settings = read_json(SETTINGS_FILE, {})
+        self.token = settings.get("share_token") or secrets.token_urlsafe(12)
+        self.port = settings.get("share_port") or main_port + 1
+        if settings.get("share_token") != self.token:
+            self.save_settings()
+
+    def save_settings(self):
+        settings = read_json(SETTINGS_FILE, {})
+        settings.update({"share_token": self.token, "share_port": self.port})
+        write_json_atomic(SETTINGS_FILE, settings)
+
+    def status(self):
+        with self.lock:
+            if not self.httpd:
+                return {"enabled": False, "urls": []}
+            port = self.httpd.server_address[1]
+        urls = ["http://{}:{}/?key={}".format(ip, port, self.token) for ip in lan_addresses()]
+        return {"enabled": True, "urls": urls}
+
+    def set_enabled(self, enabled):
+        changed = False
+        with self.lock:
+            if enabled and not self.httpd:
+                self.httpd = bind_server("0.0.0.0", self.port, LanHandler)
+                threading.Thread(target=self.httpd.serve_forever, daemon=True).start()
+                if self.httpd.server_address[1] != self.port:
+                    self.port = self.httpd.server_address[1]
+                    self.save_settings()
+                changed = True
+            elif not enabled and self.httpd:
+                self.httpd.shutdown()
+                self.httpd.server_close()
+                self.httpd = None
+                changed = True
+        status = self.status()
+        if changed and status["enabled"]:
+            print("  Shared on your network:  {}".format(status["urls"][0] if status["urls"] else "(no network found)"))
+        elif changed:
+            print("  Network sharing is off.")
+        return status
 
 
 def main():
+    global share
     parser = argparse.ArgumentParser(description="Exam Flashcards local server")
     parser.add_argument("--port", type=int, default=DEFAULT_PORT, help="port to use (default %(default)s)")
     parser.add_argument("--no-browser", action="store_true", help="don't open a browser tab automatically")
+    parser.add_argument("--lan", action="store_true", help="start with sharing on the home network switched on")
     args = parser.parse_args()
 
-    mimetypes.add_type("application/javascript", ".js")
+    mimetypes.add_type("text/javascript", ".js")
+    mimetypes.add_type("text/javascript", ".mjs")
     mimetypes.add_type("application/pdf", ".pdf")
 
-    httpd = make_server(args.port)
-    url = "http://127.0.0.1:{}/".format(httpd.server_address[1])
+    try:
+        httpd = bind_server("127.0.0.1", args.port, Handler)
+    except OSError as e:
+        sys.exit("Could not start the server: {}".format(e))
+    port = httpd.server_address[1]
+    share = LanShare(port)
+    url = "http://127.0.0.1:{}/".format(port)
     print("")
     print("  Exam Flashcards is running at  {}".format(url))
     print("  Keep this window open while studying. Press Ctrl+C to stop.")
     print("")
+    if args.lan:
+        share.set_enabled(True)
     if not args.no_browser:
         threading.Timer(0.6, lambda: webbrowser.open(url)).start()
     try:
@@ -339,6 +506,7 @@ def main():
     except KeyboardInterrupt:
         print("\n  Stopped. Your progress is saved in data/progress.json")
     finally:
+        share.set_enabled(False)
         httpd.server_close()
 
 

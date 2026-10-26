@@ -13,6 +13,9 @@
       <span class="brand-mark" aria-hidden="true"></span>Exam Flashcards
     </button>
     <div class="topbar-actions">
+      <button class="ghost share-open" id="share-open" hidden title="Use the app on your phone or another computer">
+        <span class="share-dot" aria-hidden="true"></span><span id="share-open-text">Other devices</span>
+      </button>
       <button class="ghost" id="reset-open">Reset progress…</button>
     </div>
   </header>
@@ -77,11 +80,12 @@
           <div id="rate-btns" class="rate-btns" hidden>
             <button class="rate not" data-level="not">Don't understand <kbd>1</kbd></button>
             <button class="rate partial" data-level="partial">Kinda understand <kbd>2</kbd></button>
-            <button class="rate understand" data-level="understand">Understand <kbd>3</kbd></button>
+            <button class="rate understand" data-level="understand">Understand <kbd>3</kbd><kbd>Space</kbd></button>
           </div>
         </div>
         <p class="hint muted">
-          <kbd>Space</kbd> flip · <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> rate · <kbd>S</kbd> open slide · <kbd>U</kbd> undo
+          <kbd>Space</kbd> show answer, then <kbd>Space</kbd> = understand · <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> rate ·
+          <kbd>S</kbd> slide (<kbd>←</kbd><kbd>→</kbd> browse) · <kbd>U</kbd> undo
         </p>
       </div>
 
@@ -89,11 +93,16 @@
         <div class="slide-head">
           <div class="slide-title" id="slide-title"></div>
           <div class="slide-tools">
-            <a id="slide-newtab" class="ghost-link" target="_blank" rel="noopener">New tab ↗</a>
-            <button class="ghost" id="slide-close" title="Close (Esc)">✕</button>
+            <button class="ghost icon" id="slide-prev" title="Previous page (←)" aria-label="Previous page">‹</button>
+            <span class="slide-page muted" id="slide-page"></span>
+            <button class="ghost icon" id="slide-next" title="Next page (→)" aria-label="Next page">›</button>
+            <a id="slide-newtab" class="ghost-link" target="_blank" rel="noopener" title="Open the whole PDF in a new tab">↗</a>
+            <button class="ghost icon" id="slide-close" title="Close (Esc)" aria-label="Close">✕</button>
           </div>
         </div>
-        <div class="slide-frame" id="slide-frame"></div>
+        <div class="slide-body" id="slide-body">
+          <div class="slide-status" id="slide-status"></div>
+        </div>
       </aside>
     </div>
   </main>
@@ -123,6 +132,33 @@
         <button value="cancel" class="ghost">Cancel</button>
       </div>
     </form>
+  </dialog>
+
+  <!-- ============================== SHARE ============================== -->
+  <dialog id="share-dialog">
+    <div class="dialog-body">
+      <h3>Study on another device</h3>
+      <p>Open your flashcards on a phone or another computer connected to the same Wi-Fi.
+        Progress is shared, since everything is saved on this computer.</p>
+
+      <label class="switch-row">
+        <span class="switch-label">Share on my home network</span>
+        <input type="checkbox" id="share-toggle" role="switch">
+        <span class="switch" aria-hidden="true"></span>
+      </label>
+
+      <div id="share-on" hidden>
+        <p class="share-hint">Open this link on the other device:</p>
+        <div id="share-urls"></div>
+        <p class="note">Anyone on this network who has the link can use the app. Sharing turns off when you
+          switch it off here or close the app. On Windows, click <strong>Allow access</strong> if the firewall asks.</p>
+      </div>
+      <p class="error-text" id="share-error" hidden></p>
+
+      <div class="dialog-actions">
+        <button class="ghost" id="share-close">Done</button>
+      </div>
+    </div>
   </dialog>
 
   <div class="toast" id="toast" hidden></div>

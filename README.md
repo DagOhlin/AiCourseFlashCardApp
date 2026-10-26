@@ -23,23 +23,38 @@ Your browser opens at <http://127.0.0.1:8765>. Keep the terminal window open whi
 1. **Pick decks.** Tick one or more decks; the cards from all of them are pooled together.
 2. **Pick which cards show up:** *New*, *Don't understand*, *Kinda understand* and/or *Understand*. For example, choose only *Don't understand* to drill your weak spots.
 3. **Start.** Cards always come in a completely random order.
-4. Read the question, then **show the answer** and rate yourself:
+4. Read the question, then **show the answer** (or tap the card) and rate yourself:
    **Don't understand** · **Kinda understand** · **Understand**.
-5. Under each answer you see which lecture and slide (or exam and page) it comes from. **Open slide** shows that slide beside the card; **New tab ↗** opens the whole PDF in its own tab.
+5. Under each answer you see which lecture and slide (or exam and page) it comes from. **Open slide** shows that slide beside the card. Browse with ‹ › (or swipe on a phone); **↗** opens the whole PDF in a new tab.
 
 When you finish (or end early) you get a summary, and can go again or repeat just the cards you didn't fully get.
 
 | Key | Action |
 |---|---|
-| `Space` / `Enter` | Show answer |
+| `Space` | Show answer; press again for **Understand** and the next card |
 | `1` `2` `3` | Don't understand / Kinda / Understand |
+| `Enter` | Show answer |
 | `S` | Open the slide for this card |
+| `←` `→` | Previous / next slide while the slide is open |
 | `U` / `Backspace` | Undo the last rating |
 | `Esc` | Close the slide, or end the session |
 
+## Use it on your phone or another computer
+
+The app keeps running on the computer where you started it, and other devices on the same Wi-Fi can use it from there. They share the same progress.
+
+1. Click **Other devices** in the top bar and switch on **Share on my home network**.
+2. Copy the link it shows (it looks like `http://192.168.1.23:8766/?key=…`) and open it on your phone or the other computer.
+
+- The link includes a secret key. Anyone on the network without it gets nothing.
+- Sharing stays on until you switch it off or close the app. To start with it already on, run `python start.py --lan`.
+- **Windows:** the first time, Windows Firewall asks whether Python may use the network. Click **Allow access** (private networks are enough).
+- **Linux:** if the other device can't connect and you use a firewall (e.g. `ufw`), allow the port shown in the link.
+- If the link doesn't work, the dialog may list other addresses for this computer. Try those.
+
 ## Your progress
 
-Ratings are saved in `data/progress.json` on your own computer. That folder is **not** part of git, so everyone who clones the repo starts fresh and never sees anyone else's progress.
+Ratings are saved in `data/progress.json` on your own computer. That folder is **not** part of git, so everyone who clones the repo starts fresh and never sees anyone else's progress. (`data/settings.json` holds your share key.)
 
 To start over, use **Reset progress…** in the top-right corner. You can reset only the selected decks or everything.
 
@@ -79,6 +94,7 @@ start.py         the local server (Python standard library only)
 start.bat        Windows launcher
 start.sh         Linux / macOS launcher
 web/             the app itself (HTML, CSS, JavaScript)
+web/vendor/pdfjs Mozilla's PDF.js, used to draw the slides (Apache 2.0 license)
 decks/           flashcard decks (JSON)
 materials.json   list of the lecture/exam PDFs that cards can link to
 lectures/ exams/ course material

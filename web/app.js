@@ -69,8 +69,10 @@
       body: JSON.stringify(body)
     };
     return fetch(path, opts).then(function (r) {
-      if (!r.ok) throw new Error(path + " failed (" + r.status + ")");
-      return r.json();
+      return r.json().catch(function () { return {}; }).then(function (data) {
+        if (!r.ok) throw new Error(data.error || path + " failed (" + r.status + ")");
+        return data;
+      });
     });
   }
 
@@ -86,7 +88,7 @@
 
   function serverDown(err) {
     console.error(err);
-    toast("Can't reach the flashcard server – is start.py still running?", true);
+    toast("Can't reach the flashcard app – is it still running on your computer?", true);
   }
 
   function loadPrefs() {
@@ -437,30 +439,257 @@
   }
 
   // ---------------------------------------------------------- slide panel
+  // Slides are drawn with PDF.js (web/vendor/pdfjs) rather than the browser's
+  // own PDF viewer, because phones can't show a PDF inside a page.
+
+  var slideViewer = (function () {
+    var MAX_CACHED_DOCS = 3;
+    var pdfjs = null;      // promise of the PDF.js module, loaded on first use
+    var docs = [];         // [{url, promise}], least recently used first
+    var view = null;       // {doc, url, page, pdf}
+    var openSeq = 0;
+    var renderSeq = 0;
+    var renderTask = null;
+
+    function library() {
+      if (!pdfjs) {
+        pdfjs = import("./vendor/pdfjs/pdf.min.mjs").then(function (lib) {
+          lib.GlobalWorkerOptions.workerSrc = new URL("vendor/pdfjs/pdf.worker.min.mjs", document.baseURI).href;
+          return lib;
+        });
+        pdfjs.catch(function () { pdfjs = null; });
+      }
+      return pdfjs;
+    }
+
+    function loadPdf(url) {
+      for (var i = 0; i < docs.length; i++) {
+        if (docs[i].url === url) {
+          var hit = docs.splice(i, 1)[0];
+          docs.push(hit);
+          return hit.promise;
+        }
+      }
+      var entry = {
+        url: url,
+        promise: library().then(function (lib) {
+          // verbosity 0: only errors in the console, not harmless font warnings
+          return lib.getDocument({ url: url, isEvalSupported: false, verbosity: 0 }).promise;
+        })
+      };
+      entry.promise.catch(function () {
+        docs = docs.filter(function (d) { return d !== entry; });
+      });
+      docs.push(entry);
+      while (docs.length > MAX_CACHED_DOCS) {
+        docs.shift().promise.then(function (pdf) { pdf.destroy(); }, function () {});
+      }
+      return entry.promise;
+    }
+
+    function status(text, pdfLink) {
+      var box = $("slide-status");
+      box.innerHTML = "";
+      box.hidden = !text;
+      if (!text) return;
+      box.appendChild(el("p", { text: text }));
+      if (pdfLink) box.appendChild(el("a", { href: pdfLink, target: "_blank", rel: "noopener", text: "Open the PDF in a new tab ↗" }));
+    }
+
+    function removeCanvas() {
+      var old = $("slide-body").querySelector("canvas");
+      if (old) old.remove();
+    }
+
+    function updateHead() {
+      var total = view.pdf ? view.pdf.numPages : 0;
+      var title = $("slide-title");
+      title.innerHTML = "";
+      title.title = view.doc.title;
+      title.appendChild(el("span", { class: "title-long", text: view.doc.title }));
+      title.appendChild(el("span", { class: "title-short", text: view.doc.short }));
+      $("slide-page").textContent = (view.doc.kind === "exam" ? "page " : "slide ") + view.page + (total ? " / " + total : "");
+      $("slide-prev").disabled = !total || view.page <= 1;
+      $("slide-next").disabled = !total || view.page >= total;
+      $("slide-newtab").href = view.url + "#page=" + view.page;
+    }
+
+    function render() {
+      if (!view || !view.pdf) return;
+      var seq = ++renderSeq;
+      var current = view;
+      updateHead();
+      current.pdf.getPage(current.page).then(function (page) {
+        if (seq !== renderSeq) return;
+        var body = $("slide-body");
+        var pad = 16;
+        var base = page.getViewport({ scale: 1 });
+        var availW = Math.max(body.clientWidth - pad * 2, 100);
+        var availH = Math.max(body.clientHeight - pad * 2, 100);
+        // Landscape slides fit completely; portrait exam pages fit the width and scroll.
+        var scale = availW / base.width;
+        if (base.width >= base.height) scale = Math.min(scale, availH / base.height);
+        var dpr = Math.min(window.devicePixelRatio || 1, 3);
+        var viewport = page.getViewport({ scale: Math.min(scale * dpr, 4096 / base.width) });
+        var canvas = document.createElement("canvas");
+        canvas.width = Math.floor(viewport.width);
+        canvas.height = Math.floor(viewport.height);
+        canvas.style.width = Math.floor(base.width * scale) + "px";
+        canvas.style.height = Math.floor(base.height * scale) + "px";
+        if (renderTask) renderTask.cancel();
+        renderTask = page.render({ canvas: canvas, viewport: viewport });
+        return renderTask.promise.then(function () {
+          if (seq !== renderSeq) return;
+          removeCanvas();
+          body.insertBefore(canvas, body.firstChild);
+          status("");
+        });
+      }).catch(function (err) {
+        if (seq !== renderSeq || (err && err.name === "RenderingCancelledException")) return;
+        console.error(err);
+        status("Couldn't draw this page.", current.url + "#page=" + current.page);
+      });
+    }
+
+    function open(doc, page) {
+      var url = materialUrl(doc);
+      var seq = ++openSeq;
+      var loaded = view && view.url === url ? view.pdf : null;
+      view = { doc: doc, url: url, page: page, pdf: loaded };
+      $("slide-panel").hidden = false;
+      $("study-layout").classList.add("with-slide");
+      updateHead();
+      if (loaded) { render(); return; }
+      removeCanvas();
+      status("Loading slides…");
+      loadPdf(url).then(function (pdf) {
+        if (seq !== openSeq) return;
+        view.pdf = pdf;
+        view.page = Math.min(Math.max(1, view.page), pdf.numPages);
+        render();
+      }).catch(function (err) {
+        if (seq !== openSeq) return;
+        console.error(err);
+        status("Couldn't show the slides here.", url + "#page=" + page);
+      });
+    }
+
+    function step(delta) {
+      if (!view || !view.pdf) return;
+      var next = view.page + delta;
+      if (next < 1 || next > view.pdf.numPages) return;
+      view.page = next;
+      render();
+    }
+
+    function close() {
+      if ($("slide-panel").hidden) return false;
+      $("slide-panel").hidden = true;
+      $("study-layout").classList.remove("with-slide");
+      openSeq++;
+      renderSeq++;
+      if (renderTask) { renderTask.cancel(); renderTask = null; }
+      view = null;
+      removeCanvas();
+      return true;
+    }
+
+    function isOpen() { return !$("slide-panel").hidden; }
+
+    var body = $("slide-body");
+    var resizeTimer = null;
+    if (window.ResizeObserver) {
+      new ResizeObserver(function () {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(render, 120);
+      }).observe(body);
+    }
+    // Swipe left/right on touch screens to browse pages.
+    var touch = null;
+    body.addEventListener("touchstart", function (e) {
+      touch = e.touches.length === 1 ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : null;
+    }, { passive: true });
+    body.addEventListener("touchend", function (e) {
+      if (!touch) return;
+      var dx = e.changedTouches[0].clientX - touch.x;
+      var dy = e.changedTouches[0].clientY - touch.y;
+      touch = null;
+      if (Math.abs(dx) > 50 && Math.abs(dx) > 1.5 * Math.abs(dy)) step(dx < 0 ? 1 : -1);
+    }, { passive: true });
+
+    return { open: open, close: close, step: step, isOpen: isOpen };
+  })();
 
   function openSlide(src) {
     var doc = state.materials[src.doc];
-    if (!doc) return;
-    var url = materialUrl(doc);
-    // page/view/navpanes are read by Chrome & Edge, page/zoom/pagemode by Firefox.
-    var withPage = url + "#page=" + src.page + "&view=Fit&navpanes=0&zoom=page-fit&pagemode=none";
-    $("slide-title").textContent = doc.title + " · " + sourceLabel(src);
-    $("slide-newtab").href = url + "#page=" + src.page;
-    // A fresh iframe every time: browsers ignore #page changes on an already-loaded PDF.
-    var frameBox = $("slide-frame");
-    frameBox.innerHTML = "";
-    frameBox.appendChild(el("iframe", { src: withPage, title: doc.title }));
-    $("slide-panel").hidden = false;
-    $("study-layout").classList.add("with-slide");
+    if (doc) slideViewer.open(doc, src.page);
   }
 
-  function closeSlide() {
-    var panel = $("slide-panel");
-    if (panel.hidden) return false;
-    panel.hidden = true;
-    $("slide-frame").innerHTML = "";
-    $("study-layout").classList.remove("with-slide");
-    return true;
+  function closeSlide() { return slideViewer.close(); }
+
+  // ---------------------------------------------------------------- share
+
+  var shareState = { enabled: false, urls: [], local: false };
+
+  function loadShare() {
+    return api("/api/share").then(applyShare).catch(function () { /* older server: no sharing */ });
+  }
+
+  function applyShare(s) {
+    shareState = s;
+    var btn = $("share-open");
+    btn.hidden = !s.local;
+    btn.classList.toggle("on", !!s.enabled);
+    $("share-open-text").textContent = s.enabled ? "Shared on network" : "Other devices";
+    $("share-toggle").checked = !!s.enabled;
+    $("share-on").hidden = !s.enabled;
+
+    var box = $("share-urls");
+    box.innerHTML = "";
+    if (s.enabled && !s.urls.length) {
+      box.appendChild(el("p", { class: "error-text", text: "Couldn't find this computer's network address. Is it connected to Wi-Fi or a network cable?" }));
+    }
+    s.urls.forEach(function (url, i) {
+      var input = el("input", { type: "text", readonly: "readonly", value: url, "aria-label": "Share link" });
+      input.addEventListener("focus", function () { input.select(); });
+      var copy = el("button", { class: i ? "small" : "primary", text: "Copy" });
+      copy.addEventListener("click", function () { copyText(url, input, copy); });
+      box.appendChild(el("div", { class: "url-row" + (i ? " alt" : "") }, [input, copy]));
+      if (i === 0 && s.urls.length > 1) {
+        box.appendChild(el("p", { class: "muted alt-hint", text: "If that one doesn't work, try:" }));
+      }
+    });
+  }
+
+  function copyText(text, input, button) {
+    function done(ok) {
+      button.textContent = ok ? "Copied ✓" : "Press Ctrl+C";
+      setTimeout(function () { button.textContent = "Copy"; }, 1800);
+    }
+    function fallback() {
+      input.focus();
+      input.select();
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) { /* not supported */ }
+      done(ok);
+    }
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+    } else {
+      fallback();
+    }
+  }
+
+  function setShare(enabled) {
+    var toggle = $("share-toggle");
+    var error = $("share-error");
+    toggle.disabled = true;
+    error.hidden = true;
+    api("/api/share", { enabled: enabled }).then(applyShare).catch(function (err) {
+      toggle.checked = shareState.enabled;
+      error.textContent = "Couldn't change sharing: " + err.message;
+      error.hidden = false;
+    }).then(function () { toggle.disabled = false; });
   }
 
   // ---------------------------------------------------------------- reset
@@ -489,15 +718,25 @@
 
   function onKey(e) {
     if (e.ctrlKey || e.metaKey || e.altKey) return;
-    if ($("reset-dialog").open) return;
+    if (document.querySelector("dialog[open]")) return;
     var tag = (e.target && e.target.tagName) || "";
     if (tag === "INPUT" || tag === "TEXTAREA") return;
 
     if (document.body.dataset.view === "study" && session) {
       var k = e.key;
-      if (k === " " || k === "Enter") {
+      if (k === " ") {
+        // Space: show the answer, then Space again = "Understand" and next card.
+        e.preventDefault();
+        if (e.repeat) return;
+        if (session.flipped) rate("understand"); else flip();
+      } else if (k === "Enter") {
         e.preventDefault();
         flip();
+      } else if (k === "ArrowLeft" || k === "ArrowRight") {
+        if (slideViewer.isOpen()) {
+          e.preventDefault();
+          slideViewer.step(k === "ArrowLeft" ? -1 : 1);
+        }
       } else if (RATE_KEYS[k] && session.flipped) {
         e.preventDefault();
         rate(RATE_KEYS[k]);
@@ -539,7 +778,20 @@
     });
     $("undo-btn").addEventListener("click", function () { $("undo-btn").blur(); undo(); });
     $("end-btn").addEventListener("click", endSession);
+    $("card").addEventListener("click", function (e) {
+      // Tap the question to see the answer (handy on phones).
+      if (session && !session.flipped && !e.target.closest("button, a")) flip();
+    });
     $("slide-close").addEventListener("click", closeSlide);
+    $("slide-prev").addEventListener("click", function () { slideViewer.step(-1); });
+    $("slide-next").addEventListener("click", function () { slideViewer.step(1); });
+    $("share-open").addEventListener("click", function () {
+      $("share-error").hidden = true;
+      loadShare();
+      $("share-dialog").showModal();
+    });
+    $("share-toggle").addEventListener("change", function () { setShare($("share-toggle").checked); });
+    $("share-close").addEventListener("click", function () { $("share-dialog").close(); });
     $("again-btn").addEventListener("click", function () {
       var pool = buildPool();
       if (!pool.length) { toast("No cards match your filters any more – pick other card types."); goHome(); return; }
@@ -552,6 +804,7 @@
 
     showView("home");
     load().catch(serverDown);
+    loadShare();
   }
 
   init();
