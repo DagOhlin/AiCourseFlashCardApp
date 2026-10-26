@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exam Flashcards</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='4' y='7' width='22' height='16' rx='3' fill='%23a5b4fc'/%3E%3Crect x='7' y='10' width='22' height='16' rx='3' fill='%234f46e5'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <button class="brand" id="brand" title="Back to decks">
+      <span class="brand-mark" aria-hidden="true"></span>Exam Flashcards
+    </button>
+    <div class="topbar-actions">
+      <button class="ghost" id="reset-open">Reset progress…</button>
+    </div>
+  </header>
+
+  <!-- ============================== HOME ============================== -->
+  <main id="view-home" class="view">
+    <div id="errors" class="errors" hidden></div>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2><span class="step">1</span> Pick decks</h2>
+        <div class="panel-tools">
+          <button class="link" id="sel-all">Select all</button>
+          <span aria-hidden="true">·</span>
+          <button class="link" id="sel-none">None</button>
+        </div>
+      </div>
+      <div id="deck-list" class="deck-list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2><span class="step">2</span> Which cards should show up?</h2>
+      </div>
+      <div id="level-filters" class="chips"></div>
+    </section>
+
+    <div class="start-row">
+      <button id="start-btn" class="primary big">Start</button>
+      <span id="start-info" class="muted"></span>
+    </div>
+  </main>
+
+  <!-- ============================== STUDY ============================== -->
+  <main id="view-study" class="view" hidden>
+    <div class="study-top">
+      <button class="ghost" id="end-btn" title="End session (Esc)">✕ End</button>
+      <div class="progress">
+        <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+        <span id="progress-text" class="muted"></span>
+      </div>
+      <button class="ghost" id="undo-btn" title="Undo last rating (U)">↶ Undo</button>
+    </div>
+
+    <div class="study-layout" id="study-layout">
+      <div class="card-area">
+        <article class="card" id="card">
+          <div class="card-meta">
+            <span class="deck-tag" id="card-deck"></span>
+            <span class="level-badge" id="card-level"></span>
+          </div>
+          <div class="card-face card-front" id="card-front"></div>
+          <div class="card-back" id="card-back" hidden>
+            <div class="divider"><span>Answer</span></div>
+            <div class="card-face" id="card-answer"></div>
+            <div class="sources" id="card-sources"></div>
+          </div>
+        </article>
+
+        <div class="actions">
+          <button id="flip-btn" class="primary big">Show answer <kbd>Space</kbd></button>
+          <div id="rate-btns" class="rate-btns" hidden>
+            <button class="rate not" data-level="not">Don't understand <kbd>1</kbd></button>
+            <button class="rate partial" data-level="partial">Kinda understand <kbd>2</kbd></button>
+            <button class="rate understand" data-level="understand">Understand <kbd>3</kbd></button>
+          </div>
+        </div>
+        <p class="hint muted">
+          <kbd>Space</kbd> flip · <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> rate · <kbd>S</kbd> open slide · <kbd>U</kbd> undo
+        </p>
+      </div>
+
+      <aside class="slide-panel" id="slide-panel" hidden>
+        <div class="slide-head">
+          <div class="slide-title" id="slide-title"></div>
+          <div class="slide-tools">
+            <a id="slide-newtab" class="ghost-link" target="_blank" rel="noopener">New tab ↗</a>
+            <button class="ghost" id="slide-close" title="Close (Esc)">✕</button>
+          </div>
+        </div>
+        <div class="slide-frame" id="slide-frame"></div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- ============================= SUMMARY ============================= -->
+  <main id="view-summary" class="view" hidden>
+    <section class="panel summary">
+      <h2 id="summary-title">Session complete</h2>
+      <p class="muted" id="summary-sub"></p>
+      <div class="summary-stats" id="summary-stats"></div>
+      <div class="btn-col">
+        <button class="primary big" id="again-btn">Go again – same decks &amp; filters</button>
+        <button id="repeat-btn">Repeat cards I didn't fully get</button>
+        <button class="ghost" id="home-btn">Back to decks</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============================== RESET ============================== -->
+  <dialog id="reset-dialog">
+    <form method="dialog" class="dialog-body">
+      <h3>Reset progress</h3>
+      <p>Resetting marks cards as <strong>new</strong> again, as if they were never rated. This can't be undone.</p>
+      <div class="btn-col">
+        <button value="selected" id="reset-selected">Reset the selected decks</button>
+        <button value="all" class="danger">Reset everything</button>
+        <button value="cancel" class="ghost">Cancel</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <script src="markdown.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

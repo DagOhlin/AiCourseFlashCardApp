@@ -1,0 +1,23 @@
+{
+  "documents": [
+    { "id": "L1", "kind": "lecture", "short": "L1", "title": "Lecture 1 – Introduction to Applied AI", "file": "lectures/LECTURE-1-Introduction.pdf" },
+    { "id": "L2", "kind": "lecture", "short": "L2", "title": "Lecture 2 – Intelligent Agents & Knowledge Representation", "file": "lectures/LECTURE_2.pdf" },
+    { "id": "L3", "kind": "lecture", "short": "L3", "title": "Lecture 3 – Graphs and Search in AI", "file": "lectures/LECTURE-3.pdf" },
+    { "id": "L4", "kind": "lecture", "short": "L4", "title": "Lecture 4 – Optimization & Genetic Algorithms", "file": "lectures/LECTURE-4.pdf" },
+    { "id": "L5", "kind": "lecture", "short": "L5", "title": "Lecture 5 – Data Mining & Knowledge Discovery", "file": "lectures/LECTURE-5_H26.pdf" },
+    { "id": "L6", "kind": "lecture", "short": "L6", "title": "Lecture 6 – Introduction to Machine Learning", "file": "lectures/ML_Lecture-6_H26.pdf" },
+    { "id": "L7", "kind": "lecture", "short": "L7", "title": "Lecture 7 – Neural Networks & Deep Learning", "file": "lectures/ML_Lecture_7_H26.pdf" },
+    { "id": "L8", "kind": "lecture", "short": "L8", "title": "Lecture 8 – Computer Vision & NLP", "file": "lectures/Lecture-8 KEY APPLICATIONS VISION & NATURAL LANGUAGE PROCESSING_H26.pdf" },
+    { "id": "L9", "kind": "lecture", "short": "L9", "title": "Lecture 9 – Ethics & Future of AI", "file": "lectures/Lecture9-AI_Ethics_Future_Lecture_September_2026.pdf" },
+    { "id": "L10", "kind": "lecture", "short": "L10", "title": "Lecture 10 – Generative AI & LLMs", "file": "lectures/Lecture10 - Generative AI & LLMs An Overview.pdf" },
+
+    { "id": "EX250114", "kind": "exam", "short": "Exam 2025-01-14", "title": "Exam 2025-01-14 (questions)", "file": "exams/250114 DV2618.pdf" },
+    { "id": "EX250605", "kind": "exam", "short": "Exam 2025-06-05", "title": "Exam 2025-06-05 (questions)", "file": "exams/250605 DV2618 2210.pdf" },
+    { "id": "EX251030", "kind": "exam", "short": "Exam 2025-10-30", "title": "Exam 2025-10-30 (questions)", "file": "exams/251030 DV2618 2210.pdf" },
+    { "id": "EX260112", "kind": "exam", "short": "Exam 2026-01-12", "title": "Exam 2026-01-12 (questions)", "file": "exams/260112 DV2618 2210.pdf" },
+    { "id": "EX260605", "kind": "exam", "short": "Exam 2026-06-05", "title": "Exam 2026-06-05 (questions)", "file": "exams/260605 DV2618 2210.pdf" },
+    { "id": "EX2020S", "kind": "exam", "short": "Exam 2020 sol.", "title": "Exam 2020 – solutions", "file": "exams/Exam_2020_Solution.pdf" },
+    { "id": "EX2024S", "kind": "exam", "short": "Exam 2024 sol.", "title": "Exam 2024 – solutions", "file": "exams/Solution - 2024.pdf" },
+    { "id": "EXQ", "kind": "exam", "short": "Exam questions", "title": "Exam question collection", "file": "exams/Exam-Questions.pdf" }
+  ]
+}

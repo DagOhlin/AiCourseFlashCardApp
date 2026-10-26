@@ -1,0 +1,57 @@
+{
+  "id": "lecture-01",
+  "name": "L1 · Introduction to Applied AI",
+  "description": "Starter set: the four views of AI and the Turing Test",
+  "group": "Lectures",
+  "order": 1,
+  "cards": [
+    {
+      "id": "l1-001",
+      "front": "What are the four categories (views) of AI systems?",
+      "back": "|  | **Humanly** | **Rationally** |\n|---|---|---|\n| **Thinking** | Thinking humanly – cognitive modelling | Thinking rationally – \"laws of thought\" / logic |\n| **Acting** | Acting humanly – the Turing Test approach | Acting rationally – rational agents |\n\n- Systems that **think like humans**\n- Systems that **act like humans**\n- Systems that **think rationally**\n- Systems that **act rationally**",
+      "sources": [{ "doc": "L1", "page": 23 }, { "doc": "L1", "page": 24 }]
+    },
+    {
+      "id": "l1-002",
+      "front": "What is the Turing Test, and who proposed it when?",
+      "back": "Proposed by **Alan Turing in 1950** as a test of *acting humanly*.\n\n- A human **interrogator** asks questions via a text terminal.\n- At the other end is either a human or a computer – no physical interaction.\n- The computer **passes** if the interrogator cannot reliably tell whether the answers come from a person or a machine.",
+      "sources": [{ "doc": "L1", "page": 25 }, { "doc": "L1", "page": 27 }]
+    },
+    {
+      "id": "l1-003",
+      "front": "Which four capabilities would a computer need to pass the Turing Test?",
+      "back": "1. **Natural language processing** – to communicate successfully\n2. **Knowledge representation** – to store what it knows or hears\n3. **Automated reasoning** – to use stored knowledge to answer questions and draw new conclusions\n4. **Machine learning** – to adapt to new circumstances and detect patterns",
+      "sources": [{ "doc": "L1", "page": 31 }]
+    },
+    {
+      "id": "l1-004",
+      "front": "What does the *total* Turing Test add on top of the normal Turing Test?",
+      "back": "Two more capabilities:\n\n- **Computer vision** – to perceive objects (seeing)\n- **Robotics** – to manipulate / move objects (acting)",
+      "sources": [{ "doc": "L1", "page": 32 }]
+    },
+    {
+      "id": "l1-005",
+      "front": "What is *thinking humanly* in AI?",
+      "back": "Designing systems that **emulate human cognitive processes** – trying to think the way humans think (cognitive modelling).\n\n- Closely tied to cognitive science, psychology and neuroscience.\n- Interested not only in the right answer but in **how the reasoning process** reaches it (e.g. 2, 4, 6, 8, ? → \"it increases by 2, so 10\").",
+      "sources": [{ "doc": "L1", "page": 33 }, { "doc": "L1", "page": 35 }]
+    },
+    {
+      "id": "l1-006",
+      "front": "What is *thinking rationally* (\"laws of thought\")? Give an example.",
+      "back": "Designing systems that **reason logically**, reaching conclusions by following **formal rules of logic** – conclusions consistent with the facts and rules they know.\n\nExample (syllogism):\n- All humans are mortal. Socrates is a human.\n- Human(Socrates) → Mortal(Socrates) ⇒ **Socrates is mortal.**\n\nOther example: a medical expert system with rules like *IF fever AND sore throat THEN consider throat infection*.",
+      "sources": [{ "doc": "L1", "page": 36 }, { "doc": "L1", "page": 37 }, { "doc": "EX250114", "page": 1, "note": "Question 1b" }]
+    },
+    {
+      "id": "l1-007",
+      "front": "What is *acting rationally* (the rational agent approach)?",
+      "back": "Designing a system that **chooses the best possible action** to achieve its goals, based on what it knows and observes – \"do the right thing\": the action expected to **maximize goal achievement** given the available information.\n\nExample: a self-driving car perceives a pedestrian stepping onto the road → braking is the rational action because it best serves the goal of driving safely.",
+      "sources": [{ "doc": "L1", "page": 38 }, { "doc": "L1", "page": 39 }, { "doc": "EX250114", "page": 1, "note": "Question 1a" }]
+    },
+    {
+      "id": "l1-008",
+      "front": "How can an agent act rationally *without* thinking rationally?",
+      "back": "Rational action does **not necessarily require thinking** (logical deliberation). The right action can come from:\n\n- **Reflexes** – e.g. the blinking reflex, or pulling your hand away from a hot stove: fast and correct, with no reasoning.\n- Simple condition–action rules or learned behaviour that pick the best action directly.\n\nThinking should be *in the service of* rational action, but it is not the only way to get there.",
+      "sources": [{ "doc": "L1", "page": 38 }, { "doc": "EX250114", "page": 1, "note": "Question 1c" }]
+    }
+  ]
+}

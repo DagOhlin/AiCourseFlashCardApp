@@ -1,0 +1,13 @@
+# Your personal study progress - never shared, so friends who clone start fresh
+data/
+
+# Editor / OS clutter
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local Claude Code config
+.claude/

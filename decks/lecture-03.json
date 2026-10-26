@@ -1,0 +1,57 @@
+{
+  "id": "lecture-03",
+  "name": "L3 · Graphs and Search in AI",
+  "description": "Starter set: problem formulation, DFS, BFS and A*",
+  "group": "Lectures",
+  "order": 3,
+  "cards": [
+    {
+      "id": "l3-001",
+      "front": "What are the components of a *well-defined problem*?",
+      "back": "- **Initial state** – where the agent starts\n- **Actions** (operators / successor function) – what the agent can do\n- **State space** – all states reachable from the initial state\n- **Path** – a sequence of actions from one state to another\n- **Goal test** – decides whether a state is a goal\n\nAlso: **solution** (path from initial to goal state), **search cost** (time + memory to find it), **path cost** (sum of action costs) and **total cost** = search cost + path cost.",
+      "sources": [{ "doc": "L3", "page": 14 }, { "doc": "L3", "page": 15 }]
+    },
+    {
+      "id": "l3-002",
+      "front": "What is the difference between *uninformed* and *informed* search?",
+      "back": "**Uninformed (blind) search** uses only the problem definition (graph structure, start, goal, transitions) – no extra knowledge about which direction is promising. Brute force. E.g. BFS, DFS.\n\n**Informed (heuristic) search** uses extra domain-specific knowledge – a **heuristic** estimate – to decide which nodes to explore first, so it usually finds solutions more efficiently. E.g. A*.",
+      "sources": [{ "doc": "L3", "page": 28 }, { "doc": "L3", "page": 29 }]
+    },
+    {
+      "id": "l3-003",
+      "front": "How does depth-first search (DFS) work, and which data structure does it use?",
+      "back": "DFS explores **each path as deep as possible before backtracking**.\n\n- Uses a **stack (LIFO)** – or recursion.\n- Push start node → repeatedly pop a node, push its unvisited neighbours → when a branch ends, back up one step and try the next branch.\n- The result depends on the **neighbour ordering**; it is **not** guaranteed to find the shortest path.",
+      "sources": [{ "doc": "L3", "page": 30 }, { "doc": "L3", "page": 31 }, { "doc": "L3", "page": 35 }]
+    },
+    {
+      "id": "l3-004",
+      "front": "How does breadth-first search (BFS) work, which data structure does it use, and what does it guarantee?",
+      "back": "BFS explores the graph **level by level** – all nodes at depth 1, then depth 2, …\n\n- Uses a **queue (FIFO)**.\n- Always finds a goal if one exists, and returns the path with the **fewest edges** (shortest path in an *unweighted* graph).",
+      "sources": [{ "doc": "L3", "page": 36 }, { "doc": "L3", "page": 37 }]
+    },
+    {
+      "id": "l3-005",
+      "front": "Compare the strengths and weaknesses of BFS and DFS.",
+      "back": "|  | **BFS** | **DFS** |\n|---|---|---|\n| **Strength** | Complete – always finds a goal if one exists; finds the shallowest goal (fewest steps) | Low memory – only stores the current path + siblings; can reach deep goals quickly |\n| **Weakness** | Very memory hungry – must store the whole frontier of each level (grows exponentially with depth) | Not optimal; can get lost in very deep / infinite branches; result depends on neighbour ordering |",
+      "sources": [{ "doc": "L3", "page": 35 }, { "doc": "L3", "page": 37 }, { "doc": "EX250114", "page": 3, "note": "Question 3c" }]
+    },
+    {
+      "id": "l3-006",
+      "front": "Why are BFS and DFS not suitable for finding the shortest path in a *weighted* graph?",
+      "back": "Neither looks at **edge costs**: BFS minimizes the *number of edges*, DFS just follows its ordering.\n\nIn the Romania example both return **Arad → Sibiu → Fagaras → Bucharest** with cost 140 + 99 + 211 = **450**, but the cheapest route goes via Rimnicu Vilcea and Pitesti (140 + 80 + 97 + 101 = **418**). Use a cost-aware algorithm such as **A*** instead.",
+      "sources": [{ "doc": "L3", "page": 35 }, { "doc": "L3", "page": 45 }, { "doc": "L3", "page": 46 }]
+    },
+    {
+      "id": "l3-007",
+      "front": "In A* search, what do *f(n)*, *g(n)* and *h(n)* mean?",
+      "back": "**f(n) = g(n) + h(n)**\n\n- **g(n)** – the actual path cost from the start node to n\n- **h(n)** – the heuristic *estimate* of the cost from n to the goal\n- **f(n)** – the estimated total cost of the cheapest solution through n\n\nA* always expands the node in the open list (priority queue) with the **lowest f(n)**.",
+      "sources": [{ "doc": "L3", "page": 49 }]
+    },
+    {
+      "id": "l3-008",
+      "front": "When is A* guaranteed to find the shortest path, and why is it efficient?",
+      "back": "**Optimal** if the heuristic is **admissible** (never overestimates the true cost to the goal) and **consistent**.\n\n**Efficient** because it combines Dijkstra's algorithm (the real cost so far, g) with Greedy Best-First Search (the estimate to the goal, h), so it focuses the search towards the goal without ignoring cost.",
+      "sources": [{ "doc": "L3", "page": 47 }, { "doc": "L3", "page": 52 }]
+    }
+  ]
+}
