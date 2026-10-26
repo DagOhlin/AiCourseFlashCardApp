@@ -1,57 +1,517 @@
 {
   "id": "lecture-03",
   "name": "L3 · Graphs and Search in AI",
-  "description": "Starter set: problem formulation, DFS, BFS and A*",
+  "description": "Problem formulation, graphs, BFS, DFS, A* and worked exam searches",
   "group": "Lectures",
   "order": 3,
   "cards": [
     {
       "id": "l3-001",
       "front": "What are the components of a *well-defined problem*?",
-      "back": "- **Initial state** – where the agent starts\n- **Actions** (operators / successor function) – what the agent can do\n- **State space** – all states reachable from the initial state\n- **Path** – a sequence of actions from one state to another\n- **Goal test** – decides whether a state is a goal\n\nAlso: **solution** (path from initial to goal state), **search cost** (time + memory to find it), **path cost** (sum of action costs) and **total cost** = search cost + path cost.",
-      "sources": [{ "doc": "L3", "page": 14 }, { "doc": "L3", "page": 15 }]
+      "back": "- **Initial state** – where the agent starts\n- **Actions** (operators / successor function) – what the agent can do in each state\n- **State space** – all states reachable from the initial state by any sequence of actions\n- **Path** – a sequence of actions from one state to another\n- **Goal test** – decides whether a state is a goal\n\nPlus the cost notions:\n- **Solution** – a path from the initial state to a goal state\n- **Search cost** – time and memory needed to *find* the solution\n- **Path cost** – sum of the costs of the actions on the path (what it costs to *execute* it)\n- **Total cost** = search cost + path cost\n\n*Example (Romania):* initial state = in Arad; actions = drive to a neighbouring city; goal test = in Bucharest; path cost = kilometres driven.",
+      "sources": [
+        {
+          "doc": "L3",
+          "page": 14
+        },
+        {
+          "doc": "L3",
+          "page": 15
+        }
+      ]
     },
     {
       "id": "l3-002",
       "front": "What is the difference between *uninformed* and *informed* search?",
-      "back": "**Uninformed (blind) search** uses only the problem definition (graph structure, start, goal, transitions) – no extra knowledge about which direction is promising. Brute force. E.g. BFS, DFS.\n\n**Informed (heuristic) search** uses extra domain-specific knowledge – a **heuristic** estimate – to decide which nodes to explore first, so it usually finds solutions more efficiently. E.g. A*.",
-      "sources": [{ "doc": "L3", "page": 28 }, { "doc": "L3", "page": 29 }]
+      "back": "**Uninformed (blind) search** uses only the information in the problem definition – graph structure, start, goal, possible transitions. It has no idea which direction is promising, so it explores systematically, in a brute-force way. *Examples:* BFS, DFS, iterative deepening.\n\n**Informed (heuristic) search** uses extra, domain-specific knowledge – a **heuristic h(n)** that *estimates* how far a node is from the goal – to explore the most promising nodes first, which is usually much more efficient. *Examples:* A*, greedy best-first search.\n\n*Analogy:* looking for a shop in a new city by walking every street in order (uninformed) vs. walking towards the tall building you know is next to it (informed).",
+      "sources": [
+        {
+          "doc": "L3",
+          "page": 28
+        },
+        {
+          "doc": "L3",
+          "page": 29
+        }
+      ]
     },
     {
       "id": "l3-003",
       "front": "How does depth-first search (DFS) work, and which data structure does it use?",
-      "back": "DFS explores **each path as deep as possible before backtracking**.\n\n- Uses a **stack (LIFO)** – or recursion.\n- Push start node → repeatedly pop a node, push its unvisited neighbours → when a branch ends, back up one step and try the next branch.\n- The result depends on the **neighbour ordering**; it is **not** guaranteed to find the shortest path.",
-      "sources": [{ "doc": "L3", "page": 30 }, { "doc": "L3", "page": 31 }, { "doc": "L3", "page": 35 }]
+      "back": "DFS explores **each path as deep as possible before backtracking**.\n\n- Uses a **stack (LIFO)** – or recursion.\n- Steps: push the start node → pop a node, mark it visited, push its unvisited neighbours → when a branch ends (no unvisited neighbours), back up one step and try the next branch.\n- For a tree this visits nodes in **preorder** (root, left, right).\n- To visit neighbours in alphabetical order with a stack, push them in **reverse** alphabetical order.\n\nThe result depends on the **neighbour ordering**, and DFS is **not** guaranteed to find the shortest path.",
+      "sources": [
+        {
+          "doc": "L3",
+          "page": 30
+        },
+        {
+          "doc": "L3",
+          "page": 31
+        },
+        {
+          "doc": "L3",
+          "page": 32
+        },
+        {
+          "doc": "L3",
+          "page": 35
+        }
+      ]
     },
     {
       "id": "l3-004",
       "front": "How does breadth-first search (BFS) work, which data structure does it use, and what does it guarantee?",
-      "back": "BFS explores the graph **level by level** – all nodes at depth 1, then depth 2, …\n\n- Uses a **queue (FIFO)**.\n- Always finds a goal if one exists, and returns the path with the **fewest edges** (shortest path in an *unweighted* graph).",
-      "sources": [{ "doc": "L3", "page": 36 }, { "doc": "L3", "page": 37 }]
+      "back": "BFS explores the graph **level by level** – all nodes at depth 1, then all at depth 2, …\n\n- Uses a **queue (FIFO)**: take the oldest node from the front, add its unvisited neighbours to the back.\n- **Complete:** always finds a goal if one exists (finite branching).\n- Returns the path with the **fewest edges** – the shortest path in an *unweighted* graph.\n\n*Example (graph A–H):* visiting order A → B → C → D → E → F → G → H: A first, then its neighbours B and C, then their neighbours, and so on.",
+      "sources": [
+        {
+          "doc": "L3",
+          "page": 36
+        },
+        {
+          "doc": "L3",
+          "page": 37
+        },
+        {
+          "doc": "L3",
+          "page": 43
+        }
+      ]
     },
     {
       "id": "l3-005",
       "front": "Compare the strengths and weaknesses of BFS and DFS.",
-      "back": "|  | **BFS** | **DFS** |\n|---|---|---|\n| **Strength** | Complete – always finds a goal if one exists; finds the shallowest goal (fewest steps) | Low memory – only stores the current path + siblings; can reach deep goals quickly |\n| **Weakness** | Very memory hungry – must store the whole frontier of each level (grows exponentially with depth) | Not optimal; can get lost in very deep / infinite branches; result depends on neighbour ordering |",
-      "sources": [{ "doc": "L3", "page": 35 }, { "doc": "L3", "page": 37 }, { "doc": "EX250114", "page": 3, "note": "Question 3c" }]
+      "back": "|  | **BFS** | **DFS** |\n|---|---|---|\n| **Strength** | Complete – always finds a goal if one exists; finds the shallowest goal (fewest steps, optimal when all steps cost the same) | Low memory – only stores the current path and its unexplored siblings (O(b·m)); can reach deep goals quickly |\n| **Weakness** | Very memory hungry – must store the whole frontier of each level, which grows exponentially with depth (O(bᵈ)) | Not optimal; can get lost in very deep or infinite branches (not complete there); result depends on neighbour ordering |\n\n(b = branching factor, d = depth of the shallowest goal, m = maximum depth.)\n\n**Iterative deepening** combines the strengths of both.",
+      "sources": [
+        {
+          "doc": "L3",
+          "page": 35
+        },
+        {
+          "doc": "L3",
+          "page": 37
+        },
+        {
+          "doc": "EX250114",
+          "page": 3,
+          "note": "Question 3c"
+        }
+      ]
     },
     {
       "id": "l3-006",
       "front": "Why are BFS and DFS not suitable for finding the shortest path in a *weighted* graph?",
-      "back": "Neither looks at **edge costs**: BFS minimizes the *number of edges*, DFS just follows its ordering.\n\nIn the Romania example both return **Arad → Sibiu → Fagaras → Bucharest** with cost 140 + 99 + 211 = **450**, but the cheapest route goes via Rimnicu Vilcea and Pitesti (140 + 80 + 97 + 101 = **418**). Use a cost-aware algorithm such as **A*** instead.",
-      "sources": [{ "doc": "L3", "page": 35 }, { "doc": "L3", "page": 45 }, { "doc": "L3", "page": 46 }]
+      "back": "Neither looks at **edge costs**: BFS minimizes the *number of edges*, DFS just follows its ordering.\n\nIn the Romania example both return **Arad → Sibiu → Fagaras → Bucharest** with cost 140 + 99 + 211 = **450**, but the cheapest route is **Arad → Sibiu → Rimnicu Vilcea → Pitesti → Bucharest** = 140 + 80 + 97 + 101 = **418**. Use a cost-aware algorithm such as **A*** (or uniform-cost search / Dijkstra).",
+      "sources": [
+        {
+          "doc": "L3",
+          "page": 34
+        },
+        {
+          "doc": "L3",
+          "page": 45
+        },
+        {
+          "doc": "L3",
+          "page": 46
+        },
+        {
+          "doc": "L3",
+          "page": 57
+        }
+      ]
     },
     {
       "id": "l3-007",
       "front": "In A* search, what do *f(n)*, *g(n)* and *h(n)* mean?",
-      "back": "**f(n) = g(n) + h(n)**\n\n- **g(n)** – the actual path cost from the start node to n\n- **h(n)** – the heuristic *estimate* of the cost from n to the goal\n- **f(n)** – the estimated total cost of the cheapest solution through n\n\nA* always expands the node in the open list (priority queue) with the **lowest f(n)**.",
-      "sources": [{ "doc": "L3", "page": 49 }]
+      "back": "**f(n) = g(n) + h(n)**\n\n- **g(n)** – the actual path cost from the start node to n (known)\n- **h(n)** – the heuristic *estimate* of the cost from n to the goal (guessed)\n- **f(n)** – the estimated total cost of the cheapest solution that goes through n\n\nA* always expands the node in the open list (a priority queue) with the **lowest f(n)**.\n\n*Example (Romania):* Sibiu is reached from Arad with g = 140 and has straight-line distance h = 253 to Bucharest, so f(Sibiu) = 393.",
+      "sources": [
+        {
+          "doc": "L3",
+          "page": 49
+        },
+        {
+          "doc": "L3",
+          "page": 55
+        }
+      ]
     },
     {
       "id": "l3-008",
       "front": "When is A* guaranteed to find the shortest path, and why is it efficient?",
-      "back": "**Optimal** if the heuristic is **admissible** (never overestimates the true cost to the goal) and **consistent**.\n\n**Efficient** because it combines Dijkstra's algorithm (the real cost so far, g) with Greedy Best-First Search (the estimate to the goal, h), so it focuses the search towards the goal without ignoring cost.",
-      "sources": [{ "doc": "L3", "page": 47 }, { "doc": "L3", "page": 52 }]
+      "back": "**Optimal** if the heuristic is **admissible** (never overestimates the true cost to the goal) and **consistent**.\n\n**Efficient** because it combines **Dijkstra's algorithm** (the real cost so far, g) with **Greedy Best-First Search** (the estimate to the goal, h). It focuses the search towards the goal without ignoring cost, so it usually expands far fewer nodes than either alone.\n\n**Flexible:** it adapts to different graphs and search spaces by choosing a suitable heuristic (straight-line distance on maps, Manhattan distance on grids…).",
+      "sources": [
+        {
+          "doc": "L3",
+          "page": 47
+        },
+        {
+          "doc": "L3",
+          "page": 52
+        }
+      ]
+    },
+    {
+      "id": "l3-009",
+      "front": "What is graph search in AI, and what is it used for?",
+      "back": "**Graph search** = techniques to traverse or explore a graph to find specific nodes, paths or structures that meet certain criteria.\n\nA graph is a data structure of **nodes (vertices)** connected by **edges**.\n\n**Used for:** pathfinding and route planning, network analysis, game playing, knowledge representation, robot navigation, web search.\n\n*Example problems:* Romania route finding, vacuum world, 8-puzzle, 8-queens, travelling salesman, robot navigation.",
+      "sources": [
+        {
+          "doc": "L3",
+          "page": 5
+        },
+        {
+          "doc": "L3",
+          "page": 6
+        }
+      ]
+    },
+    {
+      "id": "l3-010",
+      "front": "Formulate the Romania problem: you are in Arad and must be in Bucharest tomorrow.",
+      "back": "- **Goal formulation:** be in Bucharest.\n- **Problem formulation:**\n  - **States:** being in the various cities\n  - **Actions:** drive between neighbouring cities\n  - **Path cost:** the road distances\n- **Find a solution:** a sequence of cities, e.g. **Arad → Sibiu → Fagaras → Bucharest**\n\nThe agent first decides *what* it wants (goal), then *how to describe* the world (states, actions), then *searches* for an action sequence.",
+      "sources": [
+        {
+          "doc": "L3",
+          "page": 7
+        },
+        {
+          "doc": "L3",
+          "page": 8
+        }
+      ]
+    },
+    {
+      "id": "l3-011",
+      "front": "What is a *state*, and how does a search tree relate to the state space?",
+      "back": "A **state** is a specific configuration of the problem at a given point in time – an abstract representation of a situation the system can be in. *E.g. the agent's position on a grid.*\n\nA **search tree** is built while searching: the root is the start state, and each child is a state reached by one action, labelled with its path cost.\n\n*Example (start A, goal F):* A (cost 0) → B (cost 3) → C (cost 5) → F (cost 8) – goal! Other branches, like back to A (cost 7) or D (cost 3), are explored too.\n\nThe same state can appear **several times** in the tree (reached by different paths), which is why algorithms keep a *visited/closed* set.",
+      "sources": [
+        {
+          "doc": "L3",
+          "page": 9
+        },
+        {
+          "doc": "L3",
+          "page": 10
+        },
+        {
+          "doc": "L3",
+          "page": 11
+        }
+      ]
+    },
+    {
+      "id": "l3-012",
+      "front": "Formulate the vacuum world as a search problem.",
+      "back": "Two rooms; the robot is in one of them; each room can be dirty or clean.\n\n- **States:** robot location × dirt in each room = 2 × 2 × 2 = **8 states**\n- **Actions:** Left, Right, Clean (Suck)\n- **Goal test:** no dirt in any location (two goal states: robot in A or B with both rooms clean)\n- **Path cost:** 1 per action",
+      "sources": [
+        {
+          "doc": "L3",
+          "page": 12
+        },
+        {
+          "doc": "L3",
+          "page": 16
+        }
+      ]
+    },
+    {
+      "id": "l3-013",
+      "front": "Formulate the 8-puzzle as a search problem.",
+      "back": "A 3×3 board with 8 numbered tiles and one blank.\n\n- **States:** the locations of all tiles\n- **Actions:** move the **blank** left, right, up or down\n- **Goal test:** the board equals the goal configuration\n- **Path cost:** 1 per move\n\nThe general n-puzzle is **NP-hard**, so good heuristics (e.g. number of misplaced tiles, Manhattan distance of tiles) matter a lot.",
+      "sources": [
+        {
+          "doc": "L3",
+          "page": 17
+        }
+      ]
+    },
+    {
+      "id": "l3-014",
+      "front": "What does a problem-solving agent have to decide in *goal formulation* and *problem formulation*?",
+      "back": "**Goal formulation**\n- What is the goal state, and what are its important characteristics?\n- How does the agent know it has reached the goal?\n- Are there several possible goal states?\n\n**Problem formulation**\n- Which states of the world are relevant for solving the problem?\n- What information is accessible to the agent?\n- How can the agent move from state to state (actions)?\n\nSearch algorithms are the basis for many **optimization and planning** problems.",
+      "sources": [
+        {
+          "doc": "L3",
+          "page": 13
+        },
+        {
+          "doc": "L3",
+          "page": 18
+        }
+      ]
+    },
+    {
+      "id": "l3-015",
+      "front": "Define a graph G = (V, E) and the degree of a vertex. Give an example.",
+      "back": "- **V** – a set of **vertices** (nodes)\n- **E** – a set of **edges**; an edge is a pair (v, w) with v, w ∈ V – a connection between two vertices\n- **Degree** – the number of edges touching a vertex\n\n*Example:* V = {a, b, c, d}, E = {(a,c), (b,c), (b,d), (c,d)}\n→ degree(a) = 1, degree(b) = 2, degree(c) = 3, degree(d) = 2\n\n*Real graphs:* web pages with links, road maps, airline routes, Facebook friends, course prerequisites, family trees, mazes.",
+      "sources": [
+        {
+          "doc": "L3",
+          "page": 20
+        },
+        {
+          "doc": "L3",
+          "page": 21
+        }
+      ]
+    },
+    {
+      "id": "l3-016",
+      "front": "Define path, path length, neighbour, reachable, connected and strongly connected.",
+      "back": "- **Path** – a sequence of edges you can follow from vertex a to vertex b (written as the vertices visited, or the edges taken).\n- **Path length** – the number of edges (or vertices) in the path.\n- **Neighbour / adjacent** – two vertices directly connected by an edge.\n- **Reachable** – b is reachable from a if a path from a to b exists.\n- **Connected** – every vertex is reachable from every other vertex.\n- **Strongly connected** (as defined in the lecture) – every vertex has an edge to every other vertex.",
+      "sources": [
+        {
+          "doc": "L3",
+          "page": 22
+        },
+        {
+          "doc": "L3",
+          "page": 23
+        }
+      ]
+    },
+    {
+      "id": "l3-017",
+      "front": "What are a cycle, an acyclic graph, and a loop?",
+      "back": "- **Cycle** – a path that **begins and ends at the same node**, e.g. {U, W, V, U}.\n- **Acyclic graph** – a graph with **no cycles** (e.g. a tree).\n- **Loop** – an edge from a node **directly to itself**. Many graphs don't allow loops.\n\nCycles are why search algorithms must remember visited nodes – otherwise DFS can go round a cycle forever.",
+      "sources": [
+        {
+          "doc": "L3",
+          "page": 24
+        }
+      ]
+    },
+    {
+      "id": "l3-018",
+      "front": "What are weighted and directed graphs?",
+      "back": "**Weighted graph** – each edge has a **cost (weight)**, e.g. airline routes weighted by miles between cities. An unweighted graph can be thought of as all edges having equal weight. Most graphs don't allow negative weights.\n\n**Directed graph (digraph)** – edges are **one-way** connections. Each vertex has a separate **in-degree** and **out-degree**. A digraph can be weighted or unweighted.\n\nA directed graph can be impossible to traverse back: if a → b exists but no path leads from b back to a, it isn't connected in both directions.",
+      "sources": [
+        {
+          "doc": "L3",
+          "page": 25
+        },
+        {
+          "doc": "L3",
+          "page": 26
+        }
+      ]
+    },
+    {
+      "id": "l3-019",
+      "front": "When searching for a path between two vertices, what can we be trying to optimise?",
+      "back": "1. **Any path** – just find one (or know that one exists). *DFS is fine.*\n2. **Minimum path length** – the fewest edges. *BFS.*\n3. **Minimum path cost** – the smallest sum of edge weights. *A*, uniform-cost search / Dijkstra.*\n\n*Example:* the flight from MIA to SFO with the fewest stops is not necessarily the cheapest one.",
+      "sources": [
+        {
+          "doc": "L3",
+          "page": 27
+        }
+      ]
+    },
+    {
+      "id": "l3-020",
+      "front": "Run DFS from Arad to Bucharest (neighbours in alphabetical order). What path and cost do you get?",
+      "back": "Stack of (city, path), LIFO. Push neighbours in **reverse** alphabetical order so the alphabetically first is popped first.\n\n1. Pop Arad → visited {Arad}; push Sibiu, Timisoara, Zerind\n2. Pop **Sibiu** → neighbours Arad (visited), Fagaras, Oradea, Rimnicu Vilcea; push them\n3. Pop **Fagaras** → neighbours Bucharest, Sibiu (visited); push Bucharest\n4. Pop **Bucharest** → GOAL\n\n**Path:** Arad → Sibiu → Fagaras → Bucharest\n**Cost:** 140 + 99 + 211 = **450**\n\nDFS is deterministic given a neighbour order; change the order and you get a different path. It does not look at the costs, so it isn't optimal (the best is 418).",
+      "sources": [
+        {
+          "doc": "L3",
+          "page": 34
+        },
+        {
+          "doc": "L3",
+          "page": 35
+        }
+      ]
+    },
+    {
+      "id": "l3-021",
+      "front": "Run BFS from Arad to Bucharest (alphabetical order). What is the visiting order and the solution?",
+      "back": "Queue (FIFO); add neighbours alphabetically; don't re-add discovered cities.\n\n1. Arad → queue [Sibiu, Timisoara, Zerind]\n2. Sibiu → add Fagaras, Oradea, Rimnicu Vilcea\n3. Timisoara → add Lugoj\n4. Zerind → Oradea already discovered\n5. Fagaras → add **Bucharest** (discovered, but BFS finishes the current depth first)\n6. Oradea, 7. Rimnicu Vilcea (adds Craiova, Pitesti), 8. Lugoj\n9. **Bucharest → GOAL**\n\n**Visiting order:** Arad, Sibiu, Timisoara, Zerind, Fagaras, Oradea, Rimnicu Vilcea, Lugoj, Bucharest\n**Solution:** Arad → Sibiu → Fagaras → Bucharest (depth 3, cost 450) – the fewest edges, not the cheapest route.",
+      "sources": [
+        {
+          "doc": "L3",
+          "page": 44
+        },
+        {
+          "doc": "L3",
+          "page": 45
+        }
+      ]
+    },
+    {
+      "id": "l3-022",
+      "front": "Describe the steps of the A* algorithm.",
+      "back": "**Initialization**\n- **Open list** – priority queue (min-heap on f) of nodes to evaluate; starts with the start node.\n- **Closed list** – set of nodes already evaluated.\n\n**Loop**\n1. Take the node with the **lowest f = g + h** from the open list; move it to the closed list.\n2. If it is the **goal → stop** and reconstruct the path by following parent links.\n3. For each neighbour:\n   - If it is in the closed list, skip it.\n   - Compute g (cost via the current node), h and f.\n   - If it isn't in the open list, add it with the current node as parent.\n   - If it is already in the open list but the **new path is cheaper**, update its g, f and parent.\n\n**Termination:** when the goal is *selected* for expansion (not when it is first generated) – that's what makes the result optimal.",
+      "sources": [
+        {
+          "doc": "L3",
+          "page": 48
+        },
+        {
+          "doc": "L3",
+          "page": 49
+        },
+        {
+          "doc": "L3",
+          "page": 50
+        },
+        {
+          "doc": "L3",
+          "page": 51
+        }
+      ]
+    },
+    {
+      "id": "l3-023",
+      "front": "Run A* from Arad to Bucharest with the straight-line-distance heuristic. Which path does it find?",
+      "back": "h values from the slides: Arad 366, Sibiu 253, Timisoara 329, Zerind 374, Fagaras 178, Rimnicu Vilcea 193, Pitesti 98, Craiova 160, Oradea 380, Bucharest 0.\n\n```\nExpand Arad   (f=366): Sibiu 140+253=393, Timisoara 118+329=447, Zerind 75+374=449\nExpand Sibiu  (393):   Fagaras 239+178=417, RimnicuV 220+193=413,\n                       Oradea 291+380=671, Arad 280+366=646\nExpand RimnicuV (413): Pitesti 317+98=415, Craiova 366+160=526\nExpand Pitesti (415):  Bucharest 418+0=418, Craiova 455+160=615\nExpand Fagaras (417):  Bucharest 450+0=450  (worse than 418, keep 418)\nExpand Bucharest (418) → GOAL\n```\n\n**Path:** Arad → Sibiu → Rimnicu Vilcea → Pitesti → Bucharest, **cost 418** – the true shortest path (BFS/DFS gave 450).\n\nNote: Bucharest first appears with f = 450 via Fagaras, but A* only stops when the goal is **selected** with the lowest f.",
+      "sources": [
+        {
+          "doc": "L3",
+          "page": 53
+        },
+        {
+          "doc": "L3",
+          "page": 54
+        },
+        {
+          "doc": "L3",
+          "page": 55
+        },
+        {
+          "doc": "L3",
+          "page": 56
+        },
+        {
+          "doc": "L3",
+          "page": 57
+        }
+      ]
+    },
+    {
+      "id": "l3-024",
+      "front": "What is the straight-line-distance heuristic, and why is it admissible?",
+      "back": "h(n) = the **straight-line (Euclidean) distance** from city n to the goal; it is *not* computed from the roads:\n\n**h(n) = √((xₙ − x_goal)² + (yₙ − y_goal)²)**\n\nIt is **admissible** because the shortest road between two cities can never be shorter than the straight line between them, so h never **overestimates** the real remaining cost.\nIt is also **consistent**: by the triangle inequality, h(n) ≤ cost(n, n') + h(n').",
+      "sources": [
+        {
+          "doc": "L3",
+          "page": 54
+        }
+      ]
+    },
+    {
+      "id": "l3-025",
+      "front": "What do *admissible* and *consistent* mean for a heuristic?",
+      "back": "- **Admissible:** h(n) ≤ h\\*(n) for every node, where h\\*(n) is the true cheapest cost from n to the goal – the heuristic **never overestimates**. *E.g. straight-line distance on a road map; Manhattan distance on a 4-connected grid.*\n- **Consistent (monotone):** for every edge n → n' with cost c: **h(n) ≤ c(n, n') + h(n')** – the estimate never drops by more than the step cost (a triangle inequality). Every consistent heuristic is also admissible.\n\nWith an admissible (tree search) or consistent (graph search) heuristic, **A* is optimal**. h(n) = 0 is admissible but gives no guidance (A* becomes uniform-cost search).",
+      "sources": [
+        {
+          "doc": "L3",
+          "page": 52
+        }
+      ]
+    },
+    {
+      "id": "l3-026",
+      "front": "Graph: S→A (1), S→G (12), A→B (3), A→C (1), B→D (3), C→D (1), C→G (2), D→G (3). Ties broken alphabetically. What path do BFS and DFS return?",
+      "back": "**BFS → S → G** (cost 12)\n- Expand S: children **A**, **G** go into the queue (alphabetical).\n- Expand A: add B, C → queue [G, B, C].\n- Pop **G** → goal. (If you test the goal when it is *generated*, you stop even earlier, with the same answer.)\n- BFS finds the path with the **fewest edges** (1 edge), even though it is expensive.\n\n**DFS → S → A → B → D → G** (cost 1 + 3 + 3 + 3 = 10)\n- From S choose A (alphabetically before G) → from A choose B (before C) → from B the only child is D → from D reach G.\n- DFS goes as deep as possible along the first branch.\n\nNeither is optimal: the cheapest path is **S → A → C → G = 4** (found by uniform-cost search or A*).",
+      "sources": [
+        {
+          "doc": "EX250114",
+          "page": 3,
+          "note": "Question 3a–b"
+        },
+        {
+          "doc": "L3",
+          "page": 30
+        },
+        {
+          "doc": "L3",
+          "page": 36
+        }
+      ]
+    },
+    {
+      "id": "l3-027",
+      "front": "Exam graph (A–J): edges A–B 6, A–F 3, B–C 3, B–D 2, C–D 1, C–E 5, D–E 8, E–I 5, E–J 5, F–G 1, F–H 7, G–I 3, H–I 2, I–J 3. Run BFS from A to J.",
+      "back": "Queue (FIFO), neighbours added alphabetically, each node discovered only once:\n\n```\nExpand A → add B, F          queue: B F\nExpand B → add C, D          queue: F C D\nExpand F → add G, H          queue: C D G H\nExpand C → add E             queue: D G H E\nExpand D → (C, E known)      queue: G H E\nExpand G → add I             queue: H E I\nExpand H → (I known)         queue: E I\nExpand E → add J  (goal)\n```\n\n**BFS path:** A → B → C → E → J (4 edges, cost 6 + 3 + 5 + 5 = **19**)\n\nBFS finds a path with the **fewest edges**, but not the cheapest: A → F → G → I → J also has 4 edges and costs only **10**. B is just tried before F alphabetically.",
+      "sources": [
+        {
+          "doc": "EX260605",
+          "page": 4,
+          "note": "Question 4a"
+        },
+        {
+          "doc": "EX251030",
+          "page": 4
+        },
+        {
+          "doc": "L3",
+          "page": 36
+        }
+      ]
+    },
+    {
+      "id": "l3-028",
+      "front": "Same exam graph (A–J) with heuristics A 10, B 8, C 5, D 7, E 3, F 6, G 5, H 3, I 1, J 0. Run A* from A to J.",
+      "back": "f = g + h, always expand the lowest f:\n\n```\nExpand A (f=10):  B: 6+8=14     F: 3+6=9\nExpand F (f=9):   G: 4+5=9      H: 10+3=13\nExpand G (f=9):   I: 7+1=8\nExpand I (f=8):   J: 10+0=10    E: 12+3=15\n                  H: 9+3=12  (cheaper than 13 → update H)\nExpand J (f=10) → GOAL\n```\n\n**A* path:** A → F → G → I → J, **cost 3 + 1 + 3 + 3 = 10** – the optimal path (compare BFS: A → B → C → E → J, cost 19).\n\nThe heuristic is admissible (e.g. h(I) = 1 ≤ 3, h(F) = 6 ≤ 7), so A* is guaranteed to be optimal.",
+      "sources": [
+        {
+          "doc": "EX260605",
+          "page": 4,
+          "note": "Question 4b"
+        },
+        {
+          "doc": "EX251030",
+          "page": 4
+        },
+        {
+          "doc": "L3",
+          "page": 49
+        }
+      ]
+    },
+    {
+      "id": "l3-029",
+      "front": "How do you solve a grid maze with A* and the Manhattan-distance heuristic? Show it on an example.",
+      "back": "**Representation:** each open cell is a node (row, col); edges connect cells that are up/down/left/right neighbours and not walls (`#`); every step costs 1.\n**Heuristic:** Manhattan distance **h = |r − r_G| + |c − c_G|** – admissible because you need at least that many moves without diagonals.\n\nExample (S = (1,1), G = (1,5); ties in f broken by the lower h):\n```\n#######\n#S..#G#\n#.#.#.#\n#.....#\n#######\n```\n```\nS(1,1) g0 h4 f4 → (1,2) f=1+3=4, (2,1) f=1+5=6\n(1,2)  f4      → (1,3) f=2+2=4\n(1,3)  f4      → (2,3) f=3+3=6\n(2,3)  f6      → (3,3) f=4+4=8        [tie (2,1) f6 also expanded → (3,1) f8]\n(3,3)  f8      → (3,4) f=5+3=8, (3,2) f=5+5=10\n(3,4) → (3,5) f8 → (2,5) f8 → G(1,5) g8 f8  GOAL\n```\n**Moves:** Right, Right, Down, Down, Right, Right, Up, Up (cost 8)\n```\n#######\n#S**#G#\n#.#*#*#\n#..***#\n#######\n```",
+      "sources": [
+        {
+          "doc": "EX250114",
+          "page": 7,
+          "note": "Question 7"
+        },
+        {
+          "doc": "L3",
+          "page": 49
+        }
+      ]
+    },
+    {
+      "id": "l3-030",
+      "front": "Which search method gives the best of BFS and DFS? Explain how it works.",
+      "back": "**Iterative deepening search (IDS)** – run **depth-limited DFS** with limit 0, then 1, then 2, … until the goal is found.\n\n- Memory like **DFS** – only the current path is stored (O(b·d)).\n- Complete and finds the **shallowest goal** like **BFS** (optimal when all steps cost the same).\n- It never gets lost in an infinitely deep branch, because the depth is capped.\n- Re-visiting the shallow levels sounds wasteful, but most nodes are in the deepest level, so the overhead is small.\n\n*Example:* goal at depth 2 → limit 0: check root; limit 1: root + its children; limit 2: root, children, grandchildren → goal found.",
+      "sources": [
+        {
+          "doc": "EX2020S",
+          "page": 1,
+          "note": "Question 3"
+        },
+        {
+          "doc": "L3",
+          "page": 29
+        }
+      ]
+    },
+    {
+      "id": "l3-031",
+      "front": "What is the min-conflicts approach for constraint satisfaction problems, and what is its most useful property?",
+      "back": "**Min-conflicts** is a **local search** algorithm for CSPs:\n\n1. Assign a (random) value to every variable.\n2. Repeatedly pick a variable that is in conflict and change its value to the one that causes the **fewest conflicts** with its neighbours.\n3. Stop when there are no conflicts, or after a maximum number of iterations.\n\n**Most useful property:** the running time is **roughly independent of the problem size** – e.g. it solves the N-queens problem quickly even for a million queens.",
+      "sources": [
+        {
+          "doc": "EX2020S",
+          "page": 1,
+          "note": "Question 4"
+        }
+      ]
     }
   ]
 }

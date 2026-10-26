@@ -1,0 +1,522 @@
+{
+  "id": "lecture-04",
+  "name": "L4 · Optimization & Genetic Algorithms",
+  "description": "GA components, selection, crossover, mutation, TSP and worked exam calculations",
+  "group": "Lectures",
+  "order": 4,
+  "cards": [
+    {
+      "id": "l4-001",
+      "front": "What is an optimization problem? What are global and local optima?",
+      "back": "An **optimization problem** is finding the **best solution among all feasible solutions** – a computational problem where we **maximize or minimize** some value (profit, distance, error…).\n\n- **Global optimum** – the best value over the whole search space (global maximum / global minimum).\n- **Local optimum** – better than all its *neighbours*, but not the best overall.\n\nSimple hill-climbing methods easily get **stuck in a local optimum**; GAs search with a whole population and use mutation to escape.\n\n*Example:* minimizing the length of a delivery route (minimization), maximizing f(x) = 15x − x² (maximization).",
+      "sources": [
+        {
+          "doc": "L4",
+          "page": 8
+        },
+        {
+          "doc": "L4",
+          "page": 9
+        }
+      ]
+    },
+    {
+      "id": "l4-002",
+      "front": "What is a genetic algorithm (GA), and what is it based on?",
+      "back": "A **search-based optimization technique** inspired by **genetics and natural selection** (Darwin's theory of evolution – *survival of the fittest*).\n\n- Each **individual (chromosome) is a candidate solution**; the population evolves over generations.\n- Fitter individuals are more likely to reproduce; **crossover** combines good parents, **mutation** adds random changes.\n- Used to find **optimal or near-optimal** solutions to hard (NP-complex) problems in reasonable time.\n\n**History:** developed in the **1970s** by **John Holland** (also K. DeJong, D. Goldberg). Typically applied to **discrete optimization**; not very fast, but a good general heuristic.\n\n**Applications:** finance, economics, scheduling, planning, routing, computer vision, pattern recognition, medicine, communications, autonomous cars.",
+      "sources": [
+        {
+          "doc": "L4",
+          "page": 6
+        },
+        {
+          "doc": "L4",
+          "page": 7
+        },
+        {
+          "doc": "L4",
+          "page": 10
+        },
+        {
+          "doc": "L4",
+          "page": 11
+        }
+      ]
+    },
+    {
+      "id": "l4-003",
+      "front": "Which biological concepts are GAs based on?",
+      "back": "- All living organisms consist of **cells**; each cell has a set of **chromosomes**.\n- Chromosomes are strings of DNA made of **genes**; each gene encodes a **trait** (e.g. eye colour).\n- **Reproduction:** offspring are similar to their parents but vary because of\n  - **mutation** – random changes\n  - **crossover** – the offspring combines features from each parent\n- **Natural selection:** the fittest individuals survive and reproduce.\n\nModern evolution theory (neo-Darwinian paradigm) = Darwin's evolution + Weismann's natural selection + Mendel's genetics.\n\nGA mapping: **individual = solution**, **environment = the optimization problem**, **fitness = how good the solution is**.",
+      "sources": [
+        {
+          "doc": "L4",
+          "page": 2
+        },
+        {
+          "doc": "L4",
+          "page": 4
+        },
+        {
+          "doc": "L4",
+          "page": 11
+        }
+      ]
+    },
+    {
+      "id": "l4-004",
+      "front": "Which algorithms belong to the family of evolutionary algorithms?",
+      "back": "**Evolutionary algorithms (EAs)** include:\n\n- **Genetic algorithms** (Holland)\n- **Evolutionary programming** (Fogel)\n- **Differential evolution**\n- **Swarm intelligence** – Particle Swarm Optimization (PSO), Artificial Bee Colony (ABC), Ant Colony Optimization (ACO)\n\nAll of them improve a **population** of candidate solutions iteratively, inspired by nature.",
+      "sources": [
+        {
+          "doc": "L4",
+          "page": 5
+        }
+      ]
+    },
+    {
+      "id": "l4-005",
+      "front": "What are the components of a genetic algorithm?",
+      "back": "1. **Encoding** (representation) – how a solution is written as a chromosome of genes (bit string, real numbers, permutation…).\n2. **Initialization** – create a random population of \"guesses\".\n3. **Evaluation (fitness) function** – measures how good each solution is.\n4. **Selection** – choose parents, favouring fitter ones.\n5. **Genetic operators** – **crossover** mixes good solutions to make better ones; **mutation** introduces diversity.\n6. **Parameter settings** – population size, crossover rate, mutation rate, number of generations (\"practice and art\").",
+      "sources": [
+        {
+          "doc": "L4",
+          "page": 12
+        }
+      ]
+    },
+    {
+      "id": "l4-006",
+      "front": "Write the basic genetic algorithm loop as pseudocode.",
+      "back": "```\ndefine fitness function\ninitialize population (random)\nevaluate population\nwhile termination criteria not satisfied:\n    select parents            (e.g. roulette wheel)\n    apply crossover           (with probability pc)\n    apply mutation            (with probability pm)\n    form the new population   (replace some or all)\n    evaluate population\nreturn best individual\n```\n\n**Termination criteria:** a fixed number of generations, a good-enough fitness, or no improvement for several generations.",
+      "sources": [
+        {
+          "doc": "L4",
+          "page": 13
+        }
+      ]
+    },
+    {
+      "id": "l4-007",
+      "front": "What are genotype and phenotype in a GA? How are solutions encoded?",
+      "back": "- **Phenotype** – the actual solution in the problem domain (e.g. x = 9, or a route through cities).\n- **Genotype** – its encoded form, the chromosome (e.g. `1001`, a bit string in {0,1}ᴸ).\n- **Encoding** maps phenotype → genotype; **decoding** maps genotype → phenotype (needed to evaluate fitness).\n\nCommon encodings: **binary strings** (classic GA), **real numbers** (e.g. 43.2, −33.1, …), **permutations** (order of cities in TSP).\n\n*Example:* x ∈ [0, 15] fits in 4 bits: 0 → `0000`, 9 → `1001`, 15 → `1111`.",
+      "sources": [
+        {
+          "doc": "L4",
+          "page": 14
+        },
+        {
+          "doc": "L4",
+          "page": 15
+        },
+        {
+          "doc": "L4",
+          "page": 19
+        }
+      ]
+    },
+    {
+      "id": "l4-008",
+      "front": "What is the initial population in a GA?",
+      "back": "- A set of chromosomes (candidate solutions), usually **generated randomly**.\n- A **one-time** process at the start.\n- Can consist of binary strings, real numbers, etc.\n\n*Example:* a 16-bit chromosome `1011010010110100`.\n\nA diverse initial population matters: with crossover alone, a GA can only recombine genes that already exist in the population.",
+      "sources": [
+        {
+          "doc": "L4",
+          "page": 16
+        }
+      ]
+    },
+    {
+      "id": "l4-009",
+      "front": "What is the fitness function, and what makes a good one?",
+      "back": "The **fitness (evaluation) function** measures **how close a solution is to the optimum** – it gives each chromosome a fitness score.\n\nA good fitness function:\n- measures fitness **quantitatively**\n- is **clearly defined** and easy to understand how the score is computed\n- is **designed for the specific problem** – every problem has its own\n\nThe evaluator **decodes** a chromosome and assigns its fitness; it is the only link between the GA and the problem. A GA's solution is **only as good as its fitness function** – often the hardest part.\n\n*Examples:* f(x) = 15x − x²; for TSP, fitness = 1 / tour length (shorter tour = fitter).",
+      "sources": [
+        {
+          "doc": "L4",
+          "page": 17
+        },
+        {
+          "doc": "L4",
+          "page": 18
+        },
+        {
+          "doc": "L4",
+          "page": 51
+        }
+      ]
+    },
+    {
+      "id": "l4-010",
+      "front": "How does single-point crossover work? Give an example.",
+      "back": "Pick one **crossover point**; the offspring take the genes **before** the point from one parent and **after** it from the other.\n\n```\nP1 = 0110 | 1000        C1 = 0110 | 1010\nP2 = 1101 | 1010   →    C2 = 1101 | 1000\n```\n\nCrossover is the key GA feature: it **greatly speeds up the search** early on and **combines good sub-solutions (schemata)** from different chromosomes.",
+      "sources": [
+        {
+          "doc": "L4",
+          "page": 21
+        },
+        {
+          "doc": "L4",
+          "page": 22
+        }
+      ]
+    },
+    {
+      "id": "l4-011",
+      "front": "How does two-point crossover work? Give an example.",
+      "back": "Pick **two crossover points**; the offspring **swap the middle segment** between the points.\n\n```\nparent1 = 001 | 101100 | 1110011\nparent2 = 100 | 110101 | 1001001\n\nchild1  = 001 | 110101 | 1110011\nchild2  = 100 | 101100 | 1001001\n```",
+      "sources": [
+        {
+          "doc": "L4",
+          "page": 23
+        }
+      ]
+    },
+    {
+      "id": "l4-012",
+      "front": "How does uniform crossover work?",
+      "back": "Decide **gene by gene** which parent it comes from:\n\n- Assign \"heads\" to one parent and \"tails\" to the other.\n- **Flip a coin for each gene** of the first child to pick the parent.\n- The second child gets the **inverse** choice (the gene from the other parent).\n\nInheritance is **independent of position** – genes far apart can be mixed freely (unlike 1- or 2-point crossover, which keeps neighbouring genes together).",
+      "sources": [
+        {
+          "doc": "L4",
+          "page": 24
+        }
+      ]
+    },
+    {
+      "id": "l4-013",
+      "front": "What is mutation in a GA, and why is it needed?",
+      "back": "Mutation randomly **changes one or a few genes** of an offspring after crossover.\n\n- **Binary GA:** flip a bit (1 → 0, 0 → 1): `10110110` → `10100110`\n- **Real-valued GA:** replace a gene with an arbitrary/nearby value: (1.38, −69.4, 326.44) → (1.38, −67.5, 326.44)\n\n**Why:**\n- **Escapes local optima** and **explores** other regions of the search space\n- **Restores lost information** / keeps diversity in the population\n- **Avoids premature convergence**\n\nThe mutation rate is kept **low** (typically 1–20 %, often much lower), otherwise the GA becomes a random search.",
+      "sources": [
+        {
+          "doc": "L4",
+          "page": 25
+        },
+        {
+          "doc": "L4",
+          "page": 26
+        }
+      ]
+    },
+    {
+      "id": "l4-014",
+      "front": "How does roulette-wheel selection work? Give an example.",
+      "back": "**Fitness-proportionate** selection: each individual gets a slice of a roulette wheel proportional to its fitness; spin the wheel n times to choose n parents.\n\n**P(select i) = fitness(i) / Σ fitness**\n\n*Example:* fitness A = 3, B = 1, C = 2 (total 6)\n- A: 3/6 = **50 %**\n- B: 1/6 ≈ **17 %**\n- C: 2/6 ≈ **33 %**\n\nBetter individuals get a higher chance, but weak ones still can be picked, which keeps diversity. Problem: one very fit individual can dominate the wheel and cause premature convergence.",
+      "sources": [
+        {
+          "doc": "L4",
+          "page": 27
+        }
+      ]
+    },
+    {
+      "id": "l4-015",
+      "front": "What are rank, steady-state, tournament and elitism selection?",
+      "back": "- **Rank selection** – sort by fitness; the worst gets rank 1, the next 2, …, the best N; select in proportion to **rank** instead of raw fitness. Everyone has a fair chance, but convergence can be slower because the best ones don't stand out much.\n- **Steady-state selection** – keep most of the population; only a few individuals are replaced each generation.\n- **Tournament selection** – randomly pick a small group, and the **best of the group** becomes a parent. Easy to implement and to tune (a bigger tournament = more pressure).\n- **Elitism** – copy the **best few** chromosomes unchanged into the next generation, so the best solution is never lost.",
+      "sources": [
+        {
+          "doc": "L4",
+          "page": 28
+        },
+        {
+          "doc": "L4",
+          "page": 29
+        }
+      ]
+    },
+    {
+      "id": "l4-016",
+      "front": "What is deletion/replacement in a GA?",
+      "back": "Deciding which individuals are **discarded** to make room for the new offspring:\n\n- **Generational:** the entire population is replaced each iteration.\n- **Steady-state:** only a few members are replaced each generation.\n- Often combined with **elitism**, so the best individuals always survive.",
+      "sources": [
+        {
+          "doc": "L4",
+          "page": 30
+        }
+      ]
+    },
+    {
+      "id": "l4-017",
+      "front": "What are the main hyper-parameters of a GA, and how do they affect it?",
+      "back": "- **Population size** – number of chromosomes. Larger = more diversity but **longer running time**.\n- **Crossover rate (pc)** – fraction of chromosomes used for reproduction (crossover) in the next generation, e.g. 0.7.\n- **Mutation rate (pm)** – probability that a gene/chromosome mutates, e.g. 0.001–0.05.\n- **Number of generations** – iterations before stopping; also **directly affects running time**.\n\nOther choices: representation, selection and deletion policy, crossover/mutation operators, termination criteria.",
+      "sources": [
+        {
+          "doc": "L4",
+          "page": 50
+        },
+        {
+          "doc": "L4",
+          "page": 51
+        }
+      ]
+    },
+    {
+      "id": "l4-018",
+      "front": "How is the Travelling Salesman Problem (TSP) represented in a GA, and why doesn't normal crossover work?",
+      "back": "**TSP:** find a tour that visits every city **exactly once** with **minimum total distance**.\n\n**Representation:** an **ordered list of city numbers** (order-based GA), e.g. CityList1 = (3 5 7 2 1 6 4 8).\n\n**Problem with one-point crossover:**\n```\nP1 = (3 5 7 2 1 6 | 4 8)      C1 = (3 5 7 2 1 6 | 3 4)\nP2 = (2 5 7 6 8 1 | 3 4)  →   C2 = (2 5 7 6 8 1 | 4 8)\n```\nC1 visits city 3 twice and never visits 8 – an **invalid tour**. TSP needs **permutation crossovers** (PMX, OX) that keep every city exactly once.\n\nFitness = 1 / tour length (or minimize the length). In the 30-city example the GA improved the tour from 941 → 800 → 652 → 420.",
+      "sources": [
+        {
+          "doc": "L4",
+          "page": 32
+        },
+        {
+          "doc": "L4",
+          "page": 33
+        },
+        {
+          "doc": "L4",
+          "page": 34
+        },
+        {
+          "doc": "L4",
+          "page": 39
+        },
+        {
+          "doc": "L4",
+          "page": 42
+        }
+      ]
+    },
+    {
+      "id": "l4-019",
+      "front": "How does Partially Mapped Crossover (PMX) work? Do the example P1 = (1 2 3 | 4 5 6 | 7 8 9), P2 = (9 3 8 | 1 2 7 | 4 5 6).",
+      "back": "1. Choose two cut points and **swap the middle segments**:\n   - Child 1 = (9 3 8 | **4 5 6** | 4 5 6) ← P2's outside, P1's middle\n   - Child 2 = (1 2 3 | **1 2 7** | 7 8 9) ← P1's outside, P2's middle\n2. Build the **mapping** from the two segments: **4 ↔ 1, 5 ↔ 2, 6 ↔ 7**.\n3. **Fix duplicates outside the segment** with the mapping:\n   - Child 1: the trailing 4 5 6 are duplicates → 1 2 7 ⇒ **(9 3 8 | 4 5 6 | 1 2 7)**\n   - Child 2: the leading 1, 2 and trailing 7 are duplicates → 4, 5, 6 ⇒ **(4 5 3 | 1 2 7 | 6 8 9)**\n\nEvery city still appears exactly once, so both are valid tours.",
+      "sources": [
+        {
+          "doc": "L4",
+          "page": 35
+        },
+        {
+          "doc": "L4",
+          "page": 36
+        }
+      ]
+    },
+    {
+      "id": "l4-020",
+      "front": "How does Order Crossover (OX) work? Do the example P1 = (1 2 3 | 4 5 6 | 7 8 9), P2 = (9 3 8 | 1 2 7 | 4 5 6).",
+      "back": "1. Copy the **middle segment** of one parent into the child:\n   - Offspring 1 = (- - - | 4 5 6 | - - -)\n   - Offspring 2 = (- - - | 1 2 7 | - - -)\n2. Fill the empty positions with the remaining cities **in the order they appear in the other parent**:\n   - Offspring 1: P2's order without 4, 5, 6 is 9 3 8 1 2 7 ⇒ **(9 3 8 | 4 5 6 | 1 2 7)**\n   - Offspring 2: P1's order without 1, 2, 7 is 3 4 5 6 8 9 ⇒ **(3 4 5 | 1 2 7 | 6 8 9)**\n\nOX preserves the **relative order** of cities from the second parent.",
+      "sources": [
+        {
+          "doc": "L4",
+          "page": 35
+        },
+        {
+          "doc": "L4",
+          "page": 37
+        }
+      ]
+    },
+    {
+      "id": "l4-021",
+      "front": "Negnevitsky example: maximize f(x) = 15x − x² for integer x ∈ [0, 15]. Set up the GA and evaluate the initial population.",
+      "back": "**Encoding:** 4-bit chromosomes (0 = `0000` … 15 = `1111`). Population N = 6, pc = 0.7, pm = 0.001.\n\n| Chromosome | String | x | f(x) = 15x − x² | Fitness ratio |\n|---|---|---|---|---|\n| X1 | 1100 | 12 | 180 − 144 = 36 | 16.5 % |\n| X2 | 0100 | 4 | 60 − 16 = 44 | 20.2 % |\n| X3 | 0001 | 1 | 15 − 1 = 14 | 6.4 % |\n| X4 | 1110 | 14 | 210 − 196 = 14 | 6.4 % |\n| X5 | 0111 | 7 | 105 − 49 = 56 | 25.7 % |\n| X6 | 1001 | 9 | 135 − 81 = 54 | 24.8 % |\n\nTotal fitness = 218; ratio = f / 218 = the roulette-wheel slice. X5 and X6 are most likely to be selected for mating, X3 and X4 least likely.\nThe true maximum is **f = 56 at x = 7 (or 8)**.",
+      "sources": [
+        {
+          "doc": "L4",
+          "page": 43
+        },
+        {
+          "doc": "L4",
+          "page": 44
+        },
+        {
+          "doc": "L4",
+          "page": 45
+        },
+        {
+          "doc": "L4",
+          "page": 46
+        }
+      ]
+    },
+    {
+      "id": "l4-022",
+      "front": "How would you design a GA for finding the shortest path in a network (node 1 → node 8)?",
+      "back": "Answer the four design questions:\n\n- **Minimization or maximization?** Minimization of the total path cost (or maximize 1/cost).\n- **Chromosome:** the sequence of nodes on the path, starting at 1 and ending at 8, e.g. (1, 3, 6, 8) – integers, often variable length; or one gene per node saying whether/where it's used.\n- **Fitness function:** sum of the edge weights along the path; add a large **penalty** for invalid paths (missing edges, loops, not reaching 8).\n- **Operators:** crossover at a common node of two paths; mutation replaces a sub-path with another valid one.\n\nThe same questions apply to any GA design (e.g. an image-processing GA: what are the genes, binary or real, how to measure similarity to the target image?).",
+      "sources": [
+        {
+          "doc": "L4",
+          "page": 48
+        },
+        {
+          "doc": "L4",
+          "page": 49
+        }
+      ]
+    },
+    {
+      "id": "l4-023",
+      "front": "What are the benefits of genetic algorithms, and when should you use one?",
+      "back": "**Benefits**\n- Easy to understand; modular and separate from the application\n- Supports **multi-objective** optimization\n- Good in **noisy** environments\n- **Always has an answer**, and it gets better with time\n- **Inherently parallel**, easy to distribute\n- Easy to reuse previous solutions; a flexible building block for hybrid systems\n\n**Use a GA when:**\n- Other solutions are too slow or too complicated\n- You need an exploratory tool for new approaches\n- A similar problem has already been solved well with a GA\n- You want to hybridize with an existing solution",
+      "sources": [
+        {
+          "doc": "L4",
+          "page": 52
+        },
+        {
+          "doc": "L4",
+          "page": 53
+        },
+        {
+          "doc": "L4",
+          "page": 54
+        }
+      ]
+    },
+    {
+      "id": "l4-024",
+      "front": "GA with f(x) = (a+b) − (c+d) + (e+f) − (g+h). Evaluate and rank x1 = 65413532, x2 = 87126601, x3 = 23921285, x4 = 41852094.",
+      "back": "```\nx1 = 6 5 4 1 3 5 3 2:  (6+5) − (4+1) + (3+5) − (3+2) = 11 − 5 + 8 − 5  =   9\nx2 = 8 7 1 2 6 6 0 1:  (8+7) − (1+2) + (6+6) − (0+1) = 15 − 3 + 12 − 1 =  23\nx3 = 2 3 9 2 1 2 8 5:  (2+3) − (9+2) + (1+2) − (8+5) = 5 − 11 + 3 − 13 = −16\nx4 = 4 1 8 5 2 0 9 4:  (4+1) − (8+5) + (2+0) − (9+4) = 5 − 13 + 2 − 13 = −19\n```\n\n**Ranking (fittest first):** x2 (23) > x1 (9) > x3 (−16) > x4 (−19)",
+      "sources": [
+        {
+          "doc": "EX250114",
+          "page": 6,
+          "note": "Question 6a"
+        }
+      ]
+    },
+    {
+      "id": "l4-025",
+      "front": "Same GA: (i) one-point crossover of the two fittest at the middle; (ii) two-point crossover of the 2nd and 3rd fittest at points b and f; (iii) mutate the least fit.",
+      "back": "**(i) x2 × x1, cut in the middle (after gene d):**\n```\nx2 = 8 7 1 2 | 6 6 0 1      O1 = 8 7 1 2 3 5 3 2\nx1 = 6 5 4 1 | 3 5 3 2  →   O2 = 6 5 4 1 6 6 0 1\n```\n\n**(ii) x1 × x3, cut after b and after f (swap genes c–f):**\n```\nx1 = 6 5 | 4 1 3 5 | 3 2    O3 = 6 5 9 2 1 2 3 2\nx3 = 2 3 | 9 2 1 2 | 8 5 →  O4 = 2 3 4 1 3 5 8 5\n```\n\n**(iii) Mutate x4** – change one gene, e.g. g: 9 → 0:\n```\nx4 = 4 1 8 5 2 0 9 4  →   O5 = 4 1 8 5 2 0 0 4\n```\n(Any single gene change is accepted; picking one that raises fitness is smart.)",
+      "sources": [
+        {
+          "doc": "EX250114",
+          "page": 6,
+          "note": "Question 6b"
+        }
+      ]
+    },
+    {
+      "id": "l4-026",
+      "front": "Same GA: evaluate the five offspring O1 = 87123532, O2 = 65416601, O3 = 65921232, O4 = 23413585, O5 = 41852004. Has the overall fitness improved?",
+      "back": "```\nO1 = 8 7 1 2 3 5 3 2:  15 − 3 + 8 − 5   =  15\nO2 = 6 5 4 1 6 6 0 1:  11 − 5 + 12 − 1  =  17\nO3 = 6 5 9 2 1 2 3 2:  11 − 11 + 3 − 5  =  −2\nO4 = 2 3 4 1 3 5 8 5:  5 − 5 + 8 − 13   =  −5\nO5 = 4 1 8 5 2 0 0 4:  5 − 13 + 2 − 4   = −10\n```\n\n- Old population: sum = 9 + 23 − 16 − 19 = **−3**, average **−0.75**\n- New population: sum = 15 + 17 − 2 − 5 − 10 = **15**, average **3.0**\n\n**Yes, the overall (average) fitness improved**, and the worst individual improved from −19 to −10. But the **best** individual got worse (23 → 17) because x2 itself wasn't kept. Elitism would prevent that.",
+      "sources": [
+        {
+          "doc": "EX250114",
+          "page": 6,
+          "note": "Question 6c"
+        }
+      ]
+    },
+    {
+      "id": "l4-027",
+      "front": "Same GA (genes 0–9, f = (a+b) − (c+d) + (e+f) − (g+h)): what is the optimal chromosome and its fitness? Can the GA reach it from the initial population?",
+      "back": "**Optimum:** maximize the added genes (a, b, e, f = 9) and minimize the subtracted ones (c, d, g, h = 0):\n**x = 9 9 0 0 9 9 0 0**, f = (9+9) − 0 + (9+9) − 0 = **36**\n\n**Reachable?** Not with crossover alone. Crossover only **rearranges genes that already exist** at each position, and the initial population has:\n- position a: {6, 8, 2, 4} → no 9\n- position c: {4, 1, 9, 8} → no 0\n- position e: {3, 6, 1, 2} → no 9, etc.\n\nSo the optimum can only be reached through **mutation**, which introduces new gene values. With a low mutation rate this may take many generations, and the GA could converge prematurely to a sub-optimum.",
+      "sources": [
+        {
+          "doc": "EX250114",
+          "page": 6,
+          "note": "Question 6d–e"
+        }
+      ]
+    },
+    {
+      "id": "l4-028",
+      "front": "Use a GA with 4-bit chromosomes to maximize f(x) = 2x³ − 15x² + 36x, 0 ≤ x ≤ 15. Represent, generate 4 chromosomes, decode, evaluate, pick the best.",
+      "back": "**1. Representation:** x as a 4-bit binary number: 0 → `0000`, 15 → `1111`.\n\n**2–4. Random population, decode, evaluate:**\n```\n0101 → x = 5:   2·125 − 15·25 + 36·5    =  250 − 375 + 180   =   55\n1010 → x = 10:  2·1000 − 15·100 + 360   = 2000 − 1500 + 360  =  860\n0011 → x = 3:   2·27 − 15·9 + 108       =   54 − 135 + 108   =   27\n1100 → x = 12:  2·1728 − 15·144 + 432   = 3456 − 2160 + 432  = 1728\n```\n\n**5. Best:** `1100` (x = 12, f = 1728).\n\nDecoding a bit string: 1100 = 1·8 + 1·4 + 0·2 + 0·1 = 12.\nGlobal optimum in the range: f has a small local max at x = 2 (f = 28) and then grows, so the best is **`1111`, x = 15, f = 3915**.",
+      "sources": [
+        {
+          "doc": "EX260605",
+          "page": 6,
+          "note": "Question 6"
+        },
+        {
+          "doc": "EX251030",
+          "page": 6
+        },
+        {
+          "doc": "L4",
+          "page": 43
+        }
+      ]
+    },
+    {
+      "id": "l4-029",
+      "front": "A GA has N = 40, pc = 0.7, pm = 0.05, G = 80 generations; every individual is evaluated once per generation; each evaluation takes 0.02 s. How many fitness evaluations, and how long?",
+      "back": "**Evaluations** = population size × generations = 40 × 80 = **3200**\n(If you also count evaluating the initial population: 3200 + 40 = 3240.)\n\n**Time** = 3200 × 0.02 s = **64 s** (or 3240 × 0.02 = 64.8 s).\n\npc and pm don't change the count, because every individual is evaluated every generation anyway – they are distractors here.",
+      "sources": [
+        {
+          "doc": "EX260605",
+          "page": 7,
+          "note": "Question 7a"
+        },
+        {
+          "doc": "L4",
+          "page": 50
+        }
+      ]
+    },
+    {
+      "id": "l4-030",
+      "front": "Single-point crossover after the 4th bit: P1 = 10011010, P2 = 01100101. What are the offspring?",
+      "back": "```\nP1 = 1001 | 1010        C1 = 1001 | 0101 = 10010101\nP2 = 0110 | 0101   →    C2 = 0110 | 1010 = 01101010\n```\nEach child keeps the first 4 bits of one parent and the last 4 bits of the other.",
+      "sources": [
+        {
+          "doc": "EX260605",
+          "page": 7,
+          "note": "Question 7b"
+        },
+        {
+          "doc": "L4",
+          "page": 22
+        }
+      ]
+    },
+    {
+      "id": "l4-031",
+      "front": "12-bit chromosomes x = abc (4 bits each), f(x) = (a − b)² + c. Evaluate x1 = 0110 1001 0011, x2 = 1011 0110 0100, x3 = 0010 1110 0111, x4 = 1100 0101 1000, and cross the 2nd and 3rd fittest at the midpoint.",
+      "back": "```\nx1: a=6,  b=9,  c=3 → (6−9)²  + 3 =   9 + 3 =  12\nx2: a=11, b=6,  c=4 → (11−6)² + 4 =  25 + 4 =  29\nx3: a=2,  b=14, c=7 → (2−14)² + 7 = 144 + 7 = 151\nx4: a=12, b=5,  c=8 → (12−5)² + 8 =  49 + 8 =  57\n```\n**Ranking:** x3 (151) > x4 (57) > x2 (29) > x1 (12)\n\n**Crossover x4 × x2 at the midpoint (after bit 6):**\n```\nx4 = 110001 | 011000        O1 = 110001 100100 → a=12, b=6, c=4 → 36+4 = 40\nx2 = 101101 | 100100   →    O2 = 101101 011000 → a=11, b=5, c=8 → 36+8 = 44\n```\nBoth offspring (40, 44) are fitter than x2 (29).",
+      "sources": [
+        {
+          "doc": "EX2024S",
+          "page": 8,
+          "note": "Question 6"
+        },
+        {
+          "doc": "EX2024S",
+          "page": 9
+        }
+      ]
+    },
+    {
+      "id": "l4-032",
+      "front": "What determines whether a GA converges to a good solution?",
+      "back": "- **Population diversity** – if selection focuses only on the fittest, diversity drops and the GA risks **premature convergence** to a local optimum.\n- **Crossover** – recombines existing material; a single crossover point preserves a lot of information but explores fewer new combinations.\n- **Mutation** – introduces new variation and prevents stagnation. **Without mutation the GA may never escape a local optimum** or reach gene values that are missing from the population.\n- **Selection pressure and elitism** – too strong = premature convergence; elitism keeps the best solution.\n\nIn short: a GA converges well when it balances **exploitation** (selection, crossover) and **exploration** (mutation, diversity).",
+      "sources": [
+        {
+          "doc": "EX2024S",
+          "page": 11,
+          "note": "Question 6e"
+        },
+        {
+          "doc": "L4",
+          "page": 26
+        },
+        {
+          "doc": "L4",
+          "page": 28
+        }
+      ]
+    },
+    {
+      "id": "l4-033",
+      "front": "What are the steps involved in a genetic algorithm? (short exam answer)",
+      "back": "1. **Representation** – encode the problem as chromosomes usable by the GA.\n2. **Initialization** – create a random initial population.\n3. **Fitness evaluation** – compute the fitness of every individual.\n4. **Selection** – choose parents based on fitness (roulette wheel, tournament, rank…).\n5. **Crossover** – combine pairs of parents into offspring.\n6. **Mutation** – randomly change some genes of the offspring.\n7. **Replacement** – form the new generation; repeat from step 3 until a termination criterion is met.",
+      "sources": [
+        {
+          "doc": "EX2020S",
+          "page": 2,
+          "note": "Question 6"
+        },
+        {
+          "doc": "L4",
+          "page": 12
+        },
+        {
+          "doc": "L4",
+          "page": 13
+        }
+      ]
+    }
+  ]
+}
