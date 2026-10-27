@@ -323,6 +323,7 @@
     $("card-back").hidden = !flipped;
     $("flip-btn").hidden = flipped;
     $("rate-btns").hidden = !flipped;
+    $("unflip-btn").hidden = !flipped;
     $("card").classList.toggle("flipped", flipped);
   }
 
@@ -352,6 +353,12 @@
   function flip() {
     if (!session || session.flipped) return;
     setFlipped(true);
+  }
+
+  function unflip() {
+    if (!session || !session.flipped) return;
+    closeSlide();
+    setFlipped(false);
   }
 
   function rate(level) {
@@ -732,6 +739,9 @@
       } else if (k === "Enter") {
         e.preventDefault();
         flip();
+      } else if (k === "b" || k === "B") {
+        e.preventDefault();
+        unflip();
       } else if (k === "ArrowLeft" || k === "ArrowRight") {
         if (slideViewer.isOpen()) {
           e.preventDefault();
@@ -773,6 +783,7 @@
     });
     $("start-btn").addEventListener("click", function () { startSession(buildPool(), "main"); });
     $("flip-btn").addEventListener("click", flip);
+    $("unflip-btn").addEventListener("click", function () { $("unflip-btn").blur(); unflip(); });
     Array.prototype.forEach.call(document.querySelectorAll("#rate-btns button"), function (b) {
       b.addEventListener("click", function () { b.blur(); rate(b.dataset.level); });
     });

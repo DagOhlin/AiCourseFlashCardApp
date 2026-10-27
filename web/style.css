@@ -334,7 +334,7 @@ body[data-view="study"] #view-study { max-width: 1500px; }
 .source-doc { font-weight: 600; font-size: .92rem; }
 .source-page { font-size: .85rem; }
 
-.actions { margin-top: 1.2rem; display: flex; justify-content: center; }
+.actions { margin-top: 1.2rem; display: flex; flex-direction: column; align-items: center; gap: .6rem; }
 .rate-btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem; width: 100%; }
 .rate { padding: .85em .6em; font-weight: 600; border-width: 2px; }
 .rate.not { border-color: var(--not); color: var(--not); }
