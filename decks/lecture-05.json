@@ -1,5 +1,6 @@
 {
   "id": "lecture-05",
+  "course": "dv2618",
   "name": "L5 · Data Mining & Knowledge Discovery",
   "description": "KDD/CRISP-DM, data types and quality, preprocessing, normalization, regression",
   "group": "Lectures",

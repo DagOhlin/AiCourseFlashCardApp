@@ -1,5 +1,6 @@
 {
   "id": "lecture-03",
+  "course": "dv2618",
   "name": "L3 · Graphs and Search in AI",
   "description": "Problem formulation, graphs, BFS, DFS, A* and worked exam searches",
   "group": "Lectures",

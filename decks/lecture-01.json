@@ -1,5 +1,6 @@
 {
   "id": "lecture-01",
+  "course": "dv2618",
   "name": "L1 · Introduction to Applied AI",
   "description": "Views of AI, the Turing Test, AI history and applications",
   "group": "Lectures",

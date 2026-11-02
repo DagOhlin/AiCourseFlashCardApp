@@ -1,5 +1,6 @@
 {
   "id": "lecture-07",
+  "course": "dv2618",
   "name": "L7 · Neural Networks & Deep Learning",
   "description": "Neurons, activation functions, perceptron, gradient descent, backprop, CNN/RNN/GAN, history",
   "group": "Lectures",

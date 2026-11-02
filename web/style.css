@@ -151,6 +151,45 @@ button.danger:hover:not(:disabled) { filter: brightness(1.08); border-color: var
   padding: clamp(1rem, 3vw, 2rem) clamp(1rem, 3vw, 2rem) 4rem;
 }
 
+/* ------------------------------------------------------- courses sidebar */
+
+body[data-view="home"] #view-home {
+  max-width: 1180px;
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  gap: clamp(1rem, 3vw, 2rem);
+  align-items: start;
+}
+.home-main { max-width: 880px; min-width: 0; }
+
+.course-nav { position: sticky; top: 4.6rem; }
+.course-nav-title {
+  font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted);
+  margin: 0 .2rem .6rem;
+}
+.course-list { display: flex; flex-direction: column; gap: .5rem; }
+.course {
+  display: flex; flex-direction: column; align-items: stretch; gap: .1rem;
+  text-align: left; padding: .7rem .9rem; border-radius: 12px;
+}
+.course.active { border-color: var(--accent); background: var(--accent-weak); }
+.course-item-code { font-size: .75rem; font-weight: 700; letter-spacing: .06em; color: var(--accent); }
+.course-item-name { font-weight: 600; line-height: 1.3; }
+.course-item-count { font-size: .82rem; }
+.course .stack { flex: none; margin-top: .4rem; height: 6px; }
+
+.course-head { margin-bottom: 1.1rem; }
+.course-head h1 { font-size: 1.6rem; letter-spacing: -.01em; }
+.course-head p { margin: .2rem 0 0; }
+.course-code { font-size: .8rem; font-weight: 700; letter-spacing: .08em; color: var(--accent); }
+
+@media (max-width: 800px) {
+  body[data-view="home"] #view-home { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .course-nav { position: static; margin-bottom: 1rem; }
+  .course-list { flex-direction: row; overflow-x: auto; padding-bottom: .4rem; }
+  .course { flex: none; min-width: 9.5rem; max-width: 14rem; }
+}
+
 .panel {
   background: var(--surface);
   border: 1px solid var(--border);

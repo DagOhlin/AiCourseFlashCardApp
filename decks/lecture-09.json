@@ -1,5 +1,6 @@
 {
   "id": "lecture-09",
+  "course": "dv2618",
   "name": "L9 · Ethics & Future of AI",
   "description": "Benefits, technical/societal/security challenges, fairness, bias cases, EU AI Act, future",
   "group": "Lectures",

@@ -17,6 +17,8 @@
   // ---------------------------------------------------------------- state
 
   var state = {
+    courses: [],
+    courseId: null,
     decks: [],
     deckById: {},
     materials: {},
@@ -98,6 +100,7 @@
   function savePrefs() {
     try {
       localStorage.setItem(PREFS_KEY, JSON.stringify({
+        course: state.courseId,
         decks: Array.from(state.selectedDecks),
         levels: Array.from(state.levels)
       }));
@@ -110,6 +113,19 @@
     });
     document.body.dataset.view = name;
     window.scrollTo(0, 0);
+  }
+
+  function currentCourse() {
+    return state.courses.filter(function (c) { return c.id === state.courseId; })[0] || null;
+  }
+
+  function decksOf(courseId) {
+    return state.decks.filter(function (d) { return d.course === courseId; });
+  }
+
+  // The decks of the course being shown that are ticked.
+  function selectedDecks() {
+    return decksOf(state.courseId).filter(function (d) { return state.selectedDecks.has(d.id); });
   }
 
   function materialUrl(doc) {
@@ -126,6 +142,7 @@
 
   function load() {
     return api("/api/state").then(function (data) {
+      state.courses = data.courses;
       state.decks = data.decks;
       state.materials = data.materials;
       state.progress = data.progress || {};
@@ -134,8 +151,19 @@
 
       var prefs = loadPrefs();
       var known = (prefs.decks || []).filter(function (id) { return state.deckById[id]; });
-      state.selectedDecks = new Set(known.length ? known : data.decks.map(function (d) { return d.id; }));
+      state.selectedDecks = new Set(known);
+      // A course with nothing ticked yet (first visit) starts with all its decks ticked.
+      state.courses.forEach(function (c) {
+        var decks = decksOf(c.id);
+        if (!decks.some(function (d) { return state.selectedDecks.has(d.id); })) {
+          decks.forEach(function (d) { state.selectedDecks.add(d.id); });
+        }
+      });
       if (prefs.levels && prefs.levels.length) state.levels = new Set(prefs.levels);
+
+      var wanted = state.courseId || prefs.course;
+      var found = state.courses.some(function (c) { return c.id === wanted; });
+      state.courseId = found ? wanted : (state.courses[0] && state.courses[0].id);
 
       renderErrors(data.errors || []);
       renderHome();
@@ -172,17 +200,59 @@
     return bar;
   }
 
+  function courseCounts(courseId) {
+    var c = { new: 0, not: 0, partial: 0, understand: 0 };
+    decksOf(courseId).forEach(function (d) {
+      var dc = deckCounts(d);
+      Object.keys(c).forEach(function (k) { c[k] += dc[k]; });
+    });
+    return c;
+  }
+
+  function renderCourses() {
+    var list = $("course-list");
+    list.innerHTML = "";
+    state.courses.forEach(function (course) {
+      var counts = courseCounts(course.id);
+      var total = counts.new + counts.not + counts.partial + counts.understand;
+      var active = course.id === state.courseId;
+      list.appendChild(el("button", {
+        class: "course" + (active ? " active" : ""),
+        "aria-current": active ? "true" : false,
+        onclick: function () {
+          if (state.courseId === course.id) return;
+          state.courseId = course.id;
+          savePrefs(); renderHome();
+        }
+      }, [
+        course.code ? el("span", { class: "course-item-code", text: course.code }) : null,
+        el("span", { class: "course-item-name", text: course.name }),
+        el("span", { class: "course-item-count muted", text: total + (total === 1 ? " card" : " cards") }),
+        total ? stackedBar(counts, total) : null
+      ]));
+    });
+  }
+
   function renderHome() {
+    var course = currentCourse();
+    renderCourses();
+    $("course-code").textContent = course ? course.code : "";
+    $("course-code").hidden = !course || !course.code;
+    $("course-name").textContent = course ? course.name : "";
+    $("course-desc").textContent = course ? course.description : "";
+    $("course-desc").hidden = !course || !course.description;
+
     var list = $("deck-list");
     list.innerHTML = "";
 
-    if (!state.decks.length) {
-      list.appendChild(el("p", { class: "muted empty", text: "No decks yet. Put deck files (.json) in the decks/ folder and reload this page." }));
+    var courseDecks = decksOf(state.courseId);
+    if (!courseDecks.length) {
+      list.appendChild(el("p", { class: "muted empty", text: "No decks in this course yet. Put deck files (.json) with \"course\": \"" + state.courseId + "\" in the decks/ folder and reload this page." }));
     }
 
     var groups = [];
     var byGroup = {};
-    state.decks.forEach(function (d) {
+    courseDecks.forEach(function (d) {
       if (!byGroup[d.group]) { byGroup[d.group] = []; groups.push(d.group); }
       byGroup[d.group].push(d);
     });
@@ -233,8 +303,7 @@
 
   function selectedCounts() {
     var c = { new: 0, not: 0, partial: 0, understand: 0 };
-    state.decks.forEach(function (d) {
-      if (!state.selectedDecks.has(d.id)) return;
+    selectedDecks().forEach(function (d) {
       var dc = deckCounts(d);
       Object.keys(c).forEach(function (k) { c[k] += dc[k]; });
     });
@@ -262,7 +331,7 @@
     btn.disabled = n === 0;
     btn.textContent = n ? "Start – " + n + (n === 1 ? " card" : " cards") : "Start";
     var info = $("start-info");
-    if (!state.selectedDecks.size) info.textContent = "Pick at least one deck.";
+    if (!selectedDecks().length) info.textContent = "Pick at least one deck.";
     else if (!state.levels.size) info.textContent = "Pick at least one card type.";
     else if (!n) info.textContent = "No cards match – try including more card types.";
     else info.textContent = "Cards are shown in random order.";
@@ -270,8 +339,7 @@
 
   function buildPool() {
     var pool = [];
-    state.decks.forEach(function (deck) {
-      if (!state.selectedDecks.has(deck.id)) return;
+    selectedDecks().forEach(function (deck) {
       deck.cards.forEach(function (card) {
         if (state.levels.has(levelOf(deck.id, card.id))) pool.push({ deck: deck, card: card });
       });
@@ -702,7 +770,9 @@
   // ---------------------------------------------------------------- reset
 
   function openReset() {
-    var n = state.selectedDecks.size;
+    var n = selectedDecks().length;
+    var course = currentCourse();
+    $("reset-course").textContent = course ? (course.code ? course.code + " · " : "") + course.name : "this course";
     var sel = $("reset-selected");
     sel.disabled = n === 0;
     sel.textContent = "Reset the " + n + " selected deck" + (n === 1 ? "" : "s");
@@ -714,7 +784,8 @@
   function onResetClose() {
     var choice = $("reset-dialog").returnValue;
     if (choice !== "selected" && choice !== "all") return;
-    var body = choice === "all" ? {} : { decks: Array.from(state.selectedDecks) };
+    var decks = choice === "all" ? decksOf(state.courseId) : selectedDecks();
+    var body = { decks: decks.map(function (d) { return d.id; }) };
     api("/api/reset", body).then(function (res) {
       toast("Progress reset (" + res.removed + " card" + (res.removed === 1 ? "" : "s") + " back to new).");
       return load();
@@ -774,11 +845,11 @@
       if (session) endSession(); else goHome();
     });
     $("sel-all").addEventListener("click", function () {
-      state.decks.forEach(function (d) { state.selectedDecks.add(d.id); });
+      decksOf(state.courseId).forEach(function (d) { state.selectedDecks.add(d.id); });
       savePrefs(); renderHome();
     });
     $("sel-none").addEventListener("click", function () {
-      state.selectedDecks.clear();
+      decksOf(state.courseId).forEach(function (d) { state.selectedDecks.delete(d.id); });
       savePrefs(); renderHome();
     });
     $("start-btn").addEventListener("click", function () { startSession(buildPool(), "main"); });

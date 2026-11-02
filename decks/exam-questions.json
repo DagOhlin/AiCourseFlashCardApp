@@ -1,5 +1,6 @@
 {
   "id": "exam-questions",
+  "course": "dv2618",
   "name": "Past exam questions",
   "description": "Every unique question from the past exams, with the official solution where one exists",
   "group": "Exams",

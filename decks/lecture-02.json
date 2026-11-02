@@ -1,5 +1,6 @@
 {
   "id": "lecture-02",
+  "course": "dv2618",
   "name": "L2 · Intelligent Agents & Knowledge Representation",
   "description": "Agents, PEAS, environment types, agent types, Wumpus World, logic and FOL",
   "group": "Lectures",

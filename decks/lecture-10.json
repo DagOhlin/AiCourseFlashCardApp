@@ -1,5 +1,6 @@
 {
   "id": "lecture-10",
+  "course": "dv2618",
   "name": "L10 · Generative AI & LLMs",
   "description": "GenAI families, how LLMs work, transformers, diffusion, using LLMs, pathology case study",
   "group": "Lectures",

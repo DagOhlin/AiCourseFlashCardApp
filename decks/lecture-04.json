@@ -1,5 +1,6 @@
 {
   "id": "lecture-04",
+  "course": "dv2618",
   "name": "L4 · Optimization & Genetic Algorithms",
   "description": "GA components, selection, crossover, mutation, TSP and worked exam calculations",
   "group": "Lectures",

@@ -1,5 +1,6 @@
 {
   "id": "lecture-06",
+  "course": "dv2618",
   "name": "L6 · Introduction to Machine Learning",
   "description": "ML types, data preparation, classification and regression, metrics, overfitting",
   "group": "Lectures",

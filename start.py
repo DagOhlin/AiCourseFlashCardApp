@@ -35,6 +35,7 @@ DATA_DIR = ROOT / "data"
 PROGRESS_FILE = DATA_DIR / "progress.json"
 SETTINGS_FILE = DATA_DIR / "settings.json"
 MATERIALS_FILE = ROOT / "materials.json"
+COURSES_FILE = ROOT / "courses.json"
 
 LEVELS = ("not", "partial", "understand")
 DEFAULT_PORT = 8765
@@ -109,10 +110,40 @@ def load_materials(errors):
     return docs
 
 
-def load_decks(materials, errors):
+def load_courses(errors):
+    """Courses in the order they are listed in courses.json. Without that file
+    (or with no valid course in it) everything goes into one default course."""
+    try:
+        raw = read_json(COURSES_FILE, {})
+    except json.JSONDecodeError as e:
+        errors.append("courses.json: invalid JSON ({})".format(e))
+        raw = {}
+    courses = []
+    seen_ids = set()
+    for entry in raw.get("courses", []) if isinstance(raw, dict) else []:
+        if not isinstance(entry, dict) or not entry.get("id"):
+            errors.append("courses.json: every course needs an 'id'")
+            continue
+        if entry["id"] in seen_ids:
+            errors.append("courses.json: duplicate course id '{}' (skipped)".format(entry["id"]))
+            continue
+        seen_ids.add(entry["id"])
+        courses.append({
+            "id": entry["id"],
+            "code": entry.get("code", ""),
+            "name": entry.get("name", entry["id"]),
+            "description": entry.get("description", ""),
+        })
+    if not courses:
+        courses.append({"id": "default", "code": "", "name": "Flashcards", "description": ""})
+    return courses
+
+
+def load_decks(materials, courses, errors):
     """Read every decks/*.json file. Problems are collected in `errors`
     (and shown in the app) instead of crashing, so a typo in one deck
     never takes the others down."""
+    course_ids = {c["id"] for c in courses}
     decks = []
     seen_ids = set()
     if not DECKS_DIR.is_dir():
@@ -131,6 +162,10 @@ def load_decks(materials, errors):
             continue
         if deck_id in seen_ids:
             errors.append("{}: duplicate deck id '{}' (skipped)".format(name, deck_id))
+            continue
+        course_id = deck.get("course") or courses[0]["id"]
+        if course_id not in course_ids:
+            errors.append("{}: unknown course '{}' - add it to courses.json (deck skipped)".format(name, course_id))
             continue
         seen_ids.add(deck_id)
 
@@ -163,6 +198,7 @@ def load_decks(materials, errors):
             })
         decks.append({
             "id": deck_id,
+            "course": course_id,
             "name": deck.get("name", deck_id),
             "description": deck.get("description", ""),
             "group": deck.get("group", "Decks"),
@@ -226,10 +262,12 @@ class Handler(SimpleHTTPRequestHandler):
         if path == "/api/state":
             errors = []
             materials = load_materials(errors)
-            decks = load_decks(materials, errors)
+            courses = load_courses(errors)
+            decks = load_decks(materials, courses, errors)
             with progress_lock:
                 progress = load_progress()["cards"]
             return self.send_json({
+                "courses": courses,
                 "decks": decks,
                 "materials": materials,
                 "progress": progress,

@@ -1,5 +1,6 @@
 {
   "id": "lecture-08",
+  "course": "dv2618",
   "name": "L8 · Computer Vision & NLP",
   "description": "Images, CV problems, pattern recognition, CNNs, NLP tasks and why language is hard",
   "group": "Lectures",

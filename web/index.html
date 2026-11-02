@@ -22,30 +22,43 @@
 
   <!-- ============================== HOME ============================== -->
   <main id="view-home" class="view">
-    <div id="errors" class="errors" hidden></div>
+    <nav class="course-nav" aria-label="Courses">
+      <h2 class="course-nav-title">Courses</h2>
+      <div id="course-list" class="course-list"></div>
+    </nav>
 
-    <section class="panel">
-      <div class="panel-head">
-        <h2><span class="step">1</span> Pick decks</h2>
-        <div class="panel-tools">
-          <button class="link" id="sel-all">Select all</button>
-          <span aria-hidden="true">·</span>
-          <button class="link" id="sel-none">None</button>
+    <div class="home-main">
+      <div id="errors" class="errors" hidden></div>
+
+      <header class="course-head">
+        <div class="course-code" id="course-code"></div>
+        <h1 id="course-name"></h1>
+        <p class="muted" id="course-desc"></p>
+      </header>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2><span class="step">1</span> Pick decks</h2>
+          <div class="panel-tools">
+            <button class="link" id="sel-all">Select all</button>
+            <span aria-hidden="true">·</span>
+            <button class="link" id="sel-none">None</button>
+          </div>
         </div>
-      </div>
-      <div id="deck-list" class="deck-list"></div>
-    </section>
+        <div id="deck-list" class="deck-list"></div>
+      </section>
 
-    <section class="panel">
-      <div class="panel-head">
-        <h2><span class="step">2</span> Which cards should show up?</h2>
-      </div>
-      <div id="level-filters" class="chips"></div>
-    </section>
+      <section class="panel">
+        <div class="panel-head">
+          <h2><span class="step">2</span> Which cards should show up?</h2>
+        </div>
+        <div id="level-filters" class="chips"></div>
+      </section>
 
-    <div class="start-row">
-      <button id="start-btn" class="primary big">Start</button>
-      <span id="start-info" class="muted"></span>
+      <div class="start-row">
+        <button id="start-btn" class="primary big">Start</button>
+        <span id="start-info" class="muted"></span>
+      </div>
     </div>
   </main>
 
@@ -126,10 +139,11 @@
   <dialog id="reset-dialog">
     <form method="dialog" class="dialog-body">
       <h3>Reset progress</h3>
-      <p>Resetting marks cards as <strong>new</strong> again, as if they were never rated. This can't be undone.</p>
+      <p>Resetting marks cards as <strong>new</strong> again, as if they were never rated. This can't be undone.
+        Only <strong id="reset-course">this course</strong> is affected; other courses keep their progress.</p>
       <div class="btn-col">
         <button value="selected" id="reset-selected">Reset the selected decks</button>
-        <button value="all" class="danger">Reset everything</button>
+        <button value="all" id="reset-all" class="danger">Reset the whole course</button>
         <button value="cancel" class="ghost">Cancel</button>
       </div>
     </form>
