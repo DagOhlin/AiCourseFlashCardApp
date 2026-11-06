@@ -368,6 +368,7 @@ body[data-view="study"] #view-study { max-width: 1500px; }
   display: flex; align-items: center; gap: .8rem;
   padding: .55rem .8rem; border-radius: 10px; background: var(--surface-2);
 }
+.source.figure { background: var(--accent-weak); box-shadow: inset 0 0 0 1px var(--accent); }
 .source-icon { font-size: 1.1rem; }
 .source-text { flex: 1; min-width: 0; line-height: 1.3; }
 .source-doc { font-weight: 600; font-size: .92rem; }

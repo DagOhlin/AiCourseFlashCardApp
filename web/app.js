@@ -384,6 +384,24 @@
     $("card-answer").innerHTML = window.renderMarkdown(item.card.back);
     renderSources(item.card.sources);
     setFlipped(session.flipped);
+    if (session.flipped) autoOpenFigure();
+  }
+
+  // The source to open with S: the one marked "show" (a figure that explains
+  // the answer), otherwise the first.
+  function mainSource(card) {
+    return card.sources.filter(function (s) { return s.show; })[0] || card.sources[0] || null;
+  }
+
+  // Cards whose answer leans on a picture mark that slide with "show": true.
+  // It opens by itself when the answer is shown, but only where the slide fits
+  // beside the card; on small screens it would cover the answer.
+  var sideBySide = window.matchMedia("(min-width: 1001px)");
+  function autoOpenFigure() {
+    var item = currentItem();
+    if (!item || !sideBySide.matches) return;
+    var figure = item.card.sources.filter(function (s) { return s.show; })[0];
+    if (figure) openSlide(figure);
   }
 
   function setFlipped(flipped) {
@@ -400,18 +418,20 @@
     box.innerHTML = "";
     if (!sources || !sources.length) return;
     box.appendChild(el("div", { class: "sources-title", text: sources.length > 1 ? "Sources" : "Source" }));
-    sources.forEach(function (src, i) {
+    var main = sources.filter(function (s) { return s.show; })[0] || sources[0];
+    sources.forEach(function (src) {
       var doc = state.materials[src.doc];
       if (!doc) return;
-      box.appendChild(el("div", { class: "source" }, [
-        el("span", { class: "source-icon", "aria-hidden": "true", text: doc.kind === "exam" ? "📝" : "📄" }),
+      box.appendChild(el("div", { class: "source" + (src.show ? " figure" : "") }, [
+        el("span", { class: "source-icon", "aria-hidden": "true", text: src.show ? "🖼️" : doc.kind === "exam" ? "📝" : "📄" }),
         el("div", { class: "source-text" }, [
           el("div", { class: "source-doc", text: doc.title }),
-          el("div", { class: "source-page muted", text: sourceLabel(src) + (src.note ? " – " + src.note : "") })
+          el("div", { class: "source-page muted", text: sourceLabel(src) + (src.note ? " – " + src.note : "") +
+            (src.show ? " – figure for this answer" : "") })
         ]),
         el("button", {
-          class: "small",
-          title: i === 0 ? "Open (S)" : "Open",
+          class: "small" + (src.show ? " primary" : ""),
+          title: src === main ? "Open (S)" : "Open",
           onclick: function () { openSlide(src); }
         }, ["Open " + (doc.kind === "exam" ? "page" : "slide")])
       ]));
@@ -421,6 +441,7 @@
   function flip() {
     if (!session || session.flipped) return;
     setFlipped(true);
+    autoOpenFigure();
   }
 
   function unflip() {
@@ -826,7 +847,7 @@
         if (item && item.card.sources.length) {
           e.preventDefault();
           if (!session.flipped) setFlipped(true);
-          openSlide(item.card.sources[0]);
+          openSlide(mainSource(item.card));
         }
       } else if (k === "u" || k === "U" || k === "Backspace") {
         e.preventDefault();

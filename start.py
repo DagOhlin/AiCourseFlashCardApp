@@ -189,7 +189,8 @@ def load_decks(materials, courses, errors):
                     errors.append("{} ({}): unknown source document {!r}".format(
                         where, card["id"], src.get("doc") if isinstance(src, dict) else src))
                     continue
-                sources.append({"doc": src["doc"], "page": int(src.get("page", 1)), "note": src.get("note", "")})
+                sources.append({"doc": src["doc"], "page": int(src.get("page", 1)), "note": src.get("note", ""),
+                                "show": bool(src.get("show"))})
             cards.append({
                 "id": card["id"],
                 "front": card["front"],

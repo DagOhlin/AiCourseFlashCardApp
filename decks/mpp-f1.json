@@ -1,0 +1,588 @@
+{
+  "id": "mpp-f1",
+  "course": "mpp",
+  "name": "F1 · Introduction & Parallel Computer Architecture I",
+  "description": "Why parallelism, Amdahl's law, programming models, pipelining, memory hierarchy, Flynn, UMA/NUMA, message passing, SMT and multicore designs",
+  "group": "Lectures",
+  "order": 1,
+  "cards": [
+    {
+      "id": "mpp-f1-001",
+      "front": "What do a supercomputer, a desktop PC, a graphics card and a smartphone have in common?",
+      "back": "They are **all parallel computers**: each has many processing units working at the same time.\n\n- **Supercomputer** (e.g. Titan): thousands of nodes with multicore CPUs + GPUs.\n- **Desktop PC:** a multicore CPU (4–16+ cores, often with 2 hardware threads per core).\n- **Graphics card (GPU):** thousands of small cores running the same instruction on many data items.\n- **Smartphone:** a multicore CPU (often 6–8 cores) plus a GPU.\n\nSo parallel programming is not just for supercomputers. Every program that wants to use the full power of an ordinary computer has to be parallel, which is the reason for this course.",
+      "sources": [
+        {
+          "doc": "MPP-F1-INTRO",
+          "page": 2
+        },
+        {
+          "doc": "MPP-F1-INTRO",
+          "page": 3
+        },
+        {
+          "doc": "MPP-F1-INTRO",
+          "page": 4
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-002",
+      "front": "Why did processors become multicore around 2005, instead of just getting faster?",
+      "back": "There are two ways to get more done (the lecture's analogy):\n\n1. **Work faster.** Raise the clock frequency of a single processor. This worked well **until about 2005**.\n2. **Work together and help each other.** Put several processors (cores) on the chip. This is what has been done **since about 2005: multicore systems**.\n\nClock speeds stopped rising because of **fundamental hardware limits**: **power**, **heat (thermal)** and **energy efficiency**. A higher clock needs more power, the power becomes heat, and the chip can't be cooled. Instead, the growing number of transistors is spent on **more cores** running at a moderate clock.\n\n*Consequence:* a sequential program no longer gets faster \"for free\" on new hardware. To get faster it must be **parallel**.",
+      "sources": [
+        {
+          "doc": "MPP-F1-INTRO",
+          "page": 5
+        },
+        {
+          "doc": "MPP-F1-INTRO",
+          "page": 14
+        },
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 6,
+          "note": "processor performance flattens out around 2005"
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-003",
+      "front": "What is the main question of the course, and why are parallel computers interesting?",
+      "back": "**Main question:** *How do you get many units (processors/cores) to work efficiently together?*\n\n**Why parallel computers are interesting:**\n- There is a **limit to sequential processing**, mainly from hardware limits: power, heat and energy efficiency.\n- **Multicore processors are the main building block** of computer systems today and in the foreseeable future.\n- **Some problems always need more computing power**: weather forecasts, simulations, databases, AI/ML, computer games, …\n- **Software for parallel computers** keeps improving every year.\n\n⇒ There is, and will be, a **need for software developers with parallel programming skills**.\n\nThe big picture: understand *why* parallelism is interesting and *how* to exploit it for higher performance, in theory and in practice (labs in Pthreads and CUDA).",
+      "sources": [
+        {
+          "doc": "MPP-F1-INTRO",
+          "page": 6
+        },
+        {
+          "doc": "MPP-F1-INTRO",
+          "page": 13
+        },
+        {
+          "doc": "MPP-F1-INTRO",
+          "page": 14
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-004",
+      "front": "What are the elements of a parallel computer system, and what do we use it for?",
+      "back": "**Three elements:**\n1. **Hardware:** multiple processors or cores, plus **memory** and **networks** connecting them.\n2. **System software:** a **parallel operating system** and **programming constructs to express concurrency** (threads, message passing, …).\n3. **Algorithms and application software:** the **decomposition of the work into subtasks** that can run in parallel.\n\n**What we use it for:**\n- **Achieve speedup:** solve the same problem faster, ideally **Tₚ = Tₛ / P**. ← *the focus of this course*\n- **Solve problems with large memory requirements:** problems that don't fit in one computer's memory but fit in the combined memory of many.\n\n*Example:* a climate simulation is split into regions (decomposition) that run on many cores (hardware), coordinated by MPI or threads (system software).",
+      "sources": [
+        {
+          "doc": "MPP-F1-INTRO",
+          "page": 15
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-005",
+      "front": "What does Tₚ = Tₛ / P mean, and what is speedup?",
+      "back": "- **Tₛ** = execution time of the **sequential** program\n- **Tₚ** = execution time of the **parallel** program on **P** processors\n- **Speedup** S(P) = **Tₛ / Tₚ**\n\n**Tₚ = Tₛ / P** is the **ideal** case (linear speedup, S = P): with P processors the program runs exactly P times faster.\n\n*Example:* a program takes 120 s sequentially. On 8 cores the ideal time is 120 / 8 = **15 s** (speedup 8). If it actually takes 24 s, the speedup is 120 / 24 = **5**.\n\nIn practice the speedup is **lower than P** because of:\n- parts of the program that can't be parallelized (**Amdahl's law**)\n- **communication** between processors (e.g. remote memory accesses)\n- **synchronization** and waiting\n- **load imbalance** (some processors get more work than others)",
+      "sources": [
+        {
+          "doc": "MPP-F1-INTRO",
+          "page": 15
+        },
+        {
+          "doc": "MPP-F1-INTRO",
+          "page": 16
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-006",
+      "front": "What are the two large challenges in parallel computing?",
+      "back": "1. **Limited parallelism in the application.**\n   Part of every program is sequential. That part doesn't get faster with more processors, so it limits the total speedup. This is described by **Amdahl's law**:\n   `Speedup = 1 / (Fraction_parallel / NoProc + (1 − Fraction_parallel))`\n\n2. **Long remote memory access latencies.**\n   Accessing data held by another processor (remote memory, another node) takes much longer than a local access, often hundreds of cycles. So it is important to obtain **communication locality**: keep the data a processor uses close to it. Each remote access adds to the cycles per instruction:\n   `CPI = CPI_base + remote_req_rate × remote_req_cost`\n\n*Both say the same thing:* adding processors only helps if there is **enough parallel work** and the processors **don't spend their time waiting for data**.",
+      "sources": [
+        {
+          "doc": "MPP-F1-INTRO",
+          "page": 16
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-007",
+      "front": "State Amdahl's law and explain what it says.",
+      "back": "```\n                          1\nSpeedup = ------------------------------------\n          F_parallel / P  +  (1 − F_parallel)\n```\n- **F_parallel** = the fraction of the (sequential) execution time that can be parallelized\n- **P** = number of processors\n- **1 − F_parallel** = the **serial fraction**, which runs at the same speed whatever P is\n\n**Meaning:** only the parallel part gets faster. Even with infinitely many processors, the parallel part shrinks to 0 but the serial part stays, so\n\n**Max speedup = 1 / (1 − F_parallel)**\n\n*Example:* if 90 % is parallel, the speedup can never exceed 1 / 0.1 = **10**, not even with 1000 cores.\n\n**Lesson:** to get high speedup on many processors, the serial fraction has to be **very small**. Parallelize as much of the program as possible.",
+      "sources": [
+        {
+          "doc": "MPP-F1-INTRO",
+          "page": 16
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-008",
+      "front": "Amdahl's law: 90 % of a program can be parallelized. What is the speedup on 2, 4, 8, 16 and infinitely many processors?",
+      "back": "Speedup = 1 / (0.9 / P + 0.1)\n\n| P | Calculation | Speedup |\n|---|---|---|\n| 2 | 1 / (0.45 + 0.1) = 1 / 0.55 | **1.82** |\n| 4 | 1 / (0.225 + 0.1) = 1 / 0.325 | **3.08** |\n| 8 | 1 / (0.1125 + 0.1) = 1 / 0.2125 | **4.71** |\n| 16 | 1 / (0.05625 + 0.1) = 1 / 0.15625 | **6.40** |\n| ∞ | 1 / (0 + 0.1) | **10** |\n\n**Observations:**\n- Doubling P gives less and less: from 8 to 16 cores the speedup only goes from 4.7 to 6.4.\n- The **efficiency** (speedup / P) drops: 91 % on 2 cores, 59 % on 8, 40 % on 16.\n- The 10 % serial part ends up dominating. On 16 cores it takes 0.1 / 0.156 ≈ 64 % of the run time.",
+      "sources": [
+        {
+          "doc": "MPP-F1-INTRO",
+          "page": 16
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-009",
+      "front": "Amdahl's law: what fraction of a program must be parallel to reach a speedup of 8 on 10 processors?",
+      "back": "Set the speedup to 8 and solve for f (the parallel fraction):\n\n```\n8 = 1 / (f/10 + (1 − f))\nf/10 + 1 − f = 1/8 = 0.125\n1 − 0.9 f    = 0.125\n0.9 f        = 0.875\nf            = 0.972\n```\n\n**About 97.2 %** of the execution time must be parallelizable, so at most **2.8 %** may be serial.\n\n*Check:* 1 / (0.0972 + 0.0278) = 1 / 0.125 = 8 ✓\n\n*Another example:* with f = 0.95 on 8 processors: 1 / (0.95/8 + 0.05) = 1 / 0.16875 ≈ **5.9**, and the maximum with infinitely many processors is 1 / 0.05 = **20**.\n\nEven a small serial fraction costs a lot of speedup.",
+      "sources": [
+        {
+          "doc": "MPP-F1-INTRO",
+          "page": 16
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-010",
+      "front": "What does CPI = CPI_base + remote_req_rate × remote_req_cost mean? Give an example.",
+      "back": "It shows how **remote memory accesses** slow down a parallel program:\n- **CPI_base**: cycles per instruction when all accesses are local (e.g. hit in the local cache/memory)\n- **remote_req_rate**: the fraction of instructions that need a **remote** access (memory belonging to another processor or node)\n- **remote_req_cost**: the cost of one remote access, in cycles\n\n*Example:* CPI_base = 0.5, remote access cost = 400 cycles, and 0.2 % of the instructions access remote memory:\n\nCPI = 0.5 + 0.002 × 400 = 0.5 + 0.8 = **1.3**\n\nThe program becomes 1.3 / 0.5 = **2.6 times slower** than with only local accesses, even though just 1 in 500 instructions is remote. With 1 % remote accesses: 0.5 + 4 = 4.5 CPI, **9 times slower**.\n\n⇒ Strive for **communication locality**: place data close to the processor that uses it, and reduce communication.",
+      "sources": [
+        {
+          "doc": "MPP-F1-INTRO",
+          "page": 16
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-011",
+      "front": "What is the difference between a shared address space and a distributed address space system?",
+      "back": "**Shared address space**\n- All processors can access **one common memory** (all addresses are visible to everyone) through an interconnection network.\n- Accesses to local and non-local memory are **implicit**: an ordinary load/store, and the hardware fetches the data.\n- Processors communicate by **reading and writing shared variables**, which requires **synchronization**.\n- *Example:* today's **multicore processors**. Programmed with threads (Pthreads, OpenMP).\n\n**Distributed address space**\n- Each processor has **its own private memory module**, which the other processors cannot access directly.\n- Data is exchanged by **message passing** (explicit **send/receive**).\n- *Example:* **cluster systems** (many computers connected by a network). Programmed with MPI.\n\n*In the figure:* (a) processors → network → one shared memory; (b) processors, each with its own memory module M, connected by a network.",
+      "sources": [
+        {
+          "doc": "MPP-F1-INTRO",
+          "page": 17,
+          "show": true
+        },
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 11
+        },
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 13
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-012",
+      "front": "What are the necessary steps to parallelize an algorithm, and what is the goal of each step?",
+      "back": "1. **Decomposition** of the computations into **tasks** that can be executed in parallel.\n2. **Distribution** of the computations and their data to the processors (mapping).\n   - Tasks can have different **granularity** depending on the platform (instruction-level, data or function-level parallelism).\n   - *Goal:* a **balanced distribution** of the computations (**load balancing**).\n3. **Data exchange** between the subtasks (needed in a distributed address space): planning of communication and coordination.\n   - *Goal:* **minimize the communication costs**.\n4. **Definition of synchronization points.**\n   - *Goal:* **avoid inconsistent states** (shared address space) and **minimize waiting times**.\n\n*Example, summing 1 000 000 numbers on 4 cores:* (1) split the array into 4 chunks, (2) give each core 250 000 numbers, (3) send each partial sum to one core, (4) wait until all partial sums are ready before adding them up. With a shared variable, protect it with a lock.",
+      "sources": [
+        {
+          "doc": "MPP-F1-INTRO",
+          "page": 18
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-013",
+      "front": "What levels (types) of parallelism are there? Give an example of each.",
+      "back": "From fine to coarse **granularity**:\n\n- **Instruction-level parallelism (ILP):** several machine instructions of one program run at the same time inside a processor, exploited by **pipelining** and **superscalar** execution. *Example:* `a = b + c` and `d = e * f` are independent and can run in the same cycle.\n- **Data parallelism:** the **same operation on different parts of the data** at the same time. *Example:* adding two vectors by letting each core (or GPU thread) handle its own part of the indices.\n- **Function-level (task) parallelism:** **different functions/tasks** run in parallel. *Example:* a game where one thread does physics, one does audio and one does rendering.\n- **Mixed parallelism:** combinations, e.g. tasks that are themselves data parallel.\n\nWhich level fits depends on the **platform**: ILP is handled by the hardware, data parallelism suits GPUs/SIMD, and function-level parallelism suits multicore threads.",
+      "sources": [
+        {
+          "doc": "MPP-F1-INTRO",
+          "page": 18
+        },
+        {
+          "doc": "MPP-F1-INTRO",
+          "page": 19
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-014",
+      "front": "What questions does a parallel programming model answer (the programmer's view of a parallel system)?",
+      "back": "A **parallel programming model** describes how the programmer sees the parallel system. It is characterized by:\n\n1. **Which types/levels of parallelism are used?** Instruction-level, data, function-level or mixed parallelism.\n2. **How is the parallelism specified?** **Explicitly** (e.g. message passing, creating threads) or **implicitly** (e.g. functional languages, the compiler finds it).\n3. **In which form is the parallelism processed?** **Fork-Join**, **SPMD** or **SIMD**, **Master-Slave**, **Pipelining**.\n4. **How is data exchanged?** Through **shared variables**, or through **explicit communication** (point-to-point messages and collective communication operations).\n5. **Does a cost model exist?** Can the programmer estimate the execution time, including communication, to compare designs?\n\n*Example, Pthreads:* function-level/data parallelism, explicit (create threads), fork-join, shared variables.",
+      "sources": [
+        {
+          "doc": "MPP-F1-INTRO",
+          "page": 19
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-015",
+      "front": "What is the difference between explicit and implicit specification of parallelism?",
+      "back": "**Explicit parallelism:** the **programmer states** what runs in parallel and how the parts interact.\n- *Examples:* message passing (MPI `send`/`receive`), creating threads with `pthread_create`, launching CUDA kernels.\n- ✔ full control, high performance is possible\n- ✘ more work, and bugs are possible (deadlocks, race conditions)\n\n**Implicit parallelism:** the programmer writes (mostly) ordinary code, and the **compiler or runtime system finds and exploits** the parallelism.\n- *Examples:* **functional languages** (no side effects, so independent expressions can be evaluated in parallel), parallelizing compilers, and ILP in the processor hardware.\n- ✔ easy for the programmer\n- ✘ the system often can't find enough parallelism, so performance is limited\n\nSomething in between: **OpenMP**, where the programmer adds hints (`#pragma omp parallel for`) and the compiler generates the threads.",
+      "sources": [
+        {
+          "doc": "MPP-F1-INTRO",
+          "page": 19
+        },
+        {
+          "doc": "MPP-F1-INTRO",
+          "page": 20
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-016",
+      "front": "Briefly describe the forms of parallel processing: Fork-Join, SPMD, SIMD, Master-Slave and Pipelining.",
+      "back": "- **Fork-Join:** a thread **forks** (creates) child threads that run in parallel and later **joins** (waits for) them before continuing. *Example:* `pthread_create` … `pthread_join`.\n- **SPMD (Single Program, Multiple Data):** **all processors run the same program**, each on its own part of the data, and use their **id** to decide what to do. They are not in lockstep. *Example:* a typical MPI program.\n- **SIMD (Single Instruction, Multiple Data):** **one instruction** is applied to many data elements at the same time, in lockstep. *Example:* AVX vector instructions, GPUs.\n- **Master-Slave (master-worker):** one **master** hands out work to **slaves/workers** and collects their results. *Example:* a master hands out image tiles to render.\n- **Pipelining:** a stream of data passes through **stages**, each stage on its own processor, like an assembly line. *Example:* decode → filter → encode in video processing.\n\n(These are covered in more detail in F2.)",
+      "sources": [
+        {
+          "doc": "MPP-F1-INTRO",
+          "page": 19
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-017",
+      "front": "How can data be exchanged between the parts of a parallel program?",
+      "back": "1. **Shared variables** (shared address space):\n   - Threads read and write variables in the common memory.\n   - Need **synchronization** (locks, barriers) so that they don't interfere, e.g. two threads updating `sum` at the same time.\n   - *Used in:* Pthreads, OpenMP, Java/C++ threads.\n\n2. **Explicit communication** (distributed address space):\n   - **Point-to-point messages:** one process **sends** and one specific process **receives**, e.g. `MPI_Send`/`MPI_Recv`.\n   - **Collective communication operations:** a group of processes takes part together, e.g. **broadcast** (one → all), **reduce** (all → one, combining values such as a sum), **scatter/gather**.\n\n*Example:* computing a global sum. With shared variables each thread adds its partial sum to `sum` under a lock. With message passing, a single **reduce** operation collects and adds all partial sums.",
+      "sources": [
+        {
+          "doc": "MPP-F1-INTRO",
+          "page": 19
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-018",
+      "front": "What software exists for developing parallel programs, and which address space does each target?",
+      "back": "- **Parallelizing compiler:** automatically parallelizes sequential code (implicit; works for simple loops only).\n- **Parallel programming languages:** HPF (High Performance Fortran), UPC, X10, Fortress, Chapel.\n- **Message-passing programming** (for a **distributed address space**): communication libraries used from Fortran, C, C++ or Java.\n  - **MPI (Message Passing Interface)**\n- **Thread programming** (for a **shared address space**):\n  - **Pthreads:** a library (POSIX threads)\n  - **OpenMP:** parallelism controlled with **pragmas**, e.g. `#pragma omp parallel for`\n  - **C++ / Java:** multithreading is part of the language (`std::thread`, `Thread`)\n  - **CUDA:** define **kernels** that run in parallel on the **GPU**\n\nIn this course the labs use **Pthreads** (lab 1) and **CUDA** (labs 2–3), in C/C++.",
+      "sources": [
+        {
+          "doc": "MPP-F1-INTRO",
+          "page": 20
+        },
+        {
+          "doc": "MPP-F1-INTRO",
+          "page": 8
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-019",
+      "front": "Which trends in microprocessor architecture gave us more resources, and how are they used for parallelism?",
+      "back": "**Trends:**\n- **Clock speeds** rose by **two to three orders of magnitude** over two decades (until ~2005).\n- **Higher device integration** gives a huge number of transistors (**more than 1 billion** per chip).\n\n**How do we best use these resources?** By running more things at the same time:\n- **Superscalar processors with deep pipelines:** several **functional units** that execute **multiple instructions in the same cycle**. How instructions are selected and executed varies a lot between architectures. This is *implicit* parallelism (ILP), invisible to the programmer.\n- **Simultaneous multithreading (SMT, \"Hyperthreading\"):** several threads share one core.\n- **Chip multiprocessors (multicore processors):** several cores on one chip.\n\nThe first is handled by hardware. The last two need **several threads** from the software, which is where parallel programming comes in.",
+      "sources": [
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 3
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-020",
+      "front": "What is pipelining? How many cycles do 4 instructions take on a 5-stage pipeline, with and without pipelining?",
+      "back": "**Pipelining** overlaps the stages of instruction execution: **Fetch (FI), Decode (D), Execute (EXE), Memory/data access (MEM), Write back (WB)**. While one instruction is executing, the next is being decoded and the one after that is being fetched, **like an assembly line for cars**.\n\n**Without pipelining:** each instruction goes through all 5 stages before the next starts, so 4 × 5 = **20 cycles**.\n\n**With pipelining:** a new instruction starts every cycle, so k + (n − 1) = 5 + 3 = **8 cycles** (as in the ADD, SUB, OR, JMP diagram).\n\n- Each instruction still takes 5 cycles (the **latency** doesn't change), but up to **one instruction finishes per cycle** (the **throughput** improves).\n- *Larger example:* 100 instructions: 500 vs 104 cycles, almost 5× faster.\n- Stalls happen on **data dependencies** and **branches** (pipeline hazards).",
+      "sources": [
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 4,
+          "show": true
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-021",
+      "front": "What is superscalar execution, and what limits it?",
+      "back": "A **superscalar** processor has **multiple functional units** (e.g. 2 adders, a load/store unit) and can **issue several instructions in the same clock cycle**. A *two-way* superscalar issues up to 2 instructions per cycle. This exploits **instruction-level parallelism (ILP)**.\n\n**What limits it:**\n- **Data dependencies** (RAW, WAR, WAW): an instruction that needs the result of another can't run at the same time. Issue slots are wasted.\n- **Resource conflicts:** two instructions need the same functional unit.\n- **Branches:** it's not known which instructions come next.\n- **Instruction order:** **different instruction mixes with identical semantics can take significantly different execution time**.\n\n**In-order vs out-of-order:**\n- **In-order** issue only looks at the next instructions in program order, so a dependency blocks issuing.\n- **Out-of-order** (dynamic) issue can pick later, independent instructions and fill the slots. It is better but costs more hardware.",
+      "sources": [
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 5,
+          "show": true
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-022",
+      "front": "What are RAW, WAR and WAW data dependencies? Give an example of each.",
+      "back": "Dependencies between two instructions that access the same register or memory location. They stop the instructions from being executed in parallel or in a different order.\n\n**RAW: Read After Write** (*true dependency*). The second instruction **reads** what the first **writes**.\n```\nadd R1, R2, R3   ; R1 = R2 + R3\nsub R4, R1, R5   ; needs the new R1\n```\n\n**WAR: Write After Read** (*anti-dependency*). The second instruction **writes** something the first **reads**.\n```\nadd R4, R1, R5   ; reads R1\nmov R1, R6       ; overwrites R1, must not happen first\n```\n\n**WAW: Write After Write** (*output dependency*). Both **write** the same location, and the final value must come from the last one.\n```\nadd R1, R2, R3\nmov R1, R7       ; R1 must end up with this value\n```\n\n**RAW is a real data flow and can't be removed.** WAR and WAW are only \"name\" conflicts, and the hardware can remove them by **register renaming**.",
+      "sources": [
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 5
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-023",
+      "front": "In the superscalar example, three code fragments add the same four numbers. Why do they take different times, and what are horizontal and vertical waste?",
+      "back": "All three fragments compute the same sum of four numbers on a **two-way superscalar** processor:\n- **(i)** `load R1` · `load R2` · `add R1,@1004` · `add R2,@100C` · `add R1,R2` · `store R1`. It builds **two independent partial sums**, so the instructions can be issued **in pairs**: the two loads together, then the two adds together.\n- **(ii)** `load R1` · `add R1,@1004` · `add R1,@1008` · `add R1,@100C` · `store R1`. Every add needs the previous R1 (**a chain of RAW dependencies**), so only one instruction can be issued at a time. It is **slower even though it has fewer instructions**.\n- **(iii)** has the same instructions as (i), but with **dependent instructions next to each other**. An **in-order** processor can't pair them and wastes slots. An **out-of-order** processor can reorder it into (i).\n\n**Wasted issue slots** (figure c):\n- **Horizontal waste:** only **some** of the slots in a cycle are used (1 of 2).\n- **Vertical waste:** **no** slot is used in a cycle (the whole cycle is idle, e.g. waiting for a load).",
+      "sources": [
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 5,
+          "show": true
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-024",
+      "front": "Why is the memory system often the bottleneck? What are latency and bandwidth?",
+      "back": "For many applications **the memory system, not the processor speed, is the bottleneck**. Processor performance grew much faster than memory speed (the graph from 1980–2010: processors improved ~10 000×, DRAM only ~10×). This growing **processor–memory gap** is called the *memory wall*.\n\n**Memory performance has two parts:**\n- **Latency:** the time from **issuing a memory request** until **the data is available at the processor**.\n- **Bandwidth:** the **rate** at which data can be pumped from the memory system to the processor (bytes/second).\n\n*Analogy:* a water hose. Latency is how long it takes before water comes out, and bandwidth is how much water flows per second once it does.\n\n*Example:* latency 100 ns, bandwidth 10 GB/s.\n- One 64-byte cache line: 100 ns + 6.4 ns ≈ **106 ns**, dominated by **latency**.\n- 1 MB: 100 ns + 100 µs ≈ **100 µs**, dominated by **bandwidth**.",
+      "sources": [
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 6,
+          "show": true
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-025",
+      "front": "What is reference locality? Explain temporal and spatial locality with an example.",
+      "back": "A program accesses **only a relatively small part of the address space at any given time**. Caches rely on this.\n\n- **Temporal locality (locality in time):** if a location is referenced, it will **likely be referenced again soon**.\n- **Spatial locality (locality in space):** if a location is referenced, **locations with nearby addresses** will likely be referenced soon.\n\n```c\nfor (i = 0; i < N; i++)\n    sum += a[i];\n```\n- `sum` and `i` are used in every iteration: **temporal** locality.\n- `a[0], a[1], a[2], …` are next to each other in memory: **spatial** locality. One cache block brings in several elements at once.\n\n*Bad locality:* in C (row-major order), looping over `a[i][j]` with **i** as the inner loop jumps a whole row each step, so almost every access misses. Making **j** the inner loop gives good spatial locality.",
+      "sources": [
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 7
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-026",
+      "front": "Describe the memory hierarchy: levels, size, speed, cost, and what moves between the levels.",
+      "back": "| Level | Size | Access time | Cost |\n|---|---|---|---|\n| **Registers** | 100s of bytes | < 1 ns | – |\n| **Cache** (SRAM) | KB – MB | 0.5–2.5 ns | $500–1000/GB |\n| **Main memory** (DRAM) | GB | 50–70 ns | $10–20/GB |\n| **Disk / SSD** | TB | 5–20 ms | $0.05–0.1/GB |\n| **Tape** | \"infinite\" | sec – min | – |\n\n**Transfer units, and who moves the data:**\n- registers ↔ cache: **instruction operands**, 1–8 bytes, by the **program/compiler**\n- cache ↔ memory: **blocks** (cache lines), 8–256 bytes, by the **cache controller**\n- memory ↔ disk: **pages**, 512 B – 8 KB, by the **OS**\n- disk ↔ tape: **files**, by the **operator**\n\nThe **upper levels are faster** but small and expensive. The **lower levels are larger** but slow and cheap. Thanks to **locality**, most accesses hit the fast upper levels, so the hierarchy gives roughly **the speed of the top level at the cost per byte of the bottom level**.",
+      "sources": [
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 8,
+          "show": true
+        },
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 7
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-027",
+      "front": "Describe Flynn's taxonomy.",
+      "back": "Flynn classifies computers by the **organization of the global control** and the resulting **instruction (control) and data streams**:\n\n| | Single data | Multiple data |\n|---|---|---|\n| **Single instruction** | **SISD** | **SIMD** |\n| **Multiple instructions** | **MISD** | **MIMD** |\n\n1. **SISD:** in each step **one instruction** is applied to **one value**. A classic sequential uniprocessor.\n2. **MISD:** in each step **different instructions** are applied to **one value**. Hardly any real machines (sometimes fault-tolerant systems that compute the same data in several ways are mentioned).\n3. **SIMD:** in each step **the same instruction** is applied to **many values**. **GPUs**, vector instructions (**SSE, AVX**), older vector computers.\n4. **MIMD:** in each step **several instructions** are applied to **several values**. Each processor runs its own instruction stream: **multicore CPUs, clusters**.\n\n**Most parallel computers used today are MIMD** (often with SIMD units inside each core).",
+      "sources": [
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 10
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-028",
+      "front": "Classify with Flynn's taxonomy: (a) a GPU, (b) a quad-core laptop CPU, (c) an AVX instruction, (d) a cluster of PCs, (e) an old single-core PC.",
+      "back": "- **(a) GPU → SIMD.** Many cores execute the **same instruction on different data** (e.g. every thread processes its own pixel).\n- **(b) Quad-core CPU → MIMD.** Each core runs **its own instruction stream** on its own data, possibly different programs.\n- **(c) AVX instruction → SIMD.** One instruction, e.g. `vaddps`, adds **8 floats at once** in a 256-bit register.\n- **(d) Cluster → MIMD.** Each node runs its own program on its own data (distributed memory, message passing).\n- **(e) Single-core PC → SISD.** One instruction stream and one data stream (ignoring pipelining/ILP inside the processor).\n\n*Note:* a modern CPU is a **mix**: MIMD across its cores, with SIMD vector units (SSE/AVX) inside each core.",
+      "sources": [
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 10
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-029",
+      "front": "What is a shared-address-space platform, and what is the difference between UMA and NUMA?",
+      "back": "**Shared-address-space platform:** **all memory is accessible to all processors**. Processors interact by **modifying data objects stored in the shared address space**, so they **need synchronization**.\n\n- **UMA (Uniform Memory Access):** the **access time to any memory word is the same** for all processors.\n  *Figure, left:* processors with private caches share a cache level and **one main memory**, e.g. the cores of a single multicore chip.\n- **NUMA (Non-Uniform Memory Access):** the access time **depends on where the word is**. **Local** memory is fast, while **remote** memory (attached to another processor) is slower.\n  *Figure, right:* nodes of **multicore processor + caches + memory + directory**, connected by an **interconnection network**, e.g. a server with 2–4 CPU sockets, each with its own RAM.\n\nIn both cases a program can read any address. The difference is only **how long it takes**, and that matters for performance.",
+      "sources": [
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 11,
+          "show": true
+        },
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 12
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-030",
+      "front": "Why is the UMA/NUMA distinction important when designing algorithms?",
+      "back": "On a NUMA machine a remote access can be **several times slower** than a local one. **NUMA machines require locality from the algorithm** to perform well.\n\n**What this means for the programmer:**\n- **Place the data close to the thread that uses it**: allocate and initialize the data on the node that will work on it, e.g. each thread initializes its own part of an array (\"first touch\").\n- **Partition the work so that each processor mostly accesses its own data**, e.g. give each thread a block of rows of a matrix and keep it on the same rows throughout.\n- **Avoid moving threads between nodes**, because they lose their local data.\n\nOn **UMA** the placement of the data doesn't matter for access time. On **NUMA** the same program can run much slower if the data is badly placed, even though it is still correct.\n\nThe programming itself is easier than with message passing, because reads and writes are **implicitly visible** to the other processors. **Shared read-write data must still be coordinated** (synchronization; see threads programming).",
+      "sources": [
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 12
+        },
+        {
+          "doc": "MPP-F1-INTRO",
+          "page": 16,
+          "note": "CPI with remote accesses"
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-031",
+      "front": "What is the cache coherence problem, and what is a non-cache-coherent shared address space machine?",
+      "back": "In a shared-address-space machine each processor has **its own cache**, so **the same memory word can have several copies**. These copies have to be kept consistent: **coordinated access to multiple copies**. That is the **cache coherence problem**.\n\n*Example:*\n1. P1 and P2 both read `x = 5` into their caches.\n2. P1 writes `x = 7`. This changes only P1's cache.\n3. P2 reads `x` and gets the **stale value 5** from its own cache.\n\nA **cache coherence protocol** in hardware prevents this, e.g. by **invalidating** (or updating) the other copies when one processor writes. Large machines use **directories** to keep track of which caches have a copy (the \"Directory\" boxes in the NUMA figure).\n\n**Non-cache-coherent shared address space machines** are a weaker model. They provide a **shared address map but not coordinated access**: hardware does not keep the cached copies consistent, so software must handle it (e.g. explicitly flushing caches).",
+      "sources": [
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 12
+        },
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 11
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-032",
+      "front": "What is a message-passing platform, and how is it programmed?",
+      "back": "**Message-passing platform:** a set of **processors, each with its own exclusive (private) memory**. No processor can directly read another's memory.\n\n- *Examples:* **clustered workstations** (a cluster of PCs connected by a network) and **non-shared-address-space multicomputers**.\n- *Figure:* nodes with processor + cache, memory and I/O, connected by an **interconnection network**. There is no shared memory.\n\n**Programming:** with (variants of) **send and receive** primitives. Process A **sends** a message containing data, and process B **receives** it into its own memory.\n- Libraries such as **MPI** (Message Passing Interface) and **PVM** (Parallel Virtual Machine) provide these primitives.\n\n```c\n// process 0                           // process 1\nMPI_Send(&x, 1, MPI_INT, 1, ...);     MPI_Recv(&x, 1, MPI_INT, 0, ...);\n```\n\nAll communication is **explicit**. The programmer must decide what data to send to whom and when.",
+      "sources": [
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 13,
+          "show": true
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-033",
+      "front": "Compare message-passing and shared-address-space platforms. Why is it easy to emulate message passing on shared memory, but not the reverse?",
+      "back": "- **Message passing requires little hardware support, other than a network.** Off-the-shelf computers plus Ethernet/InfiniBand are enough, which makes it cheap and able to scale to very many nodes.\n- **Shared address space needs more hardware support:** a shared memory system, often **cache coherence** (and directories on NUMA machines).\n\n**Emulation:**\n- **Message passing on shared memory is easy.** A *send* writes the data into a shared buffer and sets a flag. A *receive* waits for the flag and reads the buffer. MPI implementations do exactly this between processes on the same multicore machine.\n- **Shared memory on message passing is hard to do efficiently.** Every access to a \"remote\" variable would have to become a **request message plus a reply message**, which is very slow. The system must also detect such accesses and keep copies consistent (software distributed shared memory).\n\n**Programming:** shared memory is usually **easier** (implicit communication), while message passing gives **explicit control** over communication and locality.",
+      "sources": [
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 14
+        },
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 11
+        },
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 13
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-034",
+      "front": "What is simultaneous multithreading (SMT / Hyperthreading), and how does it work?",
+      "back": "**Basis:** SMT **duplicates the part of the processor that stores the processor state** on the chip:\n- general-purpose registers\n- machine state registers (program counter, status, …)\n- the interrupt controller and its registers\n\n**Result:** the **physical processor is seen as two logical processors**. The **operating system can assign two processes or threads to it**, from the same or different applications.\n\n**Note:** the logical processors **share almost all resources** of the physical processor: **caches, functional units, control logic, buses**, etc. Only the state is duplicated.\n\n*Example:* a 4-core Intel i7 with Hyperthreading shows up as **8 logical processors** in the OS (e.g. in Task Manager or `nproc`).\n\nIn the pipeline, instructions **from several threads are issued in the same cycle** to the shared functional units.",
+      "sources": [
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 15
+        },
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 17
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-035",
+      "front": "What is the advantage of SMT, how much does it typically help, and what does it require from the OS and the program?",
+      "back": "**Advantage:** when **one logical processor stalls**, the **other can use the processing resources**, which increases utilization.\n\n**Reasons for stalls:** **cache misses**, **wrong branch prediction**, **dependencies between instructions**, and **pipeline hazards**.\n\n**How much it helps:**\n- Depending on the application, Hyperthreading can **decrease the run time by 15–30 %**.\n- It increases **throughput by ~30 % at ~10 % higher hardware cost**.\n- It is far from 2×, because both threads share the same caches and functional units.\n\n**Requirements:**\n- The **OS must be able to control two logical processors**, and on systems with several processors it must **distinguish logical from physical processors** (e.g. schedule 2 busy threads on two different cores, not on the two halves of one core).\n- **More than one thread must be available for execution**: the **program has to be prepared** (parallelized) for it. A single-threaded program gains nothing.",
+      "sources": [
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 16
+        },
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 17
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-036",
+      "front": "Describe how SMT shares a processor pipeline, and give examples of SMT processors.",
+      "back": "SMT exploits **thread-level parallelism at the processor chip level**: **several threads execute in parallel in the same processor pipeline**. The issue logic picks instructions from **several threads** (each with its own PC and registers) and issues them to the **shared functional units**. Slots that one thread can't fill (horizontal and vertical waste) are filled by another. That is the key idea: **resource sharing**.\n\n**Cost/benefit:** about **+30 % throughput for ~10 % more hardware**.\n\n**Examples:**\n- **Intel i7 / i9 / Xeon:** 2 threads per core (Hyperthreading)\n- **IBM Power8:** 12 cores, **8 threads per core** (96 threads)\n- **Oracle SPARC M8:** 32 cores, **256 threads** (8 per core)\n\nMany threads per core suits server workloads that often wait on memory: while one thread waits, others keep the core busy.",
+      "sources": [
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 17,
+          "show": true
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-037",
+      "front": "What is the difference between SMT (Hyperthreading) and a multicore processor?",
+      "back": "**Multicore:** several **complete execution cores** on one chip. Each core appears to the OS as a **separate logical processor with its own execution resources** (pipeline, functional units, usually L1/L2 cache).\n- 2 cores ≈ up to **2× the throughput** for parallel work.\n\n**SMT:** **one core** whose **processor state is duplicated**, so it appears as several logical processors that **share** the core's functional units and caches.\n- 2 hardware threads ≈ **+15–30 %**, because they only use resources the other thread leaves idle.\n\n| | Multicore | SMT |\n|---|---|---|\n| Duplicated | whole core | only the state (registers, PC) |\n| Shared | e.g. L3 cache, memory | almost everything |\n| Gain | up to N× | ~15–30 % |\n| Hardware cost | high | ~10 % |\n\n**They are combined:** an 8-core CPU with 2-way SMT gives **16 logical processors**. Both need a **multithreaded program** to help.",
+      "sources": [
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 15
+        },
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 16
+        },
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 18
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-038",
+      "front": "What is a multicore processor, and what are the three design options for multicore processors?",
+      "back": "**Multicore processor:** **several execution cores are integrated on the chip** of one processor. **Every core appears to the OS as a separate logical processor** with its own execution resources, which have to be controlled (scheduled) separately.\n\n**Design options:**\n1. **Hierarchical design:** the cores share **caches and memory in a tree-like hierarchy**, e.g. private L1 per core, an L2 shared by a pair of cores, and an L3/memory shared by all.\n2. **Pipelined design:** the **cores are arranged in a chain**. Data passes from one core to the next, and **each core performs one processing step**, like an assembly line.\n3. **Network-based design:** each core has its **own cache/local memory**, and the cores are connected by an **on-chip interconnection network** (e.g. a mesh) with a network control unit.\n\nHierarchical is the usual design for desktop/server CPUs and GPUs. Pipelined suits stream processing such as network packets. Network-based scales to **many** cores.",
+      "sources": [
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 19,
+          "show": true
+        },
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 18
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-039",
+      "front": "Give examples of the hierarchical multicore design.",
+      "back": "In a **hierarchical design** the cores share caches/memory at different levels of a tree.\n\n- **Quad-core AMD Opteron:** each core has **private L1 and L2**, all 4 share an **L3 cache** through a **crossbar**, and the **memory controller and HyperTransport links are on the chip**.\n- **Intel quad-core Xeon** (Core 2 era): **two dual-core dies**. Each pair of cores **shares an L2 cache**, and the pairs are connected via the **Front-Side Bus** to an **external memory controller**. Communication between the two pairs is therefore slower.\n- **Nvidia Pascal GP100 (GPU):** many **Streaming Multiprocessors (SMs)** share an **L2 cache** and the memory. Each **GP100 SM** has **64 CUDA cores, a 256 KB register file and 64 KB shared memory**, and handles up to **2048 active threads** (32 active blocks).\n\n*Note:* cores that share a cache level can exchange data faster than cores that only share main memory, which matters when placing threads that communicate.",
+      "sources": [
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 20,
+          "show": true
+        },
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 21
+        },
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 22
+        },
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 19
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-040",
+      "front": "Give an example of the pipelined multicore design, and explain when it is useful.",
+      "back": "In a **pipelined design** the cores form a **chain**: each data item flows from core to core, and **every core performs one step** of the processing.\n\n**Example: the Xelerator X11 network processor.**\n- Network packets enter through the **receive module** (RX MAC ports).\n- They pass through a **programmable pipeline** of processors (**Processor 0 … Processor 31**, PISC blocks), interleaved with special engines (hash, meter, counter, TCAM lookup engines).\n- They leave through the **transmit module** (TX MAC ports).\n- Each processor does a small part of the packet handling, e.g. parse the header, look up the route, update the counters.\n\n**Useful when:** there is a **continuous stream of independent data items** that all need the **same sequence of steps**, e.g. packets in a router, or video frames. Throughput is up to **one item per pipeline step**, even if each item takes many steps.\n\n**Drawback:** the **slowest stage limits** the throughput, so the stages must be balanced.",
+      "sources": [
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 23,
+          "show": true
+        },
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 19
+        }
+      ]
+    },
+    {
+      "id": "mpp-f1-041",
+      "front": "Give examples of the network-based multicore design. Why does it scale better?",
+      "back": "In a **network-based design** each core has its **own cache/local memory**, and the cores are connected by an **on-chip interconnection network**, typically a **2D mesh**. Data moves between cores as messages over the network.\n\n**Examples:**\n- **Intel Teraflop research chip:** **80 cores** in an **8 × 10** mesh configuration.\n- **Tilera TILE-Gx72:** **72 cores** (\"tiles\") in a mesh, with DDR3 memory controllers and I/O (PCIe, network ports) at the edges.\n\n**Why it scales better:** in a shared-bus or crossbar design, all cores compete for the **same bus/shared cache**, which becomes a bottleneck as the number of cores grows. In a mesh, **many links can be used at the same time** and each core mostly talks to its neighbours, so the total bandwidth grows with the number of cores.\n\n**Cost:** the latency between cores depends on the **distance** (number of hops), which is a form of NUMA behaviour, so **locality** matters again.",
+      "sources": [
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 24,
+          "show": true
+        },
+        {
+          "doc": "MPP-F1-ARCH",
+          "page": 19
+        }
+      ]
+    }
+  ]
+}

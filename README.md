@@ -63,7 +63,7 @@ git pull
 
 Then reload the page (no restart needed). Your ratings are kept: they live outside git and are linked to each card's id, so a reworded card keeps its rating. Newly added decks start unticked if you had saved a selection; tick them, or use **Select all**.
 
-There is one deck per lecture (L1–L10, about 315 cards). Answers are based on the slides and past exams, and worked exam problems (search traces, genetic-algorithm calculations, normalization, regression) are included as cards.
+**Applied AI:** there is one deck per lecture (L1–L10, about 315 cards). Answers are based on the slides and past exams, and worked exam problems (search traces, genetic-algorithm calculations, normalization, regression) are included as cards.
 
 The **Past exam questions** deck has one card for every unique question in the past exams (71 cards):
 
@@ -71,6 +71,8 @@ The **Past exam questions** deck has one card for every unique question in the p
 - Each card links to the question in the exam, to the official solution when there is one, and to the slides on that topic.
 - Answers start with **Official solution** (2020 and 2024 exams) or *No official solution exists – suggested answer*.
 - Where an official solution contains a mistake, or an exam question is misprinted, the card says so in a note.
+
+**Multiprocessor Programming:** one deck per lecture (F1, F2, …), added as the course goes on. Cards whose answer is easiest to understand from a diagram open that slide automatically when you show the answer.
 
 ## Your progress
 
@@ -117,7 +119,7 @@ Every deck is one JSON file in `decks/`. New files show up when you reload the p
 
 - **`id`s must stay the same.** Progress is stored per deck id and card id, so you can fix a card's text without losing its rating. Deck ids must be unique across all courses.
 - `front` and `back` support simple Markdown: `**bold**`, `*italic*`, `` `code` ``, `- lists` (indent 2 spaces to nest), `1. numbered`, `| tables |`, `> notes` and code blocks.
-- `sources` refer to documents in `materials.json` (shared by all courses, so document ids must be unique) by `doc` id (`L1`–`L10` for lectures, `EX…` for exams). `page` is the page number in the PDF. An optional `note` is shown next to it, for example `"note": "Question 3c"`.
+- `sources` refer to documents in `materials.json` (shared by all courses, so document ids must be unique) by `doc` id (`L1`–`L10` for lectures, `EX…` for exams). `page` is the page number in the PDF. An optional `note` is shown next to it, for example `"note": "Question 3c"`. Add `"show": true` to a source when its slide has a figure that explains the answer: that slide then opens by itself next to the card when the answer is shown (on screens wide enough to show both; on phones its button is highlighted instead), and `S` opens it.
 - If a deck file has a mistake, the app shows a red box on the start page explaining what's wrong, and still loads the other decks.
 
 To add new material, put the PDF in the course's folder and add an entry to `materials.json`. Applied AI uses `lectures/` and `exams/`; Multiprocessor Programming uses `multiprocessor/lectures/` and `multiprocessor/exams/`. Give each new course its own folder like that, and use document ids that don't clash with other courses (e.g. `MPP-L1`). If the PDF is a handout with several slides per page (like the Multiprocessor Programming `*_4p.pdf` files), split it first so that every slide is its own page: put the handouts in `multiprocessor/lectures/4p-originals/`, run `pip install pypdf` once, then `python3 tools/split_nup.py multiprocessor/lectures/4p-originals/*_4p.pdf`. That writes `Name.pdf` for each `Name_4p.pdf` into `multiprocessor/lectures/` without re-rendering anything; the originals folder is ignored by git. PowerPoint files have to be converted to PDF first; `lectures/LECTURE-4.pdf` is a conversion of `LECTURE-4.pptx`.
