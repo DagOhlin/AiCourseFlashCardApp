@@ -11,3 +11,6 @@ Thumbs.db
 
 # Local Claude Code config
 .claude/
+
+# 4-slides-per-page handouts; tools/split_nup.py makes the one-slide-per-page PDFs that are committed
+*_4p.pdf

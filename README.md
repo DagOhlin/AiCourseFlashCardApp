@@ -120,7 +120,7 @@ Every deck is one JSON file in `decks/`. New files show up when you reload the p
 - `sources` refer to documents in `materials.json` (shared by all courses, so document ids must be unique) by `doc` id (`L1`–`L10` for lectures, `EX…` for exams). `page` is the page number in the PDF. An optional `note` is shown next to it, for example `"note": "Question 3c"`.
 - If a deck file has a mistake, the app shows a red box on the start page explaining what's wrong, and still loads the other decks.
 
-To add new material, put the PDF in the course's folder and add an entry to `materials.json`. Applied AI uses `lectures/` and `exams/`; Multiprocessor Programming uses `multiprocessor/lectures/` and `multiprocessor/exams/`. Give each new course its own folder like that, and use document ids that don't clash with other courses (e.g. `MPP-L1`). PowerPoint files have to be converted to PDF first; `lectures/LECTURE-4.pdf` is a conversion of `LECTURE-4.pptx`.
+To add new material, put the PDF in the course's folder and add an entry to `materials.json`. Applied AI uses `lectures/` and `exams/`; Multiprocessor Programming uses `multiprocessor/lectures/` and `multiprocessor/exams/`. Give each new course its own folder like that, and use document ids that don't clash with other courses (e.g. `MPP-L1`). If the PDF is a handout with several slides per page (like the Multiprocessor Programming `*_4p.pdf` files), split it first so that every slide is its own page: `pip install pypdf`, then `python3 tools/split_nup.py multiprocessor/lectures/*_4p.pdf`. That writes `Name.pdf` next to each `Name_4p.pdf` without re-rendering anything; the `_4p` originals are ignored by git. PowerPoint files have to be converted to PDF first; `lectures/LECTURE-4.pdf` is a conversion of `LECTURE-4.pptx`.
 
 ## Files
 
@@ -133,6 +133,7 @@ web/vendor/pdfjs Mozilla's PDF.js, used to draw the slides (Apache 2.0 license)
 courses.json     the courses shown in the menu
 decks/           flashcard decks (JSON), each belonging to a course
 materials.json   list of the lecture/exam PDFs that cards can link to
+tools/split_nup.py splits handouts with several slides per page (needs pypdf)
 lectures/ exams/ Applied AI course material
 multiprocessor/  Multiprocessor Programming course material (lectures/, exams/)
 data/            your personal progress (created on first use, not in git)

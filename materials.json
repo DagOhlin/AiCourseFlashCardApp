@@ -18,6 +18,12 @@
     { "id": "EX260605", "kind": "exam", "short": "Exam 2026-06-05", "title": "Exam 2026-06-05 (questions)", "file": "exams/260605 DV2618 2210.pdf" },
     { "id": "EX2020S", "kind": "exam", "short": "Exam 2020 sol.", "title": "Exam 2020 – solutions", "file": "exams/Exam_2020_Solution.pdf" },
     { "id": "EX2024S", "kind": "exam", "short": "Exam 2024 sol.", "title": "Exam 2024 – solutions", "file": "exams/Solution - 2024.pdf" },
-    { "id": "EXQ", "kind": "exam", "short": "Exam questions", "title": "Exam question collection", "file": "exams/Exam-Questions.pdf" }
+    { "id": "EXQ", "kind": "exam", "short": "Exam questions", "title": "Exam question collection", "file": "exams/Exam-Questions.pdf" },
+
+    { "id": "MPP-F1-INTRO", "kind": "lecture", "short": "F1 Intro", "title": "F1 – Introduction", "file": "multiprocessor/lectures/F1_Introduction.pdf" },
+    { "id": "MPP-F1-ARCH", "kind": "lecture", "short": "F1 Architecture", "title": "F1 – Parallel Computer Architecture, part 1 (Ch. 2)", "file": "multiprocessor/lectures/F1_Chap2_parallel_computer_architecture_I.pdf" },
+    { "id": "MPP-F2-MODELS", "kind": "lecture", "short": "F2 Prog. models", "title": "F2 – Parallel Programming Models (Ch. 3)", "file": "multiprocessor/lectures/F2_Chap3_Parallel_Programming_Models.pdf" },
+    { "id": "MPP-F3-THREADS", "kind": "lecture", "short": "F3 Threads", "title": "F3 – Threads Programming (Ch. 3 and 6)", "file": "multiprocessor/lectures/F3_Chap3_Threads_programming.pdf" },
+    { "id": "MPP-F3-PTHREADS", "kind": "lecture", "short": "F3 Pthreads", "title": "F3 – Thread Programming with Pthreads (Ch. 6)", "file": "multiprocessor/lectures/F3_Chap6_ThreadProg_pthreads.pdf" }
   ]
 }
