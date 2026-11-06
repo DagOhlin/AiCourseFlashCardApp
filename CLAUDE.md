@@ -19,6 +19,8 @@ A local flashcard app (`start.py`, Python stdlib only, plus `web/`). Courses are
 - **Commit only when the user says so.** Finish the work, verify it, then ask. Commit straight to `main` (no branches/PRs so far). Never push unless asked.
 - **Never delete the user's files.** Move them aside instead (e.g. the 4-up originals went to a subfolder rather than being removed).
 - **Don't change card or deck ids** once committed: progress is keyed on them.
+- **Keep setup and security proportionate.** It's a personal flashcard site: no enterprise layers (e.g. Cloudflare Access). The owner wants one bookmarkable URL that works on any device with no repeat steps.
+- **Server/Docker:** `compose.yaml` runs the app (`--host 0.0.0.0 --lan --share-port 8766`, key from `SHARE_KEY`) plus cloudflared. The tunnel must point at **8766** (key-protected `LanHandler`), never 8765 (`Handler` trusts everyone as the owner). The repo is mounted read-only, `./data` read-write. Test Docker changes in a scratch copy (`git ls-files -co --exclude-standard | rsync --files-from=-`) so the real `data/` isn't touched; reach 8766 with `docker run --rm --network clone_default busybox wget …`.
 - Run the app with the `flashcards` preview config (`.claude/launch.json`, port 8765). Restart it after changing `start.py`; deck/material JSON changes only need a page reload.
 - When testing in the browser, **don't rate cards**. Ratings write to the user's real progress. Flip with Enter, leave with Escape.
 
@@ -52,3 +54,4 @@ The teacher hands out PDFs with **4 slides per page** (`*_4p.pdf`).
 Newest last. One or two lines per entry: what was done, and what's next.
 
 - 2026-11-06: added the `mpp` course, the split tool, the `show` auto-open feature, and decks F1 (41 cards), F2 (47), F3 (49). Next: F4 when its slides arrive (week 46: performance analysis, R&R Chap 4; F5 principles for parallel algorithm design).
+- 2026-11-06: Docker + Cloudflare tunnel setup (`compose.yaml`, `Dockerfile`, `.env.example`, `data/.gitkeep`), new `start.py` flags `--host`, `--share-port`, `--public-url`, env `SHARE_KEY`, `Secure` cookie over HTTPS. Tested locally with a dummy token; not yet run against a real tunnel.

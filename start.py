@@ -40,6 +40,7 @@ COURSES_FILE = ROOT / "courses.json"
 LEVELS = ("not", "partial", "understand")
 DEFAULT_PORT = 8765
 SHARE_COOKIE = "flashcards_key"
+SHARE_KEY_CHARS = set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_")
 
 progress_lock = threading.Lock()
 share = None  # LanShare, created in main()
@@ -405,8 +406,9 @@ class LanHandler(Handler):
 
     def end_headers(self):
         if self.new_cookie:
-            self.send_header("Set-Cookie", "{}={}; Max-Age=31536000; Path=/; SameSite=Strict; HttpOnly".format(
-                SHARE_COOKIE, share.token))
+            secure = "; Secure" if self.headers.get("X-Forwarded-Proto", "").lower() == "https" else ""
+            self.send_header("Set-Cookie", "{}={}; Max-Age=31536000; Path=/; SameSite=Strict; HttpOnly{}".format(
+                SHARE_COOKIE, share.token, secure))
         super().end_headers()
 
     def do_GET(self):
@@ -425,10 +427,10 @@ class LanHandler(Handler):
         super().do_POST()
 
 
-def bind_server(host, port, handler):
-    """Bind to `port`, or the next free one if it is taken."""
+def bind_server(host, port, handler, exact=False):
+    """Bind to `port`, or the next free one if it is taken (unless `exact`)."""
     last_error = None
-    for candidate in range(port, port + 20):
+    for candidate in range(port, port + (1 if exact else 20)):
         try:
             return ThreadingHTTPServer((host, candidate), handler)
         except OSError as e:
@@ -468,14 +470,20 @@ class LanShare:
     127.0.0.1; switching sharing on starts a second server on all network
     interfaces (on its own port) that requires the secret share key."""
 
-    def __init__(self, main_port):
+    def __init__(self, main_port, port=None, key=None, public_url=None):
         self.lock = threading.Lock()
         self.httpd = None
+        # A fixed port (--share-port) is used as given and never moves, so a
+        # tunnel or port forward pointing at it keeps working.
+        self.exact_port = port is not None
+        self.public_url = public_url.rstrip("/") if public_url else None
         settings = read_json(SETTINGS_FILE, {})
         self.token = settings.get("share_token") or secrets.token_urlsafe(12)
-        self.port = settings.get("share_port") or main_port + 1
-        if settings.get("share_token") != self.token:
+        self.port = port or settings.get("share_port") or main_port + 1
+        if settings.get("share_token") != self.token or (port and settings.get("share_port") != port):
             self.save_settings()
+        if key:  # SHARE_KEY from the environment wins, and isn't written to settings
+            self.token = key
 
     def save_settings(self):
         settings = read_json(SETTINGS_FILE, {})
@@ -487,14 +495,17 @@ class LanShare:
             if not self.httpd:
                 return {"enabled": False, "urls": []}
             port = self.httpd.server_address[1]
-        urls = ["http://{}:{}/?key={}".format(ip, port, self.token) for ip in lan_addresses()]
+        if self.public_url:
+            urls = ["{}/?key={}".format(self.public_url, self.token)]
+        else:
+            urls = ["http://{}:{}/?key={}".format(ip, port, self.token) for ip in lan_addresses()]
         return {"enabled": True, "urls": urls}
 
     def set_enabled(self, enabled):
         changed = False
         with self.lock:
             if enabled and not self.httpd:
-                self.httpd = bind_server("0.0.0.0", self.port, LanHandler)
+                self.httpd = bind_server("0.0.0.0", self.port, LanHandler, exact=self.exact_port)
                 threading.Thread(target=self.httpd.serve_forever, daemon=True).start()
                 if self.httpd.server_address[1] != self.port:
                     self.port = self.httpd.server_address[1]
@@ -507,7 +518,7 @@ class LanShare:
                 changed = True
         status = self.status()
         if changed and status["enabled"]:
-            print("  Shared on your network:  {}".format(status["urls"][0] if status["urls"] else "(no network found)"))
+            print("  Shared at:  {}".format(status["urls"][0] if status["urls"] else "(no network found)"))
         elif changed:
             print("  Network sharing is off.")
         return status
@@ -519,25 +530,38 @@ def main():
     parser.add_argument("--port", type=int, default=DEFAULT_PORT, help="port to use (default %(default)s)")
     parser.add_argument("--no-browser", action="store_true", help="don't open a browser tab automatically")
     parser.add_argument("--lan", action="store_true", help="start with sharing on the home network switched on")
+    parser.add_argument("--host", default="127.0.0.1",
+                        help="address for the main server (default %(default)s; use 0.0.0.0 inside Docker)")
+    parser.add_argument("--share-port", type=int, help="fixed port for the shared server (default: port + 1)")
+    parser.add_argument("--public-url", default=os.environ.get("PUBLIC_URL") or None,
+                        help="address the shared server is reached at, e.g. https://cards.example.com "
+                             "(shown as the share link; default: $PUBLIC_URL)")
     args = parser.parse_args()
+
+    share_key = os.environ.get("SHARE_KEY", "").strip() or None
+    if share_key and (len(share_key) < 8 or not set(share_key) <= SHARE_KEY_CHARS):
+        sys.exit("SHARE_KEY must be at least 8 characters, using only letters, digits, - and _.")
 
     mimetypes.add_type("text/javascript", ".js")
     mimetypes.add_type("text/javascript", ".mjs")
     mimetypes.add_type("application/pdf", ".pdf")
 
     try:
-        httpd = bind_server("127.0.0.1", args.port, Handler)
+        httpd = bind_server(args.host, args.port, Handler)
     except OSError as e:
         sys.exit("Could not start the server: {}".format(e))
     port = httpd.server_address[1]
-    share = LanShare(port)
+    share = LanShare(port, port=args.share_port, key=share_key, public_url=args.public_url)
     url = "http://127.0.0.1:{}/".format(port)
     print("")
     print("  Exam Flashcards is running at  {}".format(url))
     print("  Keep this window open while studying. Press Ctrl+C to stop.")
     print("")
     if args.lan:
-        share.set_enabled(True)
+        try:
+            share.set_enabled(True)
+        except OSError as e:
+            sys.exit("Could not start the shared server: {}".format(e))
     if not args.no_browser:
         threading.Timer(0.6, lambda: webbrowser.open(url)).start()
     try:

@@ -53,6 +53,27 @@ The app keeps running on the computer where you started it, and other devices on
 - **Linux:** if the other device can't connect and you use a firewall (e.g. `ufw`), allow the port shown in the link.
 - If the link doesn't work, the dialog may list other addresses for this computer. Try those.
 
+## Run it on a server (reachable from anywhere)
+
+`compose.yaml` runs the app plus a Cloudflare tunnel, so you get one link like `https://cards.example.com/?key=…` that works on any device. The server needs Docker and nothing else; no ports have to be opened.
+
+**Once, in Cloudflare:** create a tunnel (Zero Trust → Networks → Tunnels) and give it a public hostname whose service is `http://flashcards:8766`. Copy the tunnel token.
+
+**Once, on the server:**
+
+```bash
+git clone <this repository> && cd <folder>
+cp .env.example .env    # fill in TUNNEL_TOKEN, SHARE_KEY and PUBLIC_URL
+docker compose up -d
+```
+
+Then bookmark `https://cards.example.com/?key=<your SHARE_KEY>` on each device. `docker compose logs flashcards` prints the full link.
+
+- **New cards:** `git pull` on the server and reload the page. The code is mounted, not copied, so there is nothing to rebuild. After a change to `start.py`, run `docker compose restart flashcards`.
+- **Progress** is saved in `data/` on the server. Back up that folder; copy your old `data/progress.json` into it (before starting) to keep progress from another computer.
+- The link only works with the key; anyone without it gets an error page. To change the key, edit `.env` and run `docker compose up -d`.
+- The server's user must be UID 1000 (the usual first user), or set `APP_UID`/`APP_GID` in `.env`.
+
 ## Getting new and updated cards
 
 Cards are just files in the repository, so to get the latest ones:
@@ -139,7 +160,9 @@ materials.json   list of the lecture/exam PDFs that cards can link to
 tools/split_nup.py splits handouts with several slides per page (needs pypdf)
 lectures/ exams/ Applied AI course material
 multiprocessor/  Multiprocessor Programming course material (lectures/, exams/)
-data/            your personal progress (created on first use, not in git)
+data/            your personal progress (the files in it are not in git)
+compose.yaml     Docker setup for a server: the app + a Cloudflare tunnel
+Dockerfile       (with .env.example: copy to .env and fill in)
 ```
 
 The course slides and exams are included so the slide links work. Keep the repository **private** if you put it on GitHub.

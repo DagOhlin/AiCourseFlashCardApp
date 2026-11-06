@@ -1,0 +1,30 @@
+# Run Exam Flashcards on a server, reachable through a Cloudflare tunnel.
+# Setup: cp .env.example .env, fill it in, then `docker compose up -d`.
+# In the tunnel's public hostname, point the service at http://flashcards:8766
+
+services:
+  flashcards:
+    build: .
+    image: exam-flashcards
+    init: true
+    user: "${APP_UID:-1000}:${APP_GID:-1000}"
+    environment:
+      SHARE_KEY: ${SHARE_KEY:?Set SHARE_KEY in .env}
+      PUBLIC_URL: ${PUBLIC_URL:-}
+    volumes:
+      - ./:/app:ro          # app, decks and PDFs (read-only; update with git pull)
+      - ./data:/app/data    # your progress
+    ports:
+      # The owner page, only reachable from the server itself. The tunnel
+      # uses the key-protected port 8766 over the compose network instead.
+      - "127.0.0.1:8765:8765"
+    restart: unless-stopped
+
+  cloudflared:
+    image: cloudflare/cloudflared:2026.2.0
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:?Set TUNNEL_TOKEN in .env}
+    depends_on:
+      - flashcards
+    restart: unless-stopped

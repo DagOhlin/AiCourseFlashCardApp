@@ -1,5 +1,9 @@
 # Your personal study progress - never shared, so friends who clone start fresh
-data/
+data/*
+!data/.gitkeep
+
+# Server settings for Docker (tunnel token, share key)
+.env
 
 # Editor / OS clutter
 __pycache__/
