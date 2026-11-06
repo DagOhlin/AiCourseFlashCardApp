@@ -2,9 +2,11 @@
 """Split "4 slides per page" handout PDFs into one slide per page.
 
     pip install pypdf
-    python3 tools/split_nup.py multiprocessor/lectures/*_4p.pdf
+    python3 tools/split_nup.py multiprocessor/lectures/4p-originals/*_4p.pdf
 
-Each input "Name_4p.pdf" becomes "Name.pdf" next to it. Nothing is
+Each input "Name_4p.pdf" becomes "Name.pdf". When the input is in a folder
+called "4p-originals" the output goes in the folder above it (so the
+originals stay out of the way), otherwise next to the input. Nothing is
 re-rendered: every output page is the original page with its visible area
 (MediaBox/CropBox) set to one slide, so text stays sharp and selectable and
 the file barely grows.
@@ -28,6 +30,8 @@ except ImportError:
     sys.exit("This tool needs pypdf: pip install pypdf")
 
 logging.getLogger("pypdf").setLevel(logging.ERROR)
+
+ORIGINALS_DIR = "4p-originals"
 
 NUM = rb"(-?\d*\.?\d+)"
 CLIP_RE = re.compile(NUM + rb"\s+" + NUM + rb"\s+" + NUM + rb"\s+" + NUM + rb"\s+re\s+W\b")
@@ -63,9 +67,10 @@ def find_frames(reader):
 
 def split(path):
     src = Path(path)
-    out = src.with_name(re.sub(r"_\d+p$", "", src.stem) + ".pdf")
+    out_dir = src.parent.parent if src.parent.name == ORIGINALS_DIR else src.parent
+    out = out_dir / (re.sub(r"_\d+p$", "", src.stem) + ".pdf")
     if out == src:
-        out = src.with_name(src.stem + "_split.pdf")
+        out = out_dir / (src.stem + "_split.pdf")
     reader = PdfReader(str(src))
     frames = find_frames(reader)
     if len(frames) < 2:
@@ -84,7 +89,7 @@ def split(path):
     with open(out, "wb") as f:
         writer.write(f)
     print("{} -> {}: {} pages -> {} slides ({} per page)".format(
-        src.name, out.name, len(reader.pages), len(writer.pages), len(frames)))
+        src.name, out, len(reader.pages), len(writer.pages), len(frames)))
 
 
 if __name__ == "__main__":
