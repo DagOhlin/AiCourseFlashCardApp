@@ -1,0 +1,698 @@
+{
+  "id": "mpp-f3",
+  "course": "mpp",
+  "name": "F3 · Threads Programming & Pthreads",
+  "description": "Processes vs threads, execution models, synchronization concepts, Pthreads creation, mutexes, deadlocks, condition variables, R/W locks, attributes, cancellation, scheduling",
+  "group": "Lectures",
+  "order": 3,
+  "cards": [
+    {
+      "id": "mpp-f3-001",
+      "front": "What is a process? What happens at a context switch and at fork()?",
+      "back": "A **process** is a **program in execution**. It includes the program code and **all the data needed for the execution**: data on the runtime **stack** and the **heap**, the contents of the **registers**, etc.\n\n- **Own address space:** processes do not share memory with each other.\n- **Context switch:** the processor **changes from one process to another** by saving the state of the running process and loading the state of the next one.\n  - **Multitasking** on one processor: processes take turns using **time slicing**. This is **concurrent but not parallel**.\n  - **Multiprocessor systems:** processes really run at the same time, which is **true parallelism**.\n- **Creation:** with the **`fork()`** call. The **child process gets a copy of the parent's address space** and continues with the **same program after the `fork` call**.\n- **Rating:** creating and managing processes is **relatively time consuming** (copying the address space, kernel involvement, expensive context switches).\n\nThat cost, and the lack of shared memory, is why **threads** are used for parallel programming on multicore processors.",
+      "sources": [
+        {
+          "doc": "MPP-F3-THREADS",
+          "page": 5
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-002",
+      "front": "What are threads, and what are their advantages over processes?",
+      "back": "**Threads** extend the process model: **one process contains several independent flows of computation**. They are flows of computation **of the same program** that run in parallel and **access common variables in shared memory**.\n\n**Advantages:**\n- **Threads share the address space of their process**, so they can **exchange information quickly** by reading and writing shared variables (compared with e.g. sockets between processes).\n- **Fast creation** of threads, since no address space needs to be copied.\n- They can **execute on different processors/cores**, giving **true parallelism**.\n\n**Each thread has its own:** program counter, registers and **runtime stack** (local variables).\n**Shared by all threads of a process:** global data, the heap, program code, open files.\n\n*Programming environments:* **Pthreads**, Java threads, OpenMP, Win32 threads.\n*Drawback:* because everything is shared, **access to shared data must be synchronized**, or race conditions occur.",
+      "sources": [
+        {
+          "doc": "MPP-F3-THREADS",
+          "page": 6
+        },
+        {
+          "doc": "MPP-F3-THREADS",
+          "page": 4
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-003",
+      "front": "What is the difference between concurrency and parallelism?",
+      "back": "**Concurrency:** several flows of computation are **in progress during the same period**, but not necessarily at the same instant. On **one processor** they take turns through **time slicing** (multitasking).\n\n**Parallelism:** several computations **execute at literally the same time** on **different processors/cores**.\n\n*Example:* two threads each summing half of an array.\n- On **1 core** they are **concurrent**: the OS alternates between them every few milliseconds, and the total time is about the same as sequential.\n- On **2 cores** they run **in parallel**, ideally finishing in half the time.\n\n**Why it matters for synchronization:** the **effects of cooperation and coordination can differ** between concurrency and parallelism. A race condition can show up on a multicore machine even if it never appeared on a single core, because the interleavings are different and more frequent. A correct program must therefore be correct for **every possible interleaving**.",
+      "sources": [
+        {
+          "doc": "MPP-F3-THREADS",
+          "page": 5
+        },
+        {
+          "doc": "MPP-F3-THREADS",
+          "page": 12
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-004",
+      "front": "What is the difference between user-level threads and OS-level (kernel) threads?",
+      "back": "**User-level threads**\n- Managed by a **thread library in user space**. **The OS has no knowledge of the threads**, only of the process.\n- ✔ **Fast thread switching** and creation (no system call).\n- ✘ If one thread makes a **blocking call** (e.g. waits for I/O), **the OS stops the whole process**, so **no switch to another thread** of that process is possible.\n- ✘ The OS can't put the threads of one process on different processors, so there is **no true parallelism**.\n\n**OS-level (kernel) threads**\n- **Known to and scheduled by the operating system.**\n- ✔ Different threads of one process can run **on different cores at the same time**.\n- ✔ A blocking thread blocks **only itself**.\n- ✘ Creation and switching are more expensive (kernel calls).\n\nHow user threads are mapped onto OS threads/processes gives the three **thread execution models**: **N:1, 1:1 and N:M**.",
+      "sources": [
+        {
+          "doc": "MPP-F3-THREADS",
+          "page": 6
+        },
+        {
+          "doc": "MPP-F3-THREADS",
+          "page": 7
+        },
+        {
+          "doc": "MPP-F3-THREADS",
+          "page": 8
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-005",
+      "front": "Explain the N:1 thread execution model.",
+      "back": "**N:1 mapping:** all the user threads (**N**) of a process are mapped by a **library scheduler** onto **one OS process (1)**. The **OS scheduler** then assigns OS processes to processors.\n\n*In the figure:* the threads T of Process 1 go through the library scheduler to one OS process (BP), which the OS scheduler places on a processor P.\n\n✔ **Very fast** thread creation and switching, entirely in user space with no kernel involvement.\n✔ Works even if the OS doesn't support threads.\n\n✘ **No true parallelism within a process:** the process runs on only **one processor** at a time, however many threads it has.\n✘ **A blocking system call** (e.g. I/O) by one thread **blocks all the threads** of the process.\n\nThis is the **pure user-level thread** model, e.g. early \"green threads\" in Java. It is useless for speeding up a program on a multicore processor.",
+      "sources": [
+        {
+          "doc": "MPP-F3-THREADS",
+          "page": 7,
+          "show": true
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-006",
+      "front": "Explain the 1:1 thread execution model.",
+      "back": "**1:1 mapping:** **each user thread is mapped to its own OS thread** (BT). The **OS scheduler** assigns the OS threads directly to processors. There is no library scheduler.\n\n*In the figure:* every T in Process 1 and Process n has its own arrow to an OS thread BT, and the OS scheduler maps the BTs to the processors P.\n\n✔ **True parallelism:** the threads of one process can run on **different cores simultaneously**.\n✔ A thread that **blocks** (I/O, waiting) **only blocks itself**, and the others keep running.\n✔ Simple, because the OS does all the scheduling.\n\n✘ Thread creation and switching need **kernel calls**, which is slower than pure user-level threads.\n✘ Very many threads (e.g. 100 000) burden the OS.\n\n**This is what Pthreads uses on Linux (NPTL) and Windows threads use**, so in the labs each `pthread_create` gives a real kernel thread that the OS can place on any core.",
+      "sources": [
+        {
+          "doc": "MPP-F3-THREADS",
+          "page": 8,
+          "show": true
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-007",
+      "front": "Explain the N:M thread execution model.",
+      "back": "**N:M mapping:** a **library scheduler** maps the **N user threads** of a process onto **M OS threads**, and the **OS scheduler** then maps the OS threads onto processors. It is **two-level scheduling**.\n\n*In the figure:* the threads of each process go through a library scheduler to several BTs (OS threads), and the OS scheduler distributes the BTs over the processors.\n\n✔ Combines the advantages: **cheap user-level switching** *and* **true parallelism** (M OS threads can run on M cores).\n✔ Can support a huge number of light-weight threads (N ≫ M).\n✔ A blocking thread can be handled by moving the other user threads to another OS thread.\n\n✘ **Complex to implement**, and the two schedulers can make conflicting decisions (e.g. the library doesn't know when the OS deschedules an OS thread).\n\n*Examples:* **Go goroutines** (many goroutines on a few OS threads), Java virtual threads, older Solaris threads. The Pthreads chapter's \"library scheduler maps user threads to kernel threads\" describes this model.",
+      "sources": [
+        {
+          "doc": "MPP-F3-THREADS",
+          "page": 9,
+          "show": true
+        },
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 49
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-008",
+      "front": "What states can a thread be in, and what causes the transitions?",
+      "back": "**States:** **New**, **Executable** (ready), **Running**, **Waiting** (blocked), **Finished**.\n\n**Transitions:**\n- **new → executable:** **start**. The thread is created and ready to run.\n- **executable → running:** **assign**. The scheduler gives it a processor.\n- **running → executable:** **interrupt**. Its time slice is over, or a higher-priority thread needs the processor.\n- **running → waiting:** **block**. It waits for something, e.g. I/O, a locked mutex, or a condition variable.\n- **waiting → executable:** **wakeup**. The event occurred (the mutex was released, another thread signalled the condition, the I/O finished).\n- **running → finished:** **end**. The thread returns from its start function or calls `pthread_exit`.\n\n**Note:** a woken-up thread goes back to **executable**, not straight to running. It has to be scheduled again first.\n\n*Example:* a thread calls `pthread_mutex_lock` on a locked mutex: running → **waiting**. When the owner unlocks it: waiting → **executable** → (when scheduled) running.",
+      "sources": [
+        {
+          "doc": "MPP-F3-THREADS",
+          "page": 10,
+          "show": true
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-009",
+      "front": "Which data is private to a thread and which is shared? How is the address space organized?",
+      "back": "**Each thread has its own private runtime stack** for its **local data** (local variables, function parameters, return addresses):\n- **Local data of a thread is invisible to the other threads.**\n- The **stack exists as long as the thread exists**.\n- So **special methods are required to pass a return value** (`pthread_exit(value)` / `pthread_join(tid, &value)`), because the thread's stack disappears when it ends.\n\n**Shared by all threads:** **global data**, **heap data** (`malloc`), and the **program code**.\n\n**Address space** (from high addresses to address 0):\n- the stack region for the main thread, then for thread 1, thread 2, …\n- the heap\n- global data\n- the program code\n\n**Pitfall:** never return or pass on a pointer to a local variable of a thread that may already have ended. Its stack is gone. Use `malloc` or global data instead.",
+      "sources": [
+        {
+          "doc": "MPP-F3-THREADS",
+          "page": 11,
+          "show": true
+        },
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 58
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-010",
+      "front": "What is synchronization of threads used for?",
+      "back": "**Synchronization = coordination of threads.** It is used for:\n\n1. **Getting a desired order of execution.** *E.g.* thread B may only use a result after thread A has computed it, or all threads must finish step k before anyone starts step k + 1.\n2. **Designing the access to the shared memory.** *E.g.* only one thread at a time may update a shared counter or linked list.\n\n**Why it's needed:**\n- The **order in which computations execute determines the state of the shared memory**, i.e. which values end up in the shared variables.\n- Synchronization **avoids undesired effects of parallel access** to a shared variable (lost updates, inconsistent data structures).\n- The effects of cooperation and coordination **can differ between concurrency and parallelism**.\n\n**Mechanisms covered:** barrier synchronization, locks (mutexes), condition variables, semaphores and monitors.",
+      "sources": [
+        {
+          "doc": "MPP-F3-THREADS",
+          "page": 12
+        },
+        {
+          "doc": "MPP-F3-THREADS",
+          "page": 13
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-011",
+      "front": "What is barrier synchronization? Give an example where it's needed.",
+      "back": "**Barrier synchronization:** **all participating threads wait for each other**, and **no thread executes an instruction after the synchronization point** until **every** thread has reached it.\n\n**In Pthreads:**\n```c\npthread_barrier_t b;\npthread_barrier_init(&b, NULL, NUM_THREADS);\n...\nfor (k = 0; k < n; k++) {\n    eliminate_my_rows(k);          // each thread: its part of step k\n    pthread_barrier_wait(&b);      // wait until ALL threads are done with step k\n}\n```\n\n*Example, Gaussian elimination (lab 1):* in step k every thread updates its rows using pivot row k. Step k + 1 uses rows that other threads changed in step k, so **no thread may start step k + 1 before everyone has finished step k**. A barrier after each step guarantees this.\n\n*Also:* the `synch()` at the end of the shared-memory matrix-vector multiplication (F2) is a barrier, so no thread uses c before it is complete.\n\n**Cost:** everyone waits for the **slowest** thread, so load imbalance shows up directly as waiting time.",
+      "sources": [
+        {
+          "doc": "MPP-F3-THREADS",
+          "page": 13
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-012",
+      "front": "What is a race condition, a critical section and mutual exclusion?",
+      "back": "**Race condition:** the **result of the parallel execution** of a program fragment by several threads **depends on the relative execution speed** of the threads. Executing it first by T1 and then T2 gives a **different result** than T2 first and then T1, so the behaviour is **non-deterministic**.\n\n**Critical section:** a **program fragment with accesses to shared variables** that may also be **accessed concurrently by other threads**.\n*Example:* `sum += a[i] * b[i];` where `sum` is shared.\n\n**Mutual exclusion:** guarantees that **only one thread at a time** executes the critical section (accesses the variable exclusively). This gives a correct execution order and removes the race.\n- *Methods:* **lock synchronization** (mutexes) and **condition variables**.\n\n```c\npthread_mutex_lock(&m);\nsum += local_sum;        // critical section: one thread at a time\npthread_mutex_unlock(&m);\n```\n\n**Keep critical sections short.** Everything inside them runs sequentially.",
+      "sources": [
+        {
+          "doc": "MPP-F3-THREADS",
+          "page": 14
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-013",
+      "front": "How do locks work? What happens when thread T1 calls lock(s)?",
+      "back": "A **lock variable s** (or **mutex variable**) protects a critical region:\n- **`lock(s)`** is called **before entering** the critical region.\n- **`unlock(s)`** is called **after leaving** it.\n\n**Effect of `lock(s)` for thread T1:**\n- If **no other thread has locked s**, then s is **assigned to T1** (T1 becomes the owner) and T1 continues.\n- If **another thread T2 has locked s**, then **T1 blocks until T2 releases s** by calling `unlock(s)`.\n\n**Important:** race conditions are only avoided if **every** thread follows this convention. A lock does not physically protect the data. A thread that accesses the variable without locking still causes races.\n\n**Realization:** in **Pthreads** (`pthread_mutex_lock` / `pthread_mutex_unlock`), **Java threads** (`synchronized`, `ReentrantLock`) and **OpenMP** (`omp_set_lock`, `#pragma omp critical`).",
+      "sources": [
+        {
+          "doc": "MPP-F3-THREADS",
+          "page": 15
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-014",
+      "front": "What is a condition variable, conceptually?",
+      "back": "With a **condition variable**, a thread **T1 blocks until a specific condition occurs**.\n- **Waking up T1 can only be done by another thread T2** (by signalling the condition variable).\n- **After waking up, T1 tests the condition again**, because it may have changed again (or not hold yet) when T1 gets to run.\n- To **avoid race conditions**, an **additional lock (mutex) variable** is used together with the condition variable. It protects the variables in the condition.\n\n*Example, producer-consumer:* a consumer waits on the condition \"buffer not empty\". When a producer inserts an item, it signals the condition variable, the consumer wakes up, re-checks that the buffer really is non-empty, and takes the item.\n\n**Why not just loop and check?** That would be **busy waiting**: the thread uses CPU time doing nothing useful. A thread blocked on a condition variable uses **no CPU time** until it is woken.",
+      "sources": [
+        {
+          "doc": "MPP-F3-THREADS",
+          "page": 16
+        },
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 20
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-015",
+      "front": "What is a semaphore? Explain P/wait and V/signal and the typical usage pattern.",
+      "back": "A **semaphore** is a structure with an **integer counter s** that can only be accessed by **two atomic operations**:\n- **P(s)** (or **wait(s)**): **waits until s > 0**, then **decrements s by 1** and continues.\n- **V(s)** (or **signal(s)**): **increments s by 1**, which may let a waiting thread continue.\n\n**Typical pattern** (with s initialized to 1):\n```\nwait(s)\ncritical section\nsignal(s)\n```\nWith s = 1 it acts as a **lock** (a *binary semaphore*): the first thread brings s to 0, and the others wait.\n\n**Counting semaphore:** with s initialized to **k**, **at most k threads** can be inside at the same time.\n*Example:* a pool of 3 database connections. With s = 3, the 4th thread blocks in wait(s) until someone calls signal(s).\n\nPOSIX/C: `sem_t`, `sem_init`, `sem_wait`, `sem_post`.\n**Unlike a mutex**, a semaphore has **no owner**: any thread may call signal. That makes it usable for signalling between threads too.",
+      "sources": [
+        {
+          "doc": "MPP-F3-THREADS",
+          "page": 17
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-016",
+      "front": "What is a monitor?",
+      "back": "A **monitor** is a **language construct** that **combines data and the operations that access that data into one structure**:\n- The monitor data can **only be accessed through the monitor operations**.\n- **Only one monitor operation may execute at a time**, so mutual exclusion is automatic.\n\n✔ The programmer can't forget to lock: the **compiler/language enforces** the mutual exclusion.\n\n*Example, Java:*\n```java\nclass Counter {\n    private int value;                          // data, only reachable via methods\n    public synchronized void inc() { value++; }  // one thread at a time\n    public synchronized int get()  { return value; }\n}\n```\n\n**In C with Pthreads** there are no monitors, but you build the same thing by hand: a struct with the data **plus a mutex**, and functions that lock the mutex on entry and unlock it on exit. The thread-safe **linked list** (`list_t` with its own mutex, and `list_insert()`) is exactly this. Condition variables add the ability to wait inside the monitor.",
+      "sources": [
+        {
+          "doc": "MPP-F3-THREADS",
+          "page": 18
+        },
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 16
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-017",
+      "front": "Compare locks, semaphores, condition variables, monitors and barriers.",
+      "back": "| Mechanism | What it does | Typical use |\n|---|---|---|\n| **Lock / mutex** | one thread at a time; has an **owner** who must unlock | protect a critical section |\n| **Semaphore** | counter with atomic **P (wait)** / **V (signal)**, no owner | allow at most k threads; signal events |\n| **Condition variable** | **block until a condition holds**; woken by another thread; used **with a mutex** | wait for \"buffer not empty\" |\n| **Monitor** | **language construct**: data + operations, only one operation at a time | Java `synchronized` classes |\n| **Barrier** | **all threads wait** until all have arrived | separate the phases of an iterative algorithm |\n\n**Relations:**\n- A binary semaphore (initialized to 1) can be used as a lock.\n- A monitor = a lock that is taken automatically around every operation (+ condition variables for waiting).\n- More complex mechanisms (e.g. **reader/writer locks**, barriers) can be **built from mutexes and condition variables**.",
+      "sources": [
+        {
+          "doc": "MPP-F3-THREADS",
+          "page": 13
+        },
+        {
+          "doc": "MPP-F3-THREADS",
+          "page": 15
+        },
+        {
+          "doc": "MPP-F3-THREADS",
+          "page": 16
+        },
+        {
+          "doc": "MPP-F3-THREADS",
+          "page": 17
+        },
+        {
+          "doc": "MPP-F3-THREADS",
+          "page": 18
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-018",
+      "front": "How is a thread created with Pthreads? Explain the parameters of pthread_create.",
+      "back": "When a Pthreads program starts, **one main thread** is active, executing `main()`. More threads are created with:\n\n```c\nint pthread_create(pthread_t *thread,\n                   pthread_attr_t *attr,\n                   void *(*start_routine)(void *),\n                   void *arg);\n```\n- **`thread`:** receives the **thread ID** (TID) of the new thread, used later e.g. for `pthread_join`.\n- **`attr`:** an **attribute object** for the thread's properties. **`NULL` gives the default properties.**\n- **`start_routine`:** the **start function** that the new thread executes. It takes a `void *` and returns a `void *`.\n- **`arg`:** **the parameter passed to the start function**.\n\n**Note:** **only one parameter** can be passed to the start function, so **several parameters must be packed into a single structure** and a pointer to it passed as `arg`.\n\nReturns 0 on success, or an error code.",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 3
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-019",
+      "front": "How does a Pthreads thread terminate, and how do you wait for it with pthread_join?",
+      "back": "**Termination:**\n```c\nvoid pthread_exit(void *valuep);\n```\n- `valuep` = the **return value** handed to the thread that joins it.\n- A thread also **terminates implicitly when it returns from its start function** (the returned pointer is the return value).\n\n**Waiting for another thread:**\n```c\nint pthread_join(pthread_t thread, void **valuep);\n```\n- `thread` = the TID of the thread to wait for.\n- `valuep` = where the **return value** is stored (or `NULL` if you don't need it).\n- **Effect:** the calling thread is **blocked until the specified thread has terminated**.\n\n**Only one thread can wait for the termination of a given thread.** If several call `pthread_join()` on it, only one call succeeds and the others return an error (**ESRCH** according to the slides).\n\n```c\nvoid *result;\npthread_join(tid, &result);   // blocks until tid is done\n```\nThe return value must **not point to the thread's local variables**, because its stack is gone. Use `malloc` or global memory.",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 4
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-020",
+      "front": "How do you pass several parameters to a Pthreads thread? Why is pthread_join necessary in this example?",
+      "back": "Pack the parameters into a **struct** and pass a pointer to it:\n```c\ntypedef struct { int rows, cols; } thrarg_t;\n\nvoid *loopthread(void *arg) {\n    thrarg_t *thrarg = (thrarg_t *) arg;    // cast back\n    for (j = 0; j < thrarg->rows; j++)\n        for (k = 0; k < thrarg->cols; k++)\n            printf(\"loop iteration %d\\t%d\\n\", j, k);\n    return NULL;\n}\n\nint main(void) {\n    pthread_t tid;\n    thrarg_t thrarg;\n    thrarg.rows = 10; thrarg.cols = 20;\n    pthread_create(&tid, NULL, loopthread, &thrarg);\n    pthread_join(tid, NULL);\n}\n```\n\n**Why `pthread_join` is necessary:** `thrarg` is a **local variable of `main`**. The thread only gets a **pointer** to it.\n- If `main` returned without joining, `thrarg` would cease to exist while the thread may still be reading it.\n- **Returning from `main` ends the whole process**, killing the thread before it has finished.\n\nThe join keeps `main` (and `thrarg`) alive until the thread is done.",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 5
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-021",
+      "front": "What race condition occurs when the same argument struct is passed to two threads, and how do you fix it?",
+      "back": "```c\nthrarg_t thrarg;\nthrarg.rows = 10; thrarg.cols = 20;\npthread_create(&tid1, NULL, loopthread, &thrarg);\nthrarg.rows = 20; thrarg.cols = 30;          // overwrites the SAME struct\npthread_create(&tid2, NULL, loopthread, &thrarg);\npthread_join(tid1, NULL); pthread_join(tid2, NULL);\n```\n\n**Problem:** both threads get a **pointer to the same struct**. If the main thread **overwrites `thrarg` before thread 1 has read it**, thread 1 runs with 20 × 30 instead of 10 × 20. Whether this happens **depends on timing**, so it is a **race condition**: it may work in testing and fail later.\n\n**Fix:** give **each thread its own argument struct**, and keep it alive until the thread is done:\n```c\nthrarg_t args[2] = { {10, 20}, {20, 30} };\npthread_create(&tid1, NULL, loopthread, &args[0]);\npthread_create(&tid2, NULL, loopthread, &args[1]);\n```\n(or `malloc` one struct per thread and let the thread `free` it).\n\nTypical in labs: when creating threads in a loop, **don't pass `&i`** (the loop variable changes). Pass `&ids[i]` with a separate array.",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 6
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-022",
+      "front": "Explain the Pthreads matrix multiplication with one thread per element of the result. What are its weaknesses?",
+      "back": "**Idea:** for an 8 × 8 matrix product MC = MA · MB, **create one thread per element MC[r][c]**.\n\n- Each thread gets its own `malloc`-ed **work struct** with `row`, `col` and pointers to MA, MB, MC (one struct per thread avoids the shared-argument race).\n- The thread computes `MC[r][c] = Σᵢ MA[r][i] · MB[i][c]`.\n- `main` creates **SIZE × SIZE = 64 threads** in a double loop, then joins all 64.\n\n**Correct without locks:** every thread **writes a different element** MC[r][c], and MA and MB are **only read**, so there are no conflicting accesses.\n\n**Weaknesses:**\n- **Far too fine-grained:** each thread does only 8 multiply-adds, while creating and joining a thread costs much more. **64 threads on e.g. 4 cores** gives overhead and no benefit.\n  → Better: **p threads, each computing a block of n/p rows**.\n- The `work` structs are never `free`d (a memory leak).\n- On the slide, `pthread_join(thread[row][col])` is **missing its second argument**. It should be `pthread_join(thread[row][col], NULL)`.",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 7
+        },
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 8
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-023",
+      "front": "Why do threads need coordination? Explain the scalar-product race, and how to fix it efficiently.",
+      "back": "The threads of a process **share one address space** and **can be interrupted by the scheduler at any point**, so **race conditions can occur**.\n\n**Example:** two threads compute a scalar product into the shared variable `sum`:\n```c\n// Thread 1                          // Thread 2\nfor (i = 0; i < n/2; i++)            for (i = n/2; i < n; i++)\n    sum += a[i] * b[i];                  sum += a[i] * b[i];\n```\n`sum += …` is load–add–store, and the threads' steps can interleave so that **updates are lost**, giving a wrong result.\n(The slide has Thread 2 start at `n/2+1`. That would also skip element n/2.)\n\n**Slow fix:** lock a mutex around every `sum +=`. This is correct, but the threads then take turns, and with n locks it's slower than sequential.\n\n**Good fix:** accumulate into a **local (private) variable**, and lock only **once per thread**:\n```c\ndouble local = 0;\nfor (i = lo; i < hi; i++) local += a[i] * b[i];\npthread_mutex_lock(&m);\nsum += local;\npthread_mutex_unlock(&m);\n```\n**Pthreads coordination mechanisms:** mutex variables and condition variables.",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 10
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-024",
+      "front": "What is a Pthreads mutex variable, and what protocol guarantees mutual exclusion with it?",
+      "back": "**Mutex variables** are data structures of type **`pthread_mutex_t`**, used to ensure **mutual exclusion**. A mutex is in one of two states: **locked** or **unlocked**.\n\n**Protocol for protecting a shared data structure A:**\n1. **Each data structure A** that can be accessed by several threads gets **its own mutex variable M_A**.\n2. **Before every access to A (read or write)**, the thread **locks M_A**.\n3. **After the access**, the thread **unlocks M_A**.\n\n**Mutual exclusion is only guaranteed if every thread follows this procedure.** The mutex is just a convention. Nothing stops a thread from touching A without locking.\n\n**Reads must also be locked:** otherwise a reader could see the structure **half-updated**, e.g. a linked list in the middle of an insert.\n\n*Granularity choice:* one mutex for a whole list is simple but serializes all accesses. One mutex per element allows more parallelism but is more complex, with a risk of deadlock.",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 12
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-025",
+      "front": "How are Pthreads mutexes initialized, locked and unlocked? What happens to threads that wait for a locked mutex?",
+      "back": "**Initialization** (before the first use):\n```c\npthread_mutex_init(&m, NULL);                      // dynamic, NULL = default attributes\npthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;      // static, with a macro\n```\n\n**Locking: `pthread_mutex_lock(&m)`**\n- If m is **free**, it becomes **locked by the caller**, who continues.\n- If m is **locked**, the caller is **blocked until the owner unlocks it**. **Waiting threads are organized in a queue.**\n\n**Unlocking: `pthread_mutex_unlock(&m)`**\n- If the **queue is empty**, m has **no owner** and becomes **free**.\n- If the **queue is not empty**, **one waiting thread gets control of m** and is removed from the queue. **Which one is decided by priorities / the scheduling algorithm**, so it isn't necessarily the one that waited longest.\n\n**Non-blocking attempt: `pthread_mutex_trylock(&m)`**\n- If m is free, the caller **gets it** (returns 0).\n- If m is locked, the call **fails immediately without blocking** and returns **EBUSY**.\n- Useful e.g. for the back-off strategy against deadlocks, or to do other work instead of waiting.",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 13
+        },
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 14
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-026",
+      "front": "How is a thread-safe sorted linked list implemented with a mutex? Why must the whole search be inside the lock?",
+      "back": "**Data structures:** the list holds its own mutex.\n```c\ntypedef struct _node_t { int index; void *data; struct _node_t *next; } node_t;\ntypedef struct { node_t *first; pthread_mutex_t mutex; } list_t;\n```\n`list_init()` sets `first = NULL` and initializes the mutex.\n\n**`list_insert(newindex, newdata, listp)`:**\n1. `pthread_mutex_lock(&listp->mutex)`\n2. **Walk the list** (`prev`, `curr`) until `curr->index >= newindex`\n3. If the index is **not found**, `malloc` a new node and **link it in** between `prev` and `curr` (or first in the list)\n4. `pthread_mutex_unlock(&listp->mutex)`\n\nSo **`list_insert()` is thread-safe**: any number of threads can call it concurrently.\n\n**Why lock the search too?** The insert position is decided by the search. If another thread inserted or removed a node between our search and our insert, `prev`/`curr` would point to the wrong (or a freed) node, and the list would be corrupted.\n\n**Trade-off:** one mutex for the whole list is simple and safe, but **all list operations are serialized**.",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 16
+        },
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 15
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-027",
+      "front": "How can a deadlock arise with two mutexes, and what are the two solutions?",
+      "back": "**Deadlock example:** two mutexes `ma` and `mb`, and two threads:\n```c\n// T1                              // T2\npthread_mutex_lock(&ma);           pthread_mutex_lock(&mb);\npthread_mutex_lock(&mb);  // waits pthread_mutex_lock(&ma);  // waits\n```\nIf **T1 is interrupted after locking ma**, and **T2 then locks mb**, each thread waits for the mutex the other holds, **forever**.\n\n**Solution 1: locking hierarchy.** **Every thread locks the mutexes in the same order** (e.g. always ma before mb). Then a cycle of waiting threads is impossible.\n\n**Solution 2: back-off strategy with `pthread_mutex_trylock()`.** Each thread may lock in its own order, but using trylock. **If an attempt fails, it unlocks every mutex it has locked so far (backs off)** and then **starts the whole locking procedure again**.\n```c\nfor (;;) {\n    pthread_mutex_lock(&mb);\n    if (pthread_mutex_trylock(&ma) == 0) break;   // got both\n    pthread_mutex_unlock(&mb);                    // back off, retry\n}\n```\nSince a thread never *waits* while holding a lock, there is no deadlock. (Repeated retries can waste time, though.)",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 17
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-028",
+      "front": "Why are condition variables needed? What is wrong with checking a condition repeatedly under a mutex?",
+      "back": "Threads often have to **wait until a condition holds** before they can continue.\n*Example, producer/consumer:* the **consumer** waits on an **empty buffer** until another thread puts in an item, and the **producer** waits on a **full buffer** until an item is removed.\n\n**Mutex-only approach:** protect the variables in the condition with mutexes, and **from time to time** lock them, evaluate the condition, unlock, and try again later if it is false.\n- ✘ The condition may have to be evaluated **very frequently**: **active (busy) waiting** **wastes CPU time** that other threads could use.\n\n**Condition variable approach** (type `pthread_cond_t`), a **signalling mechanism**:\n- If the condition is false, the thread **blocks on the condition variable**.\n- As soon as the condition holds, **another thread wakes it up**.\n- ✔ **No CPU time is used while waiting.**\n\n**What it needs:**\n1. a **condition variable**\n2. a **mutex variable** assigned to the condition variable\n3. a **condition** to evaluate, with **the evaluation protected by the mutex**",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 19
+        },
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 20
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-029",
+      "front": "What does pthread_cond_wait(&c, &m) do exactly?",
+      "back": "**Before calling it,** the thread has **locked m** and tested the condition and found it false.\n\n**`pthread_cond_wait(&c, &m)`:**\n1. The calling thread **blocks, waiting on c**.\n2. **At the same time, and atomically, it releases the mutex m.** Another thread can then lock m, change the condition and send a wake-up signal.\n3. The thread is **only unblocked by a signal from another thread**. Without a signal it **stays blocked forever**.\n4. **When woken up, it automatically tries to lock m again.** If m is taken, it blocks, waiting for m.\n5. When the call returns, the thread **holds m again**.\n\n**Why re-check the condition after waking?** While the thread was waiting to get m back, **another thread may have changed the variables in the condition** (e.g. another consumer took the item first). So the condition must be **re-evaluated** after `pthread_cond_wait` returns, which is why it is always called in a **`while`** loop.\n\n**Initialization:** `pthread_cond_init(&c, NULL)` or `pthread_cond_t c = PTHREAD_COND_INITIALIZER;`",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 22
+        },
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 21
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-030",
+      "front": "What is the typical usage pattern for condition variables, and why is it a while loop and not an if?",
+      "back": "```c\npthread_mutex_lock(&m);\nwhile (!AnyCondition())\n    pthread_cond_wait(&c, &m);\n/* condition holds AND we hold m: do the work */\npthread_mutex_unlock(&m);\n```\n\n**The mutex m protects both the evaluation of the condition and the `pthread_cond_wait()` call.** So **the condition can't change between the test and the start of the wait**. Without that, a signal could arrive in the gap and be lost.\n\n**Requirement:** **all threads must lock m before changing any variable in the condition.**\n\n**Why `while`, not `if`:**\n- After being woken up, the thread must **compete for m** again. Another thread may get m first and **make the condition false again** (e.g. two consumers are woken up but there is only one item).\n- `pthread_cond_broadcast` wakes **all** waiters, but maybe only one can proceed.\n- POSIX also allows **spurious wake-ups** (waking without a signal).\n\nThe `while` loop simply **re-checks** and goes back to waiting if needed.",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 23
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-031",
+      "front": "What is the difference between pthread_cond_signal and pthread_cond_broadcast?",
+      "back": "**`pthread_cond_signal(&c)`:** signals that the condition may have occurred.\n- If **no thread is waiting** on c, it has **no effect** (the signal is not remembered).\n- If threads are waiting, **one of them is woken up**, and it then tries to lock the associated mutex m.\n\n**`pthread_cond_broadcast(&c)`:** wakes up **all** threads waiting on c.\n- Each woken thread tries to lock m, but **at most one succeeds at a time**. The **others block on m** and get it one after another (each then re-checks its condition).\n\n**When to use which:**\n- **signal:** when **any one waiter can handle the event** and only one can proceed. *E.g.* one item was put in the buffer, so wake one consumer.\n- **broadcast:** when **several waiters may be able to proceed**, or the waiters wait for **different conditions** on the same c. *E.g.* in the R/W lock, releasing a write lock lets **all waiting readers** in. Also when a barrier releases everyone.\n\nBroadcast is always *safe* (thanks to the while loop) but may wake threads needlessly.",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 24
+        },
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 35
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-032",
+      "front": "Should pthread_cond_signal be called while holding the mutex or after unlocking it?",
+      "back": "Calls to `pthread_cond_signal()` / `pthread_cond_broadcast()` should only be made **after the thread has evaluated (changed) the condition**, which requires **holding the mutex** for consistency.\n\nThe signal call itself **doesn't have to be protected by the mutex**, but each choice has a consequence:\n\n**Signal while m is locked:**\n- ✘ The woken thread **can't get m right away**. It blocks on m until the signaller unlocks (a small inefficiency).\n- ✔ **Safe:** nothing can happen between changing the condition and signalling.\n\n**Signal after unlocking m:**\n- ✔ The woken thread may get m **directly**, without blocking on it.\n- ✘ **This can lead to race conditions:** between the unlock and the signal, other threads can run. *Example:* another thread sees the condition already satisfied, finishes, and **destroys the condition variable** before the signal is sent.\n\n**Rule of thumb:** change the condition, **signal while holding the mutex**, then unlock.",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 25
+        },
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 27
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-033",
+      "front": "In the numThreads example, SignalCond() decrements numThreads, unlocks the mutex and then signals. What can go wrong, and how is it fixed?",
+      "back": "```c\nvoid SignalCond() {                  // each worker, when it finishes\n    pthread_mutex_lock(&data.m);\n    data.numThreads--;\n    pthread_mutex_unlock(&data.m);\n    pthread_cond_signal(&data.c);    // signal AFTER unlock\n}\nvoid WaitForCond() {                 // control thread\n    pthread_mutex_lock(&data.m);\n    while (data.numThreads > 0)\n        pthread_cond_wait(&data.c, &data.m);\n    pthread_mutex_unlock(&data.m);\n    pthread_cond_destroy(&data.c);\n}\n```\n**Problematic order:**\n1. Worker **T1** runs SignalCond(), decrements numThreads to **0**, unlocks m, and is **interrupted before signalling**.\n2. The control thread **T2** runs WaitForCond(), sees numThreads == 0, **doesn't wait**, and **destroys data.c**.\n3. T1 continues and calls `pthread_cond_signal` on a **destroyed condition variable**: **error**.\n\n**Fix:** move `pthread_cond_signal()` **before** `pthread_mutex_unlock()` in SignalCond(). T2 can't get past the lock (and destroy c) until T1 has both decremented *and* signalled.",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 26
+        },
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 27
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-034",
+      "front": "How can a signal be lost and cause a deadlock with condition variables? How is it avoided?",
+      "back": "If **no thread is waiting** on c when `pthread_cond_signal(&c)` is called, the call **has no effect**, and the runtime system doesn't remember it: **the signal is lost**. If a thread then calls `pthread_cond_wait(&c)` and no further signal comes, it **stays blocked forever: deadlock**.\n\n**Example:** SignalCond() sets the condition **without locking the mutex**:\n```c\nvoid SignalCond() {\n    data.numThreads = 0;            // NOT protected by data.m\n    pthread_cond_signal(&data.c);\n}\n```\n**Problematic order** (numThreads > 0 at first):\n1. T2 (WaitForCond) locks m, tests `numThreads > 0`, which is **true**, and is **interrupted before calling `pthread_cond_wait`**.\n2. T1 sets numThreads = 0 and signals, but **T2 isn't waiting yet**, so the signal is lost.\n3. T2 calls `pthread_cond_wait` and **waits forever**.\n\n**Fix:** **change the variables of the condition only while holding data.m.** Then T1 can't run step 2 between T2's test and T2's wait. Since `pthread_cond_wait` releases m atomically, T1 gets m only once T2 is really waiting.",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 28
+        },
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 29
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-035",
+      "front": "What does pthread_cond_timedwait do?",
+      "back": "```c\nint pthread_cond_timedwait(pthread_cond_t *c, pthread_mutex_t *m,\n                           struct timespec *t);\n```\nLike `pthread_cond_wait`, but **with a time limit**: the blocking on c is **cancelled as soon as the time t has passed**. It then returns **ETIMEDOUT** (after re-locking m).\n\n```c\nstruct timespec {\n    time_t tv_sec;    // seconds\n    long   tv_nsec;   // nanoseconds\n};\n```\n**Important:** t is an **absolute time** (a point in time), **not an interval**. Get the current time with `time()` (`<time.h>`) or `gettimeofday()` (`<sys/time.h>`), and add the timeout:\n```c\nstruct timespec t;\nt.tv_sec = time(NULL) + 5;     // wait at most 5 s from now\nt.tv_nsec = 0;\nwhile (!ready && rc != ETIMEDOUT)\n    rc = pthread_cond_timedwait(&c, &m, &t);\n```\n*Use:* avoid waiting forever, e.g. give up or report an error if a worker doesn't answer in time.",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 30
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-036",
+      "front": "Write a bounded buffer (producer-consumer) with a mutex and two condition variables.",
+      "back": "```c\n#define N 10\nint buf[N], count = 0, in = 0, out = 0;\npthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;\npthread_cond_t not_full  = PTHREAD_COND_INITIALIZER;\npthread_cond_t not_empty = PTHREAD_COND_INITIALIZER;\n\nvoid put(int x) {                       // producer\n    pthread_mutex_lock(&m);\n    while (count == N)                  // full: wait\n        pthread_cond_wait(&not_full, &m);\n    buf[in] = x; in = (in + 1) % N; count++;\n    pthread_cond_signal(&not_empty);    // wake a consumer\n    pthread_mutex_unlock(&m);\n}\n\nint get(void) {                         // consumer\n    pthread_mutex_lock(&m);\n    while (count == 0)                  // empty: wait\n        pthread_cond_wait(&not_empty, &m);\n    int x = buf[out]; out = (out + 1) % N; count--;\n    pthread_cond_signal(&not_full);     // wake a producer\n    pthread_mutex_unlock(&m);\n    return x;\n}\n```\n**Uses everything from the lecture:** the mutex protects the buffer and the conditions, **`while` loops** re-check after waking, the **signal happens while holding the mutex** (no lost signals), and there are **two condition variables**, so producers and consumers wake each other and not their own kind.",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 19
+        },
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 23
+        },
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 24
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-037",
+      "front": "What is a reader/writer lock, and how is it represented with Pthreads primitives?",
+      "back": "**Mutexes and condition variables can be used to build more complex synchronization mechanisms.**\n\n**Reader/writer (R/W) lock:** access control for a data structure where\n- **any number of reads can take place simultaneously**,\n- but **only one write at a time**, and no reads during a write.\n\n✔ **More parallelism** than a plain mutex when the data is **read often and written rarely** (e.g. a lookup table or cache): readers don't block each other.\n\n**Simple implementation:**\n```c\ntypedef struct {\n    pthread_mutex_t m;     // protects the counters\n    pthread_cond_t  c;     // wait here for access\n    int num_r, num_w;      // current read / write permissions\n} rw_lock_t;\n\nint rw_lock_init(rw_lock_t *rwl) {\n    rwl->num_r = rwl->num_w = 0;\n    pthread_mutex_init(&rwl->m, NULL);\n    pthread_cond_init(&rwl->c, NULL);\n}\n```\nPthreads also has a built-in version: `pthread_rwlock_t` with `pthread_rwlock_rdlock` / `pthread_rwlock_wrlock`.",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 32
+        },
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 33
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-038",
+      "front": "How do rw_lock_rlock and rw_lock_wlock work?",
+      "back": "**Read request:** granted only if **no thread has write permission**. Any number of readers is fine.\n```c\nint rw_lock_rlock(rw_lock_t *rwl) {\n    pthread_mutex_lock(&rwl->m);\n    while (rwl->num_w > 0)                       // a writer is active\n        pthread_cond_wait(&rwl->c, &rwl->m);\n    rwl->num_r++;                                // one more reader\n    pthread_mutex_unlock(&rwl->m);\n    return 0;\n}\n```\n\n**Write request:** granted only if **no other thread has read or write permission**.\n```c\nint rw_lock_wlock(rw_lock_t *rwl) {\n    pthread_mutex_lock(&rwl->m);\n    while (rwl->num_w > 0 || rwl->num_r > 0)     // anyone inside\n        pthread_cond_wait(&rwl->c, &rwl->m);\n    rwl->num_w = 1;\n    pthread_mutex_unlock(&rwl->m);\n    return 0;\n}\n```\n**Note:** the mutex `m` is held only **while checking and updating the counters**, not during the actual read/write of the data. That is what lets several readers work at the same time.",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 33
+        },
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 34
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-039",
+      "front": "How are read and write permissions released in the R/W lock, and why can writers starve?",
+      "back": "**Releasing a read permission:**\n```c\nint rw_lock_runlock(rw_lock_t *rwl) {\n    pthread_mutex_lock(&rwl->m);\n    rwl->num_r--;\n    if (rwl->num_r == 0)                 // last reader leaves\n        pthread_cond_signal(&rwl->c);    // wake a waiting writer\n    pthread_mutex_unlock(&rwl->m);\n}\n```\nWhen the **last reader** leaves, a waiting **writer** is woken. **No reader can be waiting** at that point, because readers only wait while a *writer* holds the lock, and a reader held it.\n\n**Releasing a write permission:** wake **all** waiting threads with **broadcast**, since several readers may now enter together:\n```c\nrwl->num_w = 0;\npthread_cond_broadcast(&rwl->c);\n```\n\n**Writer starvation:** this implementation **favours readers**. If reader A holds the lock and writer B waits, **new readers are still let in** (they only check `num_w`). As long as readers keep arriving, `num_r` never reaches 0, so **B may never get to write**.\n*Fix:* also count **waiting writers**, and make new readers wait if a writer is waiting.",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 34
+        },
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 35
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-040",
+      "front": "Which models are used to organize the cooperation of threads in Pthreads programs?",
+      "back": "- **Pipelining model:** an input/output relation between threads. **Thread Tᵢ gets the output of Tᵢ₋₁ as input** and produces data for Tᵢ₊₁. **After the start-up phase all the threads work in parallel** on different data items.\n- **Master-Slave model:** a **master thread controls the execution** of the program, and the **slave threads perform the calculations** it assigns.\n- **Worker model:** **equal worker threads** handle both the coordination and the calculations. There is no master.\n  *Variation:* the calculations to be done are stored in **task pools**, and workers take tasks from the pool (and may add new ones).\n- **Client-Server model:** **client threads generate requests**, and **server threads handle them** by performing the requested computations.\n\n*Pthreads building blocks:* the task pool and pipeline buffers are shared data structures protected by **mutexes**, and threads wait for work with **condition variables** (producer-consumer).",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 37
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-041",
+      "front": "What are thread attribute objects in Pthreads, and what can they control?",
+      "back": "So far `pthread_create()` was called with **`NULL`** as the attribute, giving **default threads**. The behaviour of threads can be changed with an **attribute object** of type `pthread_attr_t`:\n\n```c\npthread_attr_t attr;\npthread_attr_init(&attr);                 // standard attribute values\n/* change attributes with pthread_attr_set...() */\npthread_create(&tid, &attr, f, arg);\n```\n\n**What can be set (examples):**\n- **Release of the return value** (detach state: joinable or detached)\n- **Stack size** of the thread\n- **Start address of the stack**\n- **Termination (cancellation) behaviour**\n- **Scheduling** (priority, method, contention scope)\n\nThe attributes must be set **before** `pthread_create`. Changing the attribute object afterwards doesn't affect threads that already exist.",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 39
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-042",
+      "front": "What is the detach state of a thread? Joinable vs detached.",
+      "back": "The **detachstate** attribute decides what happens to a thread's **return value** when it ends.\n\n**`PTHREAD_CREATE_JOINABLE` (default):**\n- The return value is assumed to be **needed after the thread terminates**, e.g. by `pthread_join()`.\n- The runtime system **keeps the return value** (and thread information) in an internal structure **until some thread successfully calls `pthread_join()`** for it.\n- A joinable thread that is never joined wastes resources (a \"zombie\" thread).\n\n**`PTHREAD_CREATE_DETACHED`:**\n- If the return value **won't be needed**, it is **freed immediately when the thread terminates**. **The thread can't be joined.**\n```c\npthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);\n```\n- This must be set **before creating** the thread (setting it later has no effect).\n- **An already running thread can be detached with `pthread_detach(tid)`.** This returns **EINVAL** if it is already detached.\n\n*Use detached threads for \"fire and forget\" work*, e.g. a server thread handling one client request.",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 40
+        },
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 41
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-043",
+      "front": "How can a thread's stack size and stack address be set? What does the slide's attribute example do?",
+      "back": "**Stack size** (if `_POSIX_THREAD_ATTR_STACKSIZE` is defined, or `sysconf(_SC_THREAD_ATTR_STACKSIZE)` succeeds):\n```c\npthread_attr_getstacksize(&attr, &stacksize);\npthread_attr_setstacksize(&attr, stacksize);   // minimum size in bytes\n```\nThe default minimum depends on the implementation (`PTHREAD_STACK_MIN`). **Portability can be lost**, since not all libraries support changing it.\n*Why change it?* A thread with large local arrays or deep recursion may overflow the default stack.\n\n**Stack start address** (`_POSIX_THREAD_ATTR_STACKADDR`): `pthread_attr_setstackaddr(...)`. **Changing it is dangerous!**\n\n**Example from the slides:**\n```c\npthread_attr_init(&attr);\npthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);\n#ifdef _POSIX_THREAD_ATTR_STACKSIZE\n    pthread_attr_getstacksize(&attr, &stacksize);\n    pthread_attr_setstacksize(&attr, stacksize * 2);   // double the stack\n#endif\npthread_create(&tid, &attr, f, NULL);\npthread_exit(NULL);\n```\nIt creates a **detached** thread with **twice the default stack**. `main` ends with **`pthread_exit`** instead of `return`, so the process keeps running until the detached thread finishes (`return` from main would end the whole process).",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 44
+        },
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 42
+        },
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 43
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-044",
+      "front": "How can one thread cancel another in Pthreads, and what decides when the cancellation happens?",
+      "back": "Threads can terminate each other, e.g. **when one detects that another's computation is redundant** (a parallel search where one thread has found the answer).\n```c\nint pthread_cancel(pthread_t tid);\n```\nThis **starts** the termination of thread tid. **Returning from the call does not mean that tid has already terminated.**\n\n**The behaviour depends on the target's cancellation state and type.** There are three modes:\n1. **No interruptibility:** `pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &old)`. The request is **saved and executed later**, once the thread re-enables cancellation.\n2. **Delayed (deferred) interruptibility:** the default (`PTHREAD_CANCEL_ENABLE`). The thread is terminated **when it reaches a cancellation point**.\n3. **Direct (asynchronous) interruptibility:** the thread can be terminated **at any moment**.\n\n**Why deferred is the default:** a thread killed at an arbitrary point could leave a **mutex locked** or a data structure half-updated. At a cancellation point the state is well-defined.",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 45
+        },
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 46
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-045",
+      "front": "What are cancellation points?",
+      "back": "With deferred cancellation, a thread **checks for a pending cancellation request only at cancellation points**. If a request is there, **the thread terminates**.\n\n**Obligatory cancellation points** (always), e.g. calls to:\n- `pthread_cond_wait()`, `pthread_cond_timedwait()`, `pthread_join()`\n- `pthread_testcancel()`\n- `open()`, `read()`, `write()`, `wait()`\n\n**Optional cancellation points** (implementation dependent): `printf()`, `fprintf()`, `scanf()`, `fscanf()`, `fopen()`, `fclose()`, etc.\n\n**`pthread_testcancel()`** creates an **extra, user-defined cancellation point**. *Example:* a long computation loop without any blocking calls would never be cancelled, so insert one:\n```c\nfor (i = 0; i < huge; i++) {\n    compute(i);\n    if (i % 1000 == 0) pthread_testcancel();   // allow cancellation here\n}\n```",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 47
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-046",
+      "front": "How are Pthreads scheduled, and which scheduling attributes can be influenced?",
+      "back": "**Two levels:** the **user threads** defined by the programmer are mapped to **kernel threads** by the **library scheduler**, and the kernel threads are allocated to **processors** by the **operating system scheduler**.\n\nThe programmer can influence the library scheduler if **`_POSIX_THREAD_PRIORITY_SCHEDULING`** is defined (`<unistd.h>`) or `sysconf(_SC_THREAD_PRIORITY_SCHEDULING)` succeeds.\n\n**Scheduling attributes** are stored in **`struct sched_param`** (`<sched.h>`), which has at least the entry **`int sched_priority`**.\n\n**What can be influenced:**\n- the **priority** of a thread: an integer within a range given by `sched_get_priority_min(policy)` / `sched_get_priority_max(policy)`\n- the **scheduling method** (policy)\n- the **contention scope**: **process** scope (the thread competes only with threads of its own process) or **global/system** scope (it competes with all threads in the system)",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 49
+        },
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 50
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-047",
+      "front": "How does the Pthreads priority scheduler work? Which scheduling methods exist, and how is a priority set?",
+      "back": "**Operation:**\n- The library scheduler keeps **one queue per priority** with all the ready threads of that priority.\n- To run a new thread, it **picks from the non-empty queue with the highest priority**.\n- **Within a queue**, the **scheduling method** decides which thread goes next.\n- **Effect:** **low-priority threads may starve**, since the highest priorities always run first.\n\n**At least 32 priority levels** must be available.\n\n**Scheduling methods** (for threads of the same priority):\n1. **SCHED_FIFO:** first-in-first-out. A thread runs until it blocks or finishes.\n2. **SCHED_RR:** **round robin**. Like FIFO, but with time slices, so threads take turns.\n3. **SCHED_OTHER:** implementation-specific (e.g. the normal time-sharing scheduler).\nThe standard **doesn't specify a default** method.\n\n**Setting a priority:**\n```c\nstruct sched_param sp;\nsp.sched_priority = 10;\npthread_attr_setschedparam(&attr, &sp);\npthread_create(&tid, &attr, f, arg);\n```\n(`pthread_attr_getschedparam` reads it back.)",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 51
+        },
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 52
+        },
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 53
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-048",
+      "front": "How do you make sure that an initialization is executed exactly once? Explain pthread_once.",
+      "back": "Sometimes a task (e.g. **initializing a data structure**) must run **exactly once**, but it isn't known in advance **which thread** will get there first.\n\n**Simple solution:** a **boolean flag, initially FALSE, protected by a mutex**. The first thread to arrive locks the mutex, sees FALSE, sets it to TRUE and performs the task. Later threads see TRUE and skip it.\n\n**Pthreads solution: `pthread_once`**\n```c\npthread_once_t once = PTHREAD_ONCE_INIT;    // control variable\nvoid init_routine(void) { /* the one-time task, no parameters */ }\n...\npthread_once(&once, init_routine);          // may be called by many threads\n```\n**Effect:**\n- **Only the first call** executes `init_routine()`.\n- If another thread is **currently executing** `init_routine()`, a caller **waits until it has finished**.\n- If it has **already finished**, the call **returns immediately**.\n\nSo after `pthread_once` returns, the initialization is **guaranteed to be complete**.",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 55
+        },
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 56
+        }
+      ]
+    },
+    {
+      "id": "mpp-f3-049",
+      "front": "What is thread-specific data, and how is it used with keys in Pthreads?",
+      "back": "**Problem:** you want a variable that **lives as long as the thread** but **belongs to one thread only**. The options:\n- **global variable:** ✘ all threads can access it\n- **pass it as a parameter to every function:** ✘ clumsy, every call needs it\n- **thread-specific data:** ✔ **process-global keys** to which **each thread associates its own value**\n\n**API:**\n- `pthread_key_create(&key, destructor)`: create a key. The **destructor** is called with the thread's value **when the thread terminates**. **Each key may only be created once**, so use `pthread_once`.\n- `pthread_setspecific(key, value)`: store a **pointer** (not the data itself) for **the calling thread only**.\n- `pthread_getspecific(key)`: returns **the value the calling thread stored**.\n- `pthread_key_delete(key)`: remove the key. **The stored data is lost.**\n\n```c\nstatic pthread_key_t key;\nstatic pthread_once_t once = PTHREAD_ONCE_INIT;\nstatic void make_key(void) { pthread_key_create(&key, free); }\n\nchar *my_buffer(void) {            // one buffer per thread\n    pthread_once(&once, make_key);\n    char *b = pthread_getspecific(key);\n    if (!b) { b = malloc(256); pthread_setspecific(key, b); }\n    return b;\n}\n```",
+      "sources": [
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 58
+        },
+        {
+          "doc": "MPP-F3-PTHREADS",
+          "page": 59
+        }
+      ]
+    }
+  ]
+}
