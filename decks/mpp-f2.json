@@ -1,0 +1,673 @@
+{
+  "id": "mpp-f2",
+  "course": "mpp",
+  "name": "F2 · Parallel Programming Models",
+  "description": "Parallelization steps, levels of parallelism, design patterns, data distributions, communication operations and parallel matrix-vector multiplication",
+  "group": "Lectures",
+  "order": 2,
+  "cards": [
+    {
+      "id": "mpp-f2-001",
+      "front": "Models for parallel systems are distinguished by their level of abstraction. Which four kinds of models are there?",
+      "back": "From the lowest to the highest level of abstraction:\n\n1. **Parallel machine models:** the lowest level, a **hardware-related description** of the system (processors, memory, network as built).\n2. **Parallel architectural models:** an **abstraction of the machine models**. They describe the **topology** of the interconnection network, **synchronous or asynchronous** operation of the processors, **SIMD or MIMD**, and the **memory organization** (shared/distributed).\n3. **Parallel computational models:** extend the architectural models so that **algorithms can be constructed and their costs analysed**. *Example:* the **PRAM** (Parallel Random Access Machine): p processors working in synchronous steps on a shared memory where every access costs one time unit.\n4. **Parallel programming models:** describe the parallel system through the **programming language and environment**, i.e. what the programmer sees and can express.\n\nThe course mostly works at level 4: what you can express with Pthreads, MPI or CUDA, and how it maps to the hardware.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 6
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-002",
+      "front": "Which criteria characterize a parallel programming model?",
+      "back": "1. **What kind of parallelism can be used?** Instruction-level, function-level, parallel loops, …\n2. **Must the programmer specify the parallelism, and how?** **Explicit** or **implicit** specification.\n3. **In which way is it specified?** E.g. as **independent tasks managed by task pools**, or as **processes that are created and communicate** with each other.\n4. **How is the execution of the parallel units organized?** **SIMD or SPMD**, **synchronous or asynchronous**.\n5. **How is the information exchange organized?** **Messages** or **shared variables**.\n6. **What kind of synchronization can be used?** Locks, barriers, condition variables, …\n\n*Example, Pthreads:* function-level/loop parallelism, explicit, threads created by the programmer, SPMD and asynchronous, shared variables, with mutexes and condition variables for synchronization.\n*Example, MPI:* explicit, processes, SPMD, messages, with barriers and blocking communication for synchronization.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 7
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-003",
+      "front": "What are the three steps in parallelizing a program? Explain task, process and processor.",
+      "back": "1. **Decomposition (partitioning) of the computations**\n   - Split the algorithm into **tasks** and specify the **task dependencies** (which tasks must wait for which).\n   - A task is any set of computations, plus accesses to **shared variables** (shared memory) or **message exchange** (distributed memory).\n2. **Assignment of tasks to processes**\n   - Each **process** (or thread) executes its tasks **one after another**.\n   - *Aim:* every process does **nearly the same number of computations**, giving good **load balance**.\n   - This assignment is called **scheduling**.\n3. **Mapping of processes to physical processors**\n   - Usually one process per processor/core, done by the OS or runtime system.\n\n**Task** = a unit of work. **Process/thread** = the software entity that executes tasks. **Processor/core** = the hardware that runs the process.\n\n*Example, image filtering:* each row is a task, rows are assigned to 4 threads (scheduling), and the OS runs the 4 threads on 4 cores (mapping).",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 9
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 10
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-004",
+      "front": "What is the granularity of a task, and what is the trade-off between fine and coarse granularity?",
+      "back": "**Granularity** = the **number of computations performed by a task** (its size).\n\n**Fine-grained** (many small tasks), e.g. one task per matrix element:\n- ✔ lots of parallelism, and easy to get **good load balance**\n- ✘ **high overhead**: creating, scheduling and synchronizing many tasks, and more communication relative to the computation\n\n**Coarse-grained** (few large tasks), e.g. one task per block of 1000 rows:\n- ✔ **low overhead**, little communication per computation\n- ✘ less parallelism, and a risk of **load imbalance** (one big task finishing late holds everyone up)\n\n**The right granularity depends on the platform:** instruction-level parallelism is the finest (handled by the hardware), GPUs handle very fine-grained data parallelism (one thread per element), while multicore threads and especially clusters need coarser tasks because the overhead per task is larger.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 9
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 12
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-005",
+      "front": "Which levels of parallelism are distinguished in the parallel programming models lecture?",
+      "back": "Depending on the level considered, the tasks have different **granularity**:\n\n1. **Instruction-level parallelism:** multiple **machine instructions** are executed in parallel (superscalar/pipelined processors). Limited by **data dependencies**.\n2. **Data parallelism:** the **same operation on multiple data elements** in parallel (SIMD), e.g. `a(1:n) = b(0:n-1) + c(1:n)`. In MIMD it is often expressed as **SPMD**.\n3. **Loop parallelism:** the **iterations of a loop** are executed in parallel (`forall`, `doall`, `dopar`, `#pragma omp parallel for`).\n4. **Functional (task) parallelism:** the program is divided into **independent tasks** (functions) with dependencies described by a **task graph**, scheduled statically or dynamically.\n\nFrom finest to coarsest: instruction-level → data/loop → functional.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 12
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-006",
+      "front": "Define flow dependency, anti-dependency and output dependency between two instructions I1 and I2.",
+      "back": "Data dependencies **limit the parallel execution** of instructions.\n\n- **Flow dependency** (also called *true dependency*) **I1 → I2:** I1 **computes a result** in a register/variable, which I2 then **uses as an operand**. (Read after write)\n  `I1: R1 ← A` then `I2: R2 ← R2 + R1`\n- **Anti-dependency I1 → I2:** I1 **uses** a register/variable **as an operand**, which I2 later uses **to store a result**. (Write after read)\n  `I1: R2 ← R2 + R1` then `I2: R1 ← R3`\n- **Output dependency I1 → I2:** I1 and I2 **both store a result** in the same register/variable. (Write after write)\n  `I1: R1 ← A` then `I2: R1 ← R3`\n\n**Only the flow dependency is real data flow.** Anti- and output dependencies come from **reusing the same name**, and they disappear if the second instruction writes to another register instead (**register renaming**).",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 13
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 14
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-007",
+      "front": "Find all data dependencies in: I1: R1 ← A · I2: R2 ← R2 + R1 · I3: R1 ← R3 · I4: B ← R1",
+      "back": "| Dependency | Type | Why |\n|---|---|---|\n| **I1 → I2** | **flow** (δᶠ) | I1 writes R1, I2 reads R1 |\n| **I1 → I3** | **output** (δᵒ) | both write R1 |\n| **I2 → I3** | **anti** (δᵃ) | I2 reads R1, then I3 overwrites R1 |\n| **I3 → I4** | **flow** (δᶠ) | I3 writes R1, I4 reads it |\n| **I2 → I2** | **anti** (δᵃ) | I2 reads R2 and writes R2 itself |\n\nThe slide's graph also has a flow edge **I1 → I4** (I4 reads R1, which I1 wrote). However, I3 overwrites R1 in between, so the value I4 actually gets comes from I3.\n\n**Consequences:**\n- I3 must not run before I2 has read R1 (anti), and must write R1 after I1 does (output).\n- With **renaming** (I3 writes R5 instead of R1, and I4 reads R5), the anti and output dependencies disappear. I3 can then run in parallel with I1/I2, and only the flow dependencies remain.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 14,
+          "show": true
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 13
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-008",
+      "front": "What is data parallelism? What does a(1:n) = b(0:n−1) + c(1:n) mean?",
+      "back": "**Data parallelism:** special constructs that perform **the same operation on multiple data elements in parallel** (also called SIMD style).\n\n`a(1:n) = b(0:n−1) + c(1:n)` is an **array assignment**. For all i = 1…n at once:\n\n```\nfor (i = 1:n)\n    a(i) = b(i-1) + c(i)\nendfor\n```\n\n**Careful:** with array semantics the **whole right-hand side is evaluated before anything is assigned**. That matters when the same array is on both sides. *Example*, starting from a = (a0, a1, a2, a3) = (0, 0, 0, 0):\n- `a(1:3) = a(0:2) + 1` gives **(0, 1, 1, 1)**, because it uses the old values.\n- A sequential loop `a(i) = a(i-1) + 1` gives **(0, 1, 2, 3)**, because each iteration sees the previous update.\n\nData parallelism suits GPUs and vector units (SSE/AVX), where one instruction handles many elements.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 15
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-009",
+      "front": "How is data parallelism used in MIMD machines with SPMD? Explain the dot-product example.",
+      "back": "In **SPMD (Single Program, Multiple Data)**, **one program runs on all processors**, and each processor works on **its own part of the data**. In practice **most parallel programs are SPMD**.\n\n```c\nlocal_size  = size / p;\nlocal_lower = me * local_size;\nlocal_upper = (me + 1) * local_size - 1;\nlocal_sum = 0;\nfor (i = local_lower; i <= local_upper; i++)\n    local_sum += x[i] * y[i];\nReduce(&local_sum, &global_sum, 0, SUM);\n```\n- `me` = this processor's id (0 … p−1), `p` = the number of processors.\n- Each processor computes the dot product of **its own block** of x and y.\n- **Reduce** adds all `local_sum` values together into `global_sum` on processor **0** (a single accumulation).\n\n*Example:* size = 1000, p = 4. Processor me = 2 handles i = 500 … 749.\n(The code assumes `size` is divisible by `p`. Otherwise the last processor must also take the remaining elements.)",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 16
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-010",
+      "front": "Loop parallelism: what do for, forall and dopar give for a(i)=a(i)+1; b(i)=a(i−1)+a(i+1), i = 1…4, with a(0…5) = 1…6?",
+      "back": "Start: a(0)…a(5) = 1, 2, 3, 4, 5, 6\n\n| | **for** | **forall** | **dopar** |\n|---|---|---|---|\n| b(1) | 4 | 5 | 4 |\n| b(2) | 7 | 8 | 6 |\n| b(3) | 9 | 10 | 8 |\n| b(4) | 11 | 11 | 10 |\n\n- **for** (sequential): iteration i sees the updates from earlier iterations. *E.g.* b(2) = a(1) + a(3) = **3** (new) + 4 (old) = 7.\n- **forall:** **each statement is executed for all i before the next statement starts.** All a(i) are incremented first (a = 1,3,4,5,6,6), then b(i) uses the **new** values. *E.g.* b(2) = 3 + 5 = 8.\n- **dopar:** **each iteration runs independently** on its own copy, so the other iterations' updates are **not visible**. Only the old values are used. *E.g.* b(2) = 2 + 4 = 6.\n\n**Lesson:** parallel loop constructs (forall, doall, dopar, …) **can have different semantics**, so check what the language means.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 17,
+          "show": true
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-011",
+      "front": "What is functional (task) parallelism? What is a task graph, and how are tasks scheduled?",
+      "back": "**Functional parallelism** (task parallelism): the program is **divided into independent tasks** (functions, code blocks) that can run in parallel.\n\n- The tasks and their dependencies are represented as a **task graph**: **nodes = tasks**, **edges = dependencies** (a task can start only when its predecessors are done).\n- Tasks can **run in parallel as long as their dependencies are respected**.\n- **Scheduling** onto processors:\n  - **Static:** decided **before execution** (by the compiler/programmer). No runtime overhead, but it needs good estimates of task times.\n  - **Dynamic:** decided **at runtime**, when processors become free. It adapts to varying task times. A **task pool** is a popular model for this.\n\n*Example:* `make -j8` building a program. Each source file is a task, and linking depends on all of the compile tasks. Independent files compile in parallel on 8 cores, and the linker waits until they are all done.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 18,
+          "show": true
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-012",
+      "front": "Which parallel design patterns (ways of coordinating threads) are presented?",
+      "back": "**Parallel design patterns** = structures for **coordinating the threads/tasks** of a program:\n\n- **Creation of threads:** static or dynamic\n- **Fork-Join:** a thread creates child threads and waits for them\n- **Parbegin-Parend:** a structured block where all statements run in parallel\n- **SPMD and SIMD:** the same program/instruction on different data\n- **Master-Slave (Master-Worker):** one thread controls the work of workers\n- **Client-Server:** clients send requests that a server handles\n- **Pipelining:** threads in a chain, each one's output is the next one's input\n- **Taskpools:** a shared pool of tasks that a fixed set of threads executes\n- **Producer-Consumer:** producers put data into a shared buffer and consumers take it out\n\nA real program often combines several, e.g. SPMD worker threads that take jobs from a task pool, with a fork-join at the start and end.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 19
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-013",
+      "front": "What is the difference between static and dynamic thread creation?",
+      "back": "**Static thread creation**\n- A **fixed number** of processes/threads is created **at program start**.\n- All of them **exist during the entire execution** and are terminated when the program finishes.\n- *Example:* an MPI program started with `mpirun -np 8` has 8 processes from start to end, or a Pthreads program that creates one thread per core at the start.\n- ✔ simple, with no creation overhead during the run ✘ the amount of parallelism can't adapt\n\n**Dynamic thread creation**\n- Threads can be **created and terminated at arbitrary points at run time**.\n- *Example:* a parallel **quicksort** that creates a new thread for one half after each partition step, or a server that creates a thread per incoming request.\n- ✔ adapts to the problem (e.g. recursive algorithms) ✘ creation overhead, and there is a risk of creating far more threads than there are cores\n\n*Middle ground:* create a fixed set of threads statically and give them work dynamically through a **task pool**.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 20
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-014",
+      "front": "Explain the Fork-Join pattern, with a Pthreads example.",
+      "back": "**Fork-Join:** an existing thread **T1 creates (forks)** a second thread T2, or a group of threads, which run in parallel with it. Later T1 **waits (joins)** until they have finished, and then continues.\n\n- **Arbitrary nesting:** a forked thread can itself fork new threads (e.g. recursive divide-and-conquer).\n- The details differ between programming languages and environments.\n\n```c\npthread_t t[4];\nfor (i = 0; i < 4; i++)                       // fork\n    pthread_create(&t[i], NULL, work, &arg[i]);\n/* main thread can do its own work here */\nfor (i = 0; i < 4; i++)                       // join\n    pthread_join(t[i], NULL);\n/* all four results are now available */\n```\n\n*Nested example:* parallel quicksort. After partitioning, fork a thread for the left half, sort the right half yourself, then join.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 21
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-015",
+      "front": "What is Parbegin-Parend, and how does it differ from Fork-Join?",
+      "back": "**Parbegin-Parend:** a **structured** way to create threads. **Several threads are created and destroyed together.**\n\n```\nparbegin\n    S1;  S2;  S3;      // each statement runs in its own thread\nparend\nS4;                    // runs only after S1, S2 and S3 are all done\n```\n\n- The statements between `parbegin` and `parend` are mapped to **separate threads**.\n- The statements after `parend` run only **after all the extra threads have finished**.\n- Whether they *actually* run in parallel depends on the implementation (e.g. the number of cores).\n- *Example in OpenMP:* **parallel sections**\n```c\n#pragma omp parallel sections\n{\n  #pragma omp section\n  computeA();\n  #pragma omp section\n  computeB();\n}   // implicit wait for both\n```\n\n**Difference from Fork-Join:** Fork-Join can create and wait for threads at **arbitrary points** (unstructured). Parbegin-Parend is a **block**: everything starts at the beginning and ends together at the end, which is easier to reason about.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 22
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-016",
+      "front": "What is the difference between SPMD and SIMD?",
+      "back": "In both, **all threads execute the same program but on different data**.\n\n**SIMD (Single Instruction, Multiple Data)**\n- **Synchronous**: all threads execute **the same instruction at the same time** (lockstep).\n- This is **data parallelism in the strict sense**.\n- *Examples:* AVX vector instructions. A GPU warp (32 threads executing one instruction together).\n\n**SPMD (Single Program, Multiple Data)**\n- **Asynchronous**: at a given moment, **different threads can be executing different statements** of the program.\n- Threads can take different branches depending on their id or data, and only meet at synchronization points.\n- *Examples:* MPI programs, and a Pthreads program where all threads run the same `work()` function on different rows.\n\n```c\nif (me == 0) read_input();   // only thread 0 does this: fine in SPMD,\ncompute(my_part);            // in strict SIMD the others would idle\n```",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 23
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-017",
+      "front": "Compare the Master-Slave (Master-Worker) pattern with the Client-Server model.",
+      "back": "**Master-Slave / Master-Worker**\n- **One single thread (the master) controls the whole computation** of the program.\n- It creates mostly **similar worker (slave) threads** and **assigns computations** to them, then collects the results.\n- *Example:* rendering an image. The master splits it into tiles, hands each tile to a free worker, and assembles the picture.\n\n**Client-Server model**\n- **Several client threads send requests to a server thread**, and the **server handles the requests concurrently** (in parallel).\n- *Extensions:* several server threads, or threads that are **both client and server** (e.g. multi-tier systems).\n- *Example:* a web server or database server answering many users at once.\n\n**Key difference:** in master-worker **the master drives the work** (it decides what each worker does and when). In client-server **the clients initiate** the requests and the server just responds to whatever arrives.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 24
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-018",
+      "front": "Explain the Pipelining pattern. How can it give parallelism despite data dependencies?",
+      "back": "**Pipelining:** threads **T1, …, Tn are logically ordered**.\n- **T1** gets its input from other parts of the program.\n- **Ti gets the output of Ti−1 as input**, computes its own output, and passes it to **Ti+1**.\n- **Tn** delivers its output to other parts of the program.\n\n**Parallelism despite data dependencies:** each stage depends on the previous stage's result **for the same data item**, so one item can't be processed in parallel. But with a **stream** of items, **the stages work on different items at the same time**.\n\n*Example, video processing with 3 stages:*\n| Time | T1: read | T2: decode | T3: filter |\n|---|---|---|---|\n| 1 | frame 1 | – | – |\n| 2 | frame 2 | frame 1 | – |\n| 3 | frame 3 | frame 2 | frame 1 |\n\nFrom step 3 on, all three threads are busy, and **one frame is finished per step**.\nThe **slowest stage** decides the throughput, so the stages should take about the same time.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 25
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-019",
+      "front": "What is a task pool, and why is it a good way to schedule tasks dynamically?",
+      "back": "**Task pool:** a **data structure that manages program parts in the form of tasks (functions)** waiting to be executed.\n\n- A **fixed number of threads** repeatedly **take a task out** of the pool and execute it.\n- While executing, a thread can **put new tasks into** the pool.\n- The program ends when the pool is empty and all threads are idle.\n- Access to the pool must be **synchronized** (e.g. protected by a mutex), since several threads use it at once.\n\n**Why it's good:**\n- **Dynamic load balancing:** a thread that finishes early simply takes the next task, so no thread sits idle while others still have work.\n- **No thread creation per task:** the threads are created once (statically), and only the cheap tasks are dynamic.\n- Works well when task sizes vary or are unknown in advance.\n\n*Example:* parallel **quicksort**. Each partition step puts two new subarray tasks into the pool, and 4 threads keep taking subarrays until everything is sorted.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 26
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 18
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-020",
+      "front": "Explain the Producer-Consumer pattern.",
+      "back": "**Producer threads create data** and **consumer threads use the data**. They communicate through a **common data structure of fixed size** (a **bounded buffer** or queue).\n\n```\nproducer:  while (more) { x = produce(); put(buffer, x); }\nconsumer:  while (true) { x = get(buffer); consume(x); }\n```\n\n**Synchronization is needed:**\n- Only one thread at a time may modify the buffer (**mutual exclusion**, a lock).\n- A producer must **wait when the buffer is full**.\n- A consumer must **wait when the buffer is empty**.\n(In Pthreads: a mutex plus **condition variables**, covered in the threads lectures.)\n\n*Example:* one thread reads log lines from disk (producer) into a queue of 100 entries, and 4 threads parse them (consumers). The buffer decouples their speeds: if the disk is briefly slow, the consumers keep working on what is already in the buffer.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 26
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-021",
+      "front": "What is data distribution, and what does it mean on distributed vs shared memory?",
+      "back": "**Data distribution** (data decomposition, data partitioning): the **data is partitioned into smaller pieces** that are **assigned to the processors**, and each processor computes on its own piece.\n\n- **Distributed memory:** the data assigned to a processor is **stored in its local memory**, and **only that processor (the owner)** can access it. Others need communication to get it.\n- **Shared memory:** all data stays in the **same shared memory**. The distribution only decides **which processor accesses which part**, so processors access different data and there are **no access conflicts**.\n\n**Choices covered:**\n- **1D arrays:** blockwise, cyclic, block-cyclic\n- **2D arrays:** distributing in only one dimension (rows or columns: blockwise, cyclic, block-cyclic), or in both dimensions (**checkerboard**: blockwise, cyclic, block-cyclic)\n\nA good distribution gives **balanced work** and **little communication**.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 28
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-022",
+      "front": "Explain the blockwise data distribution of a 1D array. Distribute n = 14 elements over p = 4 processors.",
+      "back": "**Blockwise distribution:** the array v = (v₁, …, vₙ) is split into p blocks of **⌈n/p⌉ consecutive elements**.\n- Block j (for 1 ≤ j < p) contains the indices **(j − 1)·⌈n/p⌉ + 1, …, j·⌈n/p⌉**.\n- The **last block p** gets the rest, from (p − 1)·⌈n/p⌉ + 1 up to n.\n- Block j is assigned to processor Pⱼ.\n\n**Example, n = 14, p = 4:** ⌈14/4⌉ = 4\n- P1: v1, v2, v3, v4\n- P2: v5, v6, v7, v8\n- P3: v9, v10, v11, v12\n- P4: v13, v14 (only 2, since the last block takes what is left)\n\n✔ Each processor has a **contiguous** piece: good **locality**, and few neighbours to communicate with (e.g. in stencil computations only the block borders are needed).\n✘ **Load imbalance** if the work per element isn't uniform (e.g. if the later elements need more computation).",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 29
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-023",
+      "front": "Explain the cyclic data distribution of a 1D array. Distribute n = 14 elements over p = 4 processors.",
+      "back": "**Cyclic distribution:** elements are dealt out **round robin**, like cards.\n- **vᵢ is assigned to processor P₍₍ᵢ₋₁₎ mod p₎₊₁**\n- Pⱼ owns j, j + p, j + 2p, … If n mod p ≠ 0, the first n mod p processors get ⌈n/p⌉ elements and the rest get one fewer. Otherwise all get n/p.\n\n**Example, n = 14, p = 4** (14 mod 4 = 2, so P1 and P2 get 4 elements and P3 and P4 get 3):\n- P1: v1, v5, v9, v13\n- P2: v2, v6, v10, v14\n- P3: v3, v7, v11\n- P4: v4, v8, v12\n\n✔ **Good load balance** even when the work per element changes along the array, because every processor gets elements from all parts of it. *Example:* Gaussian elimination, where the first rows stop being used early. With blocks, P1 would become idle.\n✘ **Poor locality:** neighbouring elements belong to different processors, so neighbour computations need a lot of communication.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 30
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-024",
+      "front": "What is a block-cyclic data distribution, and why use it?",
+      "back": "**Block-cyclic distribution** combines the blockwise and cyclic distributions:\n1. Split the array into **blocks of size b** (usually **b ≪ n/p**).\n2. Distribute the **blocks cyclically** (round robin) to the processors P1, …, Pp.\n\n**Example from the slide:** n = 12, b = 2, p = 4:\n| Elements | 1–2 | 3–4 | 5–6 | 7–8 | 9–10 | 11–12 |\n|---|---|---|---|---|---|---|\n| Processor | P1 | P2 | P3 | P4 | P1 | P2 |\n\n**Why:** it is a compromise between the two others.\n- From **cyclic**: every processor gets parts from all over the array, so there is **good load balance**.\n- From **blockwise**: neighbouring elements are often on the same processor, so there is **better locality and fewer, larger messages**.\n\n**Special cases:** b = 1 gives the **cyclic** distribution, and b = ⌈n/p⌉ gives the **blockwise** one.\nLibraries such as ScaLAPACK use block-cyclic distributions for dense linear algebra.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 31,
+          "show": true
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-025",
+      "front": "Distribute n = 10 elements over p = 3 processors: blockwise, cyclic, and block-cyclic with b = 2.",
+      "back": "**Blockwise:** ⌈10/3⌉ = 4\n- P1: v1, v2, v3, v4\n- P2: v5, v6, v7, v8\n- P3: v9, v10\n\n**Cyclic:** vᵢ → P₍₍ᵢ₋₁₎ mod 3₎₊₁ (10 mod 3 = 1, so only P1 gets 4 elements)\n- P1: v1, v4, v7, v10\n- P2: v2, v5, v8\n- P3: v3, v6, v9\n\n**Block-cyclic, b = 2:** the blocks {1,2} {3,4} {5,6} {7,8} {9,10} are dealt to P1, P2, P3, P1, P2\n- P1: v1, v2, v7, v8\n- P2: v3, v4, v9, v10\n- P3: v5, v6\n\n*Check with the formula:* in the cyclic distribution, v8 → (8 − 1) mod 3 + 1 = 1 + 1 = **P2** ✓",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 29
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 30
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 31
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-026",
+      "front": "Distributing a 2D array in only one dimension: what are blockwise, cyclic and block-cyclic columnwise (or rowwise) distributions?",
+      "back": "The matrix is split **along one dimension only**, by whole columns (or whole rows).\n\n- **Blockwise columnwise:** each processor gets a **block of contiguous columns** of equal size, and block i goes to Pᵢ.\n  *4×8 matrix, p = 4:* P1 columns 1–2, P2 columns 3–4, P3 columns 5–6, P4 columns 7–8.\n- **Cyclic columnwise:** the columns are dealt **round robin**.\n  *8 columns, p = 4:* P1 P2 P3 P4 P1 P2 P3 P4, so P1 gets columns 1 and 5.\n- **Block-cyclic columnwise:** **blocks of contiguous columns** are dealt out cyclically.\n  *12 columns, block size 2, p = 4:* P1 P2 P3 P4 P1 P2, so P1 gets columns 1–2 and 9–10.\n\nThe **rowwise** variants work the same way with rows. The choice follows the algorithm: e.g. the **row-wise blockwise** distribution is natural for matrix-vector multiplication with scalar products, because each processor then owns complete rows.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 32,
+          "show": true
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 33
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-027",
+      "front": "What is a checkerboard distribution? Explain the blockwise checkerboard distribution.",
+      "back": "**Checkerboard distribution:** the processors are arranged in a **virtual mesh of size p₁ × p₂ = p**, and the array (n₁ × n₂) is distributed **along both dimensions**: blockwise, cyclic or block-cyclic.\n\n**Blockwise checkerboard:**\n- The array is split into **p₁ × p₂ blocks**.\n- Block (i, j) contains the elements (k, l) with\n  k = (i − 1)·⌈n₁/p₁⌉ + 1, …, i·⌈n₁/p₁⌉ and\n  l = (j − 1)·⌈n₂/p₂⌉ + 1, …, j·⌈n₂/p₂⌉\n- **Block (i, j) goes to processor (i, j)** in the processor grid.\n\n*Example, 4×8 matrix on a 2×2 mesh:* P1 gets rows 1–2 × columns 1–4, P2 rows 1–2 × columns 5–8, P3 rows 3–4 × columns 1–4, P4 rows 3–4 × columns 5–8.\n\n**Why 2D?** Each processor's block is closer to a square, so it has **less border relative to its area**. For many matrix algorithms (e.g. matrix multiplication) each processor then needs to communicate with fewer processors and less data than with a 1D (row or column) distribution.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 35,
+          "show": true
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 34
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-028",
+      "front": "Explain the cyclic checkerboard distribution.",
+      "back": "**Cyclic checkerboard:** elements are dealt **round robin in both dimensions** over the p₁ × p₂ processor mesh.\n\n- **Element (k, l) goes to the processor at mesh position ((k − 1) mod p₁ + 1, (l − 1) mod p₂ + 1).**\n- The processor at position (i, j) owns all elements (k, l) with k = i + s·p₁ and l = j + t·p₂, for 0 ≤ s < n₁/p₁ and 0 ≤ t < n₂/p₂.\n\n*Example, 4×8 matrix on a 2×2 mesh* (P1 = (1,1), P2 = (1,2), P3 = (2,1), P4 = (2,2)): the odd rows alternate **P1 P2 P1 P2 …** and the even rows alternate **P3 P4 P3 P4 …**, like a fine checkerboard where every element switches owner.\n✔ Very **even load** even if the work is concentrated in one part of the matrix (e.g. a triangular region).\n✘ Every neighbour of an element belongs to another processor, so there is **much communication** for neighbour-based computations.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 36,
+          "show": true
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-029",
+      "front": "Explain the block-cyclic checkerboard distribution and its special cases.",
+      "back": "**Block-cyclic checkerboard:**\n1. Split the array into **blocks of size b₁ × b₂**.\n2. **Element (m, n) belongs to block (k, l)** with k = ⌈m/b₁⌉ and l = ⌈n/b₂⌉.\n3. **Block (k, l) goes to the processor at mesh position ((k − 1) mod p₁ + 1, (l − 1) mod p₂ + 1)**, i.e. the blocks are dealt cyclically over the mesh.\n\n*Example, 4×12 matrix, 2×2 blocks, 2×2 mesh:* rows 1–2 are split into 2-column blocks owned **P1 P2 P1 P2 P1 P2**, and rows 3–4 into blocks owned **P3 P4 P3 P4 P3 P4**. So it is the cyclic checkerboard pattern, but with 2×2 blocks instead of single elements.\n\n**Special cases:**\n- **b₁ = b₂ = 1** gives the **cyclic checkerboard** distribution.\n- **b₁ = n₁/p₁ and b₂ = n₂/p₂** gives the **blockwise checkerboard** distribution.\n\nIt is the most general of the distributions: the block size lets you trade **load balance** (small blocks) against **locality and fewer messages** (large blocks).",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 37,
+          "show": true
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-030",
+      "front": "On a 2×2 processor mesh (P1=(1,1), P2=(1,2), P3=(2,1), P4=(2,2)), who owns element (3,6) with a cyclic checkerboard, and who owns element (3,7) with a block-cyclic checkerboard with 2×2 blocks?",
+      "back": "**Cyclic checkerboard, element (k, l) = (3, 6):**\nmesh position = ((k − 1) mod p₁ + 1, (l − 1) mod p₂ + 1)\n= ((3 − 1) mod 2 + 1, (6 − 1) mod 2 + 1)\n= (0 + 1, 1 + 1) = **(1, 2) → P2**\n\n*Check:* row 3 follows the pattern P1 P2 P1 P2 …, and column 6 is even, so it's P2 ✓\n\n**Block-cyclic checkerboard, b₁ = b₂ = 2, element (m, n) = (3, 7):**\n1. Block: k = ⌈3/2⌉ = **2**, l = ⌈7/2⌉ = **4**, so block (2, 4)\n2. Mesh position = ((2 − 1) mod 2 + 1, (4 − 1) mod 2 + 1) = (1 + 1, 1 + 1) = **(2, 2) → P4**\n\n*Check:* rows 3–4 are the second block row (P3 P4 P3 P4 …), and columns 7–8 are the 4th block, so it's P4 ✓",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 36
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 37
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-031",
+      "front": "How do you choose between blockwise, cyclic and block-cyclic distributions?",
+      "back": "The choice is a trade-off between **load balance** and **locality/communication**:\n\n| | Load balance | Locality / communication |\n|---|---|---|\n| **Blockwise** | ✘ poor if the work varies along the array | ✔ contiguous data, communication only at block borders |\n| **Cyclic** | ✔ every processor gets work from everywhere | ✘ neighbours are on other processors |\n| **Block-cyclic** | ✔ good (with small blocks) | ✔ better than cyclic (with larger blocks) |\n\n**Rules of thumb:**\n- **Uniform work, neighbour communication** (e.g. a heat-diffusion stencil): use **blockwise**.\n- **Work that shrinks or moves during the algorithm** (e.g. **Gaussian elimination**: after step k, rows/columns 1…k are finished): use **cyclic or block-cyclic**, so all processors keep having active rows.\n- **Shared memory:** a block distribution also keeps each core on its own cache lines (fewer cache conflicts), while cyclic per element can make cores write to the same cache line (false sharing).",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 29
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 30
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 31
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-032",
+      "front": "How is information exchanged between processors on shared vs distributed address space systems?",
+      "back": "It depends on the **organization of the memory**:\n\n**Shared address space: shared variables**\n- Processors exchange information by reading and writing **shared variables**.\n- **Concurrent accesses** by several processors **to the same address must be protected by synchronization operations**:\n  - this **serializes** the concurrent accesses (one at a time)\n  - and **prevents race conditions**\n- The simplest synchronization: **lock / unlock**.\n\n**Distributed address space: explicit communication operations**\n- Information is exchanged by **sending messages** (message passing).\n- There are two kinds:\n  - **point-to-point** communication: one sender, one receiver\n  - **global (collective)** communication: a group of processors takes part (broadcast, reduction, gather, scatter, …)",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 39
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-033",
+      "front": "What is a race condition? Show how one happens with a shared counter, and how a lock prevents it.",
+      "back": "A **race condition**: the result depends on the **timing (interleaving) of concurrent accesses** to shared data, and at least one of them is a write.\n\n`counter++` is really three steps: **load, add 1, store**.\n\n| Time | Thread A | Thread B | counter |\n|---|---|---|---|\n| 1 | load 5 | | 5 |\n| 2 | | load 5 | 5 |\n| 3 | add → 6 | add → 6 | 5 |\n| 4 | store 6 | | 6 |\n| 5 | | store 6 | **6** |\n\nTwo increments, but counter = **6, not 7**: one update is **lost**. It happens only *sometimes*, which makes it hard to debug.\n\n**Fix:** make the update **mutually exclusive** with a lock:\n```c\npthread_mutex_lock(&m);\ncounter++;              // only one thread at a time\npthread_mutex_unlock(&m);\n```\nThe lock **serializes** the accesses, so counter always ends at 7. Don't lock more than needed, though: the code inside the lock runs sequentially (Amdahl).",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 39
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-034",
+      "front": "How does a point-to-point transfer (send/receive) work?",
+      "back": "**Point-to-point transfer:** processor **Pᵢ (sender)** sends a message to **Pⱼ (receiver)**.\n\n- The **sender** executes a **send** operation, specifying a **send buffer** (the data) and the **id of the receiver**.\n- The **receiver** executes a matching **receive** operation, specifying a **receive buffer** (where to put the data) and the **id of the sender**.\n\nBoth sides must take part. A send without a matching receive (or the other way round) can make the program hang.\n\n**In MPI:**\n```c\nif (me == 0)\n    MPI_Send(&x, 1, MPI_DOUBLE, 1, 0, MPI_COMM_WORLD);         // to P1\nelse if (me == 1)\n    MPI_Recv(&x, 1, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, &status); // from P0\n```\n\nAll the collective operations (broadcast, gather, …) could be built from point-to-point transfers, but the library versions are faster (e.g. using a tree).",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 40
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-035",
+      "front": "What are single broadcast and single accumulation (reduction)?",
+      "back": "**Single broadcast:** one specific processor **Pᵢ (the root)** sends **the same message** to **all other** processors.\n```\nbefore:  P1: x   P2: –   …  Pp: –\nafter:   P1: x   P2: x   …  Pp: x\n```\n*Example:* the root reads a parameter (e.g. the matrix size) from a file, and every process needs it. MPI: `MPI_Bcast`.\n\n**Single accumulation (reduction):** **each** process sends a message with **data of the same type** to the root. The messages are **combined elementwise with a reduction operation** (sum, max, min, product, …), and the root ends up with **one combined message**.\n```\nbefore:  P1: x1   P2: x2   …  Pp: xp\nafter:   P1: x1 + x2 + … + xp\n```\nEach process specifies the buffer with its data and the reduction operation to use.\n*Example:* summing the partial dot products. MPI: `MPI_Reduce(..., MPI_SUM, root, ...)`.\n\nThey are each other's **dual**: the same pattern with the direction reversed (one → all vs all → one).",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 41,
+          "show": true
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 40
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-036",
+      "front": "What are gather and scatter?",
+      "back": "**Gather:** **each** process sends a message to the root, and the root **collects them without any reduction** (it concatenates them).\n```\nbefore:  P1: x1   P2: x2   …  Pp: xp\nafter:   P1: x1 ‖ x2 ‖ … ‖ xp\n```\nEach process specifies a buffer with its data, and the root also specifies an **additional buffer** for the collected messages.\n*Example:* collecting each process's block of the result vector on the root for printing. MPI: `MPI_Gather`.\n\n**Scatter:** the root **sends a different message to each** of the other processors.\n```\nbefore:  P1: x1 ‖ x2 ‖ … ‖ xp   P2: –   …\nafter:   P1: x1   P2: x2   …  Pp: xp\n```\n*Example:* the root reads a large array and gives each process its own block. MPI: `MPI_Scatter`.\n\n**Compare:** broadcast sends the **same** data to everyone, while scatter sends **different** parts. Accumulation **combines** the data, while gather **keeps every part**. Scatter and gather are each other's **duals**.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 42,
+          "show": true
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 43
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-037",
+      "front": "What is a multi-broadcast operation?",
+      "back": "**Multi-broadcast:** **every** processor performs a single broadcast. **Each processor sends the same message to every other processor.**\n- Seen from the receivers: each processor receives one message from every other processor, and all receivers get the same message from a given sender.\n- **There is no specific root process.**\n\n```\nbefore:  P1: x1            P2: x2            …  Pp: xp\nafter:   P1: x1‖x2‖…‖xp    P2: x1‖x2‖…‖xp    …  Pp: x1‖x2‖…‖xp\n```\nSo it is like a **gather where everyone gets the result**. In MPI: **`MPI_Allgather`**.\n\n*Example:* in parallel matrix-vector multiplication, each processor computes **one block of the result vector c**. If c is needed **on all processors** (e.g. as the next input vector in an iterative method), a multi-broadcast gives everyone the complete c.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 44,
+          "show": true
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 54
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-038",
+      "front": "What is a multi-accumulation operation?",
+      "back": "**Multi-accumulation:** **every** processor performs a single accumulation. **Each process provides a (possibly different) message for each other process**, and the messages meant for the same receiver are **combined with a reduction operation**, so each receiver gets one combined message.\n- **There is no specific root process.**\n\nWith xᵢⱼ = the message from Pᵢ meant for Pⱼ:\n```\nbefore:  P1: x11‖x12‖…‖x1p    P2: x21‖x22‖…‖x2p   …\nafter:   P1: x11 + x21 + … + xp1\n         P2: x12 + x22 + … + xp2\n         …\n         Pp: x1p + x2p + … + xpp\n```\n(Receiver j combines the **j-th part** from every process.)\n\nIn MPI this corresponds to **`MPI_Reduce_scatter`**: reduce elementwise and give each process its own block of the result.\n\n*Example:* column-wise matrix-vector multiplication. Each processor computes a **partial result vector** of full length, and processor j needs the **sum of everyone's partial results for its block** of c.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 45,
+          "show": true
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-039",
+      "front": "What is a total exchange operation?",
+      "back": "**Total exchange:** **each processor sends a possibly different message to each other processor**, **without** any reduction.\n- Seen as: **every processor executes a scatter** (sending its parts out), and at the same time **every processor executes a gather** (collecting one part from everyone).\n- **There is no specific root process.**\n\nWith xᵢⱼ = the message from Pᵢ to Pⱼ:\n```\nbefore:  P1: x11‖x12‖…‖x1p      P2: x21‖x22‖…‖x2p   …\nafter:   P1: x11‖x21‖…‖xp1      P2: x12‖x22‖…‖xp2   …\n```\nPⱼ ends up with the **j-th part from every processor**, so it is like **transposing** the data between the processors.\n\nIn MPI: **`MPI_Alltoall`**.\n*Example:* transposing a row-distributed matrix (each processor sends a piece of its rows to every other processor), or redistributing data between phases, e.g. in a parallel FFT or a bucket sort.\n\nIt is the **most general** collective operation, the top of the hierarchy.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 46,
+          "show": true
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-040",
+      "front": "Describe the hierarchy of communication operations and what 'duality' means.",
+      "back": "The operations come from a **stepwise specialization** of the most general one, the **total exchange**. There are five levels, with a dual pair on each of the middle three:\n1. **total exchange**\n2. **multi-broadcast** ⟷ **multi-accumulation**\n3. **scatter** ⟷ **gather**\n4. **single broadcast** ⟷ **single accumulation**\n5. **single transfer**\n\nThe arrows **cross** between levels 2 and 3: multi-broadcast → **gather**, and multi-accumulation → **scatter**. Then scatter → single broadcast, gather → single accumulation, and both of those → single transfer.\n\n**Reading the arrows (a special case of the operation above it):**\n- **gather** = a multi-broadcast where only the root keeps the result\n- **scatter** = a multi-accumulation where only the root has (non-neutral) data to give\n- **single broadcast** = a scatter where all the messages are the same\n- **single accumulation** = a gather where the collected messages are combined with a reduction\n- **single transfer** = any of them with just one sender and one receiver\n\n**Duality (⟷):** two operations with the **same pattern but the opposite direction**, e.g. broadcast (one → all) and accumulation (all → one). One can be implemented by **reversing the order and direction** of the other's messages.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 47,
+          "show": true
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-041",
+      "front": "Which MPI function corresponds to each communication operation?",
+      "back": "| Operation | MPI function | Root? |\n|---|---|---|\n| Single transfer | `MPI_Send` / `MPI_Recv` | – |\n| Single broadcast | `MPI_Bcast` | yes |\n| Single accumulation | `MPI_Reduce` | yes |\n| Gather | `MPI_Gather` | yes |\n| Scatter | `MPI_Scatter` | yes |\n| Multi-broadcast | `MPI_Allgather` | no |\n| Multi-accumulation | `MPI_Reduce_scatter` | no |\n| Total exchange | `MPI_Alltoall` | no |\n\n**Note:** `MPI_Allreduce` = an accumulation where **everyone** gets the full combined result, i.e. a single accumulation followed by a broadcast.\n\n*Example from the slides:* the matrix-vector multiplication ends with\n`MPI_Allgather(local_c, local_n, MPI_DOUBLE, global_c, local_n, MPI_DOUBLE, comm);`\nwhich is a **multi-broadcast**: every process gets the complete result vector.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 40
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 44
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 45
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 46
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 56
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-042",
+      "front": "Which communication operation fits each situation? (a) root gives each process its part of the input (b) root needs the global sum (c) everyone needs a parameter only the root knows (d) everyone needs the whole result vector, which is spread in blocks (e) root collects the blocks to print them (f) transpose a row-distributed matrix",
+      "back": "- **(a) Scatter.** Different data goes from the root to each process (`MPI_Scatter`).\n- **(b) Single accumulation (reduction)** with SUM: partial sums are combined at the root (`MPI_Reduce`).\n- **(c) Single broadcast.** The same data goes from the root to all (`MPI_Bcast`).\n- **(d) Multi-broadcast.** Every process sends its block to all others, so everyone gets the complete vector (`MPI_Allgather`). This is what the parallel matrix-vector multiplication uses.\n- **(e) Gather.** The blocks are concatenated at the root, with no reduction (`MPI_Gather`).\n- **(f) Total exchange.** Each process sends a *different* piece of its rows to *every* other process (`MPI_Alltoall`).\n\n**How to decide:**\n- **One sender or all senders?** Root-based or not (multi-).\n- **The same data or different data per receiver?** Broadcast or scatter.\n- **Combine the data or keep it all?** Accumulation or gather.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 40
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 41
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 42
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 43
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 44
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 46
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-043",
+      "front": "Matrix-vector multiplication c = A·b: give the definition and the two sequential algorithms (scalar products vs linear combination).",
+      "back": "A is a dense **n × m** matrix, b has length m, and c has length n:   **cᵢ = Σⱼ aᵢⱼ·bⱼ**, i = 1 … n\n\n**1. Scalar products (row-oriented), i outer:** cᵢ is the **dot product of row i with b**.\n```c\nfor (i = 0; i < n; i++) c[i] = 0;\nfor (i = 0; i < n; i++)\n    for (j = 0; j < m; j++)\n        c[i] = c[i] + A[i][j] * b[j];\n```\n\n**2. Linear combination of columns (column-oriented), j outer:** c = Σⱼ bⱼ·(column j of A). Each step adds column j, scaled by bⱼ.\n```c\nfor (j = 0; j < m; j++)\n    for (i = 0; i < n; i++)\n        c[i] = c[i] + A[i][j] * b[j];\n```\n\n**Both give the same result.** The loops can be exchanged because of **data independence** (only the order of the additions into c[i] changes).\n\n*Side note on locality:* C stores A row by row. Version 1 walks along rows (good spatial locality), while version 2 jumps m elements per access.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 50,
+          "show": true
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 49
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 51
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-044",
+      "front": "What are the two parallel implementations of matrix-vector multiplication that follow from the two sequential versions?",
+      "back": "**(a) Row-oriented (scalar products)**\n- **Each processor computes about n/p scalar products**: n/p complete entries of c.\n- It needs its **n/p rows of A** and **all of b**.\n- No combining is needed: each cᵢ is finished by exactly one processor.\n- Afterwards c is **block-distributed**. If everyone needs all of c → **multi-broadcast**.\n\n**(b) Column-oriented (linear combination)**\n- **Each processor computes a part of the linear combination** using about m/p **columns** of A and the **matching part of b**.\n- Each processor produces a **partial result vector of full length n**: c⁽ᵏ⁾ = Σ over its columns of bⱼ·(column j).\n- The final c is the **sum of all the partial vectors**, which needs an **accumulation**: a single accumulation if one process should hold c, or a **multi-accumulation** if c should end up distributed in blocks.\n\nSo the **choice of algorithm decides the data distribution** (rows vs columns) and the **communication operation** needed.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 52
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 51
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 45
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-045",
+      "front": "Parallel matrix-vector multiplication with a row distribution on distributed memory: how are A, b and c distributed, and why is a multi-broadcast needed?",
+      "back": "**Set-up:** p processors with **distributed memory**. Each computes the scalar products for **the rows it owns**.\n\n**Data distribution:**\n- **A: row-oriented blockwise.** Processor Pₖ stores rows aᵢ for **i = n/p·(k − 1) + 1, …, n/p·k** in its local memory.\n- **b: replicated.** Every processor has a full copy.\n- **c: block-distributed.** Pₖ computes exactly the entries cᵢ for its own rows.\n\n**Why a multi-broadcast?** When the product is part of a larger algorithm (e.g. an **iterative method**, where c becomes the next b), c might need the **same distribution as b**, i.e. **replicated on all processors**. So:\n- **every Pₖ sends its block (c_{n/p·(k−1)+1}, …, c_{n/p·k}) to all other processors**, which is a **multi-broadcast** (`MPI_Allgather`).\n\n**Cost:** each processor does **n/p · m** multiply-adds, then one multi-broadcast of n/p values per processor.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 54,
+          "show": true
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 53
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 55
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-046",
+      "front": "Explain the MPI program for row-wise parallel matrix-vector multiplication.",
+      "back": "SPMD program for processor Pₖ (k = 1 … p):\n```c\nlocal_n = n / p;\nfor (i = 0; i < local_n; i++) local_c[i] = 0;\nfor (i = 0; i < local_n; i++)\n    for (j = 0; j < m; j++)\n        local_c[i] = local_c[i] + local_A[i][j] * b[j];\nMPI_Allgather(local_c, local_n, MPI_DOUBLE,\n              global_c, local_n, MPI_DOUBLE, comm);\n```\n- **local_A** (local_n × m) holds this processor's rows: `local_A[i][j] = A[i + (k−1)·n/p][j]`\n- **b** is replicated, so every processor has all m elements.\n- **local_c** (length local_n): the processor's part of the result, computed with ordinary scalar products using **local indices** 0 … local_n−1.\n- **MPI_Allgather = multi-broadcast:** every processor sends its local_n values, and every processor receives everything, in order of rank. Afterwards `global_c[i + (k−1)·n/p] = local_c[i]` on **all** processors.\n\n*Example:* n = 8, p = 4, so local_n = 2. P3 (k = 3) owns rows 4 and 5 (0-based) and computes c[4] and c[5].",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 56,
+          "show": true
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 55
+        }
+      ]
+    },
+    {
+      "id": "mpp-f2-047",
+      "front": "How does parallel matrix-vector multiplication work on shared memory, and why are there no access conflicts?",
+      "back": "**SPMD program with a distribution of the computations**, with **no explicit distribution of the data**: A, b and c all stay in shared memory. Each process has a **private variable k** (its id).\n\n```c\nlocal_n = n / p;\nfor (i = 0; i < local_n; i++) c[i + (k-1)*local_n] = 0;\nfor (i = 0; i < local_n; i++)\n    for (j = 0; j < m; j++)\n        c[i + (k-1)*local_n] =\n            c[i + (k-1)*local_n] + A[i + (k-1)*local_n][j] * b[j];\nsynch();\n```\n- **Each process computes n/p components of c**, using **the corresponding n/p rows of A**.\n- **No access conflicts:** every process **writes only its own part of c**, and A and b are **only read**. No two processes write the same location, so **no locks are needed**.\n- **`synch()` is a barrier.** No process may use c until **all** processes have finished their parts.\n\n**Compared with distributed memory:** there is no MPI_Allgather, because c is already visible to everyone. The barrier takes the place of the communication.",
+      "sources": [
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 58,
+          "show": true
+        },
+        {
+          "doc": "MPP-F2-MODELS",
+          "page": 57
+        }
+      ]
+    }
+  ]
+}
