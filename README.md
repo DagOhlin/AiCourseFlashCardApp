@@ -128,6 +128,7 @@ To add new material, put the PDF in the course's folder and add an entry to `mat
 
 ```
 start.py         the local server (Python standard library only)
+CLAUDE.md        notes and preferences for AI (Claude Code) sessions
 start.bat        Windows launcher
 start.sh         Linux / macOS launcher
 web/             the app itself (HTML, CSS, JavaScript)
